@@ -1,0 +1,66 @@
+#! /bin/bash
+
+# usage:
+#		tarball devel|release [<scite_release> <fox_release>]
+# example:
+#		tarball 1_40 3
+# produces
+#		snapshot/scite140fox3.zip
+
+if [ "$1" = "devel" ]; then
+		devel=true
+else
+		devel=false
+fi
+	
+major=$2
+minor=$3
+
+if [ ! -d snapshot ]; then
+	mkdir snapshot
+fi
+cd snapshot
+
+rm -fr scintilla
+
+if [ ! -z $major ]; then
+		cvs -w export -r "scintilla-${major}fox${minor}" scintilla
+else
+		cvs -w export -r HEAD scintilla
+fi
+
+find scintilla -type f ! \( \
+		-name makefile -o \
+		-name '*.png' -o \
+		-name '*.ico' -o \
+		-name '*.cur' -o \
+		-name '*.jpg' -o \
+		-name '*.bmp' \) \
+	-exec unix2dos -o {} \;
+
+cd scintilla
+
+if [ "$devel" = "false" ]; then
+		rm -fr scintilla/gtk scintilla/win32
+		rm -fr scite/gtk scite/win32
+		rm -f scintilla/scintilla.dsp
+		rm -f scintilla/scintilla.dsw
+		rm -f scintilla/fox/scintilla.dsp
+		rm -f scintilla/fox/scintilla.dsw
+fi
+
+if [ ! -z $major ]; then
+		name="../scite"`echo $major | sed 's/_//'`"fox${minor}.tgz"
+else
+		name="../scite.tgz"
+fi
+rm -f $name
+
+if [ "$devel" = "false" ]; then
+		tar cvzf $name scintilla scite
+else
+		tar cvzf $name .
+fi
+
+ls -l $name
+cd ../..

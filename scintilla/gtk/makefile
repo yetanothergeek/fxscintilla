@@ -50,6 +50,7 @@ $(COMPLIB): DocumentAccessor.o WindowAccessor.o KeyWords.o StyleContext.o Docume
 	ScintillaBase.o ContractionState.o Editor.o PropSet.o PlatGTK.o \
 	KeyMap.o LineMarker.o ScintillaGTK.o CellBuffer.o ViewStyle.o \
 	RESearch.o Style.o Indicator.o AutoComplete.o
+	$(RM) $^
 	$(AR) rc $@ $^
 	$(RANLIB) $@
 

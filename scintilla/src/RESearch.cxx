@@ -30,8 +30,11 @@
  * Modification history:
  *
  * $Log: RESearch.cxx,v $
- * Revision 1.1  2002/03/08 19:47:01  pini
- * Initial revision
+ * Revision 1.2  2002/03/10 11:14:24  pini
+ * Addedng FXScintilla 1.44fo
+ *
+ * Revision 1.4  2002/02/08 10:13:18  pini
+ * Upgrade to 1.44.
  *
  * Revision 1.6  2001/04/29 13:32:10  nyamatongwe
  * Addition of new target methods - versions of ReplaceTarget that take counted

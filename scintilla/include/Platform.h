@@ -47,11 +47,28 @@
 // Underlying the implementation of the platform classes are platform specific types.
 // Sometimes these need to be passed around by client code so they are defined here
 
+#if PLAT_FOX
+class FXFont;
+class FXDrawable;
+class FXWindow;
+class FXMenuPane;
+#ifndef WIN32
+class FXTimer;
+#else
+struct FXTimer;
+#endif	// WIN32
+typedef FXFont * FontID;
+typedef FXDrawable * SurfaceID;
+typedef FXWindow * WindowID;
+typedef FXMenuPane * MenuID;
+typedef FXTimer * TickerID;
+#else
 typedef void *FontID;
 typedef void *SurfaceID;
 typedef void *WindowID;
 typedef void *MenuID;
 typedef void *TickerID;
+#endif
 
 /**
  * A geometric point class.
@@ -205,6 +222,8 @@ class Palette {
 #if PLAT_GTK
 	void *allocatedPalette; // GdkColor *
 	int allocatedLen;
+#elif PLAT_FOX
+	void * visual;
 #endif
 public:
 #if PLAT_WIN
@@ -345,6 +364,9 @@ private:
 /**
  * Listbox management.
  */
+#if PLAT_FOX
+class FXList;
+#endif
 
 class ListBox : public Window {
 private:
@@ -352,6 +374,9 @@ private:
 	WindowID list;
 	WindowID scroller;
 	int current;
+#endif
+#if PLAT_FOX
+	FXList * list;
 #endif
 	int desiredVisibleRows;
 	unsigned int maxItemCharacters;
@@ -362,6 +387,9 @@ public:
 public:
 	ListBox();
 	virtual ~ListBox();
+#if PLAT_FOX
+	void Show();
+#endif
 	void Create(Window &parent, int ctrlID);
 	virtual void SetFont(Font &font);
 	void SetAverageCharWidth(int width);

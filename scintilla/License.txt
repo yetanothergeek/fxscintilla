@@ -1,3 +1,9 @@
+FXScintilla is a derivated work from the Scintilla widget.
+See the file COPYING for the FXScintilla license.
+Below is the original license for the Scintilla widget.
+
+------------------------------------------------------------------------
+
 License for Scintilla and SciTE
 
 Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>

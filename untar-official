@@ -1,0 +1,40 @@
+#! /bin/bash
+
+# usage:
+#		untar-official <scite_release>
+# example:
+#		untar-official 140
+# produces
+#		~/scite140
+# directory from
+# ~/scite140.zip
+# official archive with end of line conversions using dos2unix.
+
+version=$1
+archive=$HOME/scite$version.zip
+directory=$HOME/scite$version
+
+if [ ! -f $archive ]; then
+	echo "The archive $archive doesn't exist."
+	exit
+fi
+if [ -d $directory ]; then
+	echo "The directory $directory shouldn't exist. Remove it first."
+	exit
+fi
+
+mkdir $directory
+pushd $directory
+
+unzip $archive
+
+find . -type f ! \( \
+		-name makefile -o \
+		-name '*.png' -o \
+		-name '*.ico' -o \
+		-name '*.cur' -o \
+		-name '*.jpg' -o \
+		-name '*.bmp' \) \
+	-exec dos2unix -o {} \;
+
+popd

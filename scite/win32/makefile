@@ -151,4 +151,3 @@ SciTERes.o:	SciTERes.rc SciTE.h PlatformRes.h
 # so must explicitly ask to build it.
 Sc1Res.o:	SciTERes.rc SciTE.h PlatformRes.h
 	windres $(RCINCLUDEDIRS) SciTERes.rc --define STATIC_BUILD $@
-
