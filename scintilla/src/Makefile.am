@@ -47,6 +47,7 @@ libscintilla_la_SOURCES = \
 	LexCrontab.cxx \
 	LexCSS.cxx \
 	LexEiffel.cxx \
+	LexErlang.cxx \
 	LexEScript.cxx \
 	LexForth.cxx \
 	LexFortran.cxx \

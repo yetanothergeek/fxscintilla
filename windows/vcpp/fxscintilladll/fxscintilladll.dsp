@@ -185,6 +185,10 @@ SOURCE=..\..\..\scintilla\src\LexEiffel.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexErlang.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexEScript.cxx
 # End Source File
 # Begin Source File
