@@ -30,7 +30,7 @@ class ScintillaFOX;
 
 #define SCID(id) (FXScrollArea::ID_LAST+id)
 
-class FXScintilla : public FXScrollArea
+class FXAPI FXScintilla : public FXScrollArea
 {
 	friend class ScintillaFOX;
   FXDECLARE(FXScintilla)
@@ -45,6 +45,8 @@ public:
 	};
 public:
 	long onScintillaCommand(FXObject *, FXSelector, void*);
+	long onCommand(FXObject *, FXSelector, void*);
+	long onChanged(FXObject *, FXSelector, void*);
 	long onPaint(FXObject *, FXSelector, void *);
 	long onConfigure(FXObject *, FXSelector, void *);
 	long onTimeoutTicking(FXObject *, FXSelector, void *);
