@@ -59,6 +59,7 @@ libscintilla_la_SOURCES = \
 	LexMetapost.cxx \
 	LexMMIXAL.cxx \
 	LexMPT.cxx \
+	LexMSSQL.cxx \
 	LexNsis.cxx \
 	LexOthers.cxx \
 	LexPascal.cxx \
@@ -72,6 +73,7 @@ libscintilla_la_SOURCES = \
 	LexSQL.cxx \
 	LexTeX.cxx \
 	LexVB.cxx \
+	LexVerilog.cxx \
 	LexYAML.cxx
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
