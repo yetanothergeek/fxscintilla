@@ -184,7 +184,7 @@ static const char *CharacterSetName(int characterSet) {
 }
 
 void Font::Create(const char *faceName, int characterSet,
-	int size, bool bold, bool italic) {
+	int size, bool bold, bool italic, bool) {
 	Release();
 	// If name of the font begins with a '-', assume, that it is
 	// a full fontspec.
@@ -707,6 +707,19 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 		ox = 0;
 	if (oy < 0)
 		oy = 0;
+
+	/* do some corrections to fit into screen */
+	int sizex = rc.right - rc.left;
+	int sizey = rc.bottom - rc.top;
+	int screenWidth = FXApp::instance()->getRoot()->getDefaultWidth();;
+	int screenHeight = FXApp::instance()->getRoot()->getDefaultHeight();;
+	if (sizex > screenWidth)
+		ox = 0; /* the best we can do */
+	else if (ox + sizex > screenWidth)
+		ox = screenWidth - sizex;
+	if (oy + sizey > screenHeight)
+		oy = screenHeight - sizey;
+
 	id->position(ox, oy, rc.Width(), rc.Height());
 }
 

@@ -37,9 +37,12 @@ libscintilla_la_SOURCES = \
 	ExternalLexer.cxx \
 	KeyWords.cxx \
 	LexAda.cxx \
+	LexAPDL.cxx \
 	LexAsm.cxx \
+	LexAU3.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
+	LexBash.cxx \
 	LexBullant.cxx \
 	LexCLW.cxx \
 	LexConf.cxx \
@@ -51,7 +54,9 @@ libscintilla_la_SOURCES = \
 	LexEScript.cxx \
 	LexForth.cxx \
 	LexFortran.cxx \
+	LexGui4Cli.cxx \
 	LexHTML.cxx \
+	LexKix.cxx \
 	LexLisp.cxx \
 	LexLout.cxx \
 	LexLua.cxx \
@@ -70,6 +75,7 @@ libscintilla_la_SOURCES = \
 	LexPython.cxx \
 	LexRuby.cxx \
 	LexScriptol.cxx \
+	LexSpecman.cxx \
 	LexSQL.cxx \
 	LexTeX.cxx \
 	LexVB.cxx \
