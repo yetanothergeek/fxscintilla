@@ -22,8 +22,12 @@ your system.
 Install FXScintilla for Win32 systems
 =====================================
 
-You must first have Visual C++ 6.0 installed.
-Everything you need is in the VC++ workspace:
+Supported build environments are:
+- Visual C++ 6.0 (see below)
+- Cygwin  (see Unix build instructions)
+- MinGW32 (see Unix build instructions)
+
+To build using Visual C++ 6.0 everything you need is in the VC++ workspace:
 
 	fxscintilla/windows/vcpp/win32.dsw
 
