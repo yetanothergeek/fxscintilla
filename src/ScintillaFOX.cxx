@@ -92,6 +92,8 @@
 #define SELTYPE FXSELTYPE
 #endif
 
+#include "version.h"
+
 // ====================================================================
 // ScintillaFOX
 // ====================================================================
@@ -400,12 +402,12 @@ void ScintillaFOX::CreateCallTipWindow(PRectangle /* rc */)
 void ScintillaFOX::AddToPopUp(const char * label, int cmd, bool enabled)
 {
 	if (label[0]) {
-		FXMenuCommand * item = new FXMenuCommand(popup.GetID(), label, NULL, &_fxsc, SCID(cmd));
+		FXMenuCommand * item = new FXMenuCommand(static_cast<FXComposite *>(popup.GetID()), label, NULL, &_fxsc, SCID(cmd));
 		if (!enabled)
 			item->disable();
 	}
 	else
-		new FXMenuSeparator(popup.GetID());
+		new FXMenuSeparator(static_cast<FXComposite *>(popup.GetID()));
 }
 
 sptr_t ScintillaFOX::DirectFunction(

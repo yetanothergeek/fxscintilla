@@ -45,6 +45,7 @@ public:
 		ID_LAST
 	};
 public:
+	static FXString version();
 	long onScintillaCommand(FXObject *, FXSelector, void*);
 	long onCommand(FXObject *, FXSelector, void*);
 	long onChanged(FXObject *, FXSelector, void*);
