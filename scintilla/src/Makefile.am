@@ -1,10 +1,9 @@
-INCLUDES = -I../../include -I../include
-AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
+AM_CXXFLAGS = -W -Wall -DFOX
 
-noinst_LTLIBRARIES = libscintilla.la
-lib_LTLIBRARIES = libscilexers.la
+noinst_LTLIBRARIES = libscintillanolexer.la libscintilla.la
 
-libscintilla_la_SOURCES = \
+libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
 	KeyWords.cxx \
@@ -24,7 +23,8 @@ libscintilla_la_SOURCES = \
 	Indicator.cxx \
 	AutoComplete.cxx
 
-libscilexers_la_SOURCES = \
+libscintilla_la_SOURCES = \
+	$(libscintillanolexer_la_SOURCES) \
 	LexAda.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
@@ -45,4 +45,4 @@ libscilexers_la_SOURCES = \
 	LexSQL.cxx \
 	LexVB.cxx
 
-libscilexers_la_LDFLAGS = -version-info $(LT_SCILEXER_CURRENT):$(LT_SCILEXER_REVISION):$(LT_SCILEXER_AGE)
+libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER

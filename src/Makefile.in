@@ -93,26 +93,44 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-INCLUDES = -I../include -I../scintilla/include -I../scintilla/src
-AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include -I$(top_srcdir)/scintilla/src
+AM_CXXFLAGS = -W -Wall -DFOX
 
-lib_LTLIBRARIES = libfxscintilla.la
+lib_LTLIBRARIES = libfxscintillanolexer.la libfxscintilla.la
 
-libfxscintilla_la_SOURCES = \
+libfxscintillanolexer_la_SOURCES = \
 	PlatFOX.cxx \
 	ScintillaFOX.cxx
 
 
-libfxscintilla_la_LIBADD = ../scintilla/src/libscintilla.la
-libfxscintilla_la_LDFLAGS = -version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
+libfxscintilla_la_SOURCES = \
+	$(libfxscintillanolexer_la_SOURCES)
+
+
+libfxscintillanolexer_la_LIBADD = $(top_srcdir)/scintilla/src/libscintillanolexer.la
+libfxscintilla_la_LIBADD = $(top_srcdir)/scintilla/src/libscintilla.la
+
+libfxscintillanolexer_la_LDFLAGS = \
+	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
+
+libfxscintilla_la_LDFLAGS = $(libfxscintillanolexer_la_LDFLAGS)
+
+libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
-libfxscintilla_la_DEPENDENCIES = ../scintilla/src/libscintilla.la
-am_libfxscintilla_la_OBJECTS = PlatFOX.lo ScintillaFOX.lo
+libfxscintilla_la_DEPENDENCIES = \
+	$(top_srcdir)/scintilla/src/libscintilla.la
+am_libfxscintilla_la_OBJECTS = libfxscintilla_la-PlatFOX.lo \
+	libfxscintilla_la-ScintillaFOX.lo
 libfxscintilla_la_OBJECTS = $(am_libfxscintilla_la_OBJECTS)
+libfxscintillanolexer_la_DEPENDENCIES = \
+	$(top_srcdir)/scintilla/src/libscintillanolexer.la
+am_libfxscintillanolexer_la_OBJECTS = PlatFOX.lo ScintillaFOX.lo
+libfxscintillanolexer_la_OBJECTS = \
+	$(am_libfxscintillanolexer_la_OBJECTS)
 
 DEFS = @DEFS@
 DEFAULT_INCLUDES =  -I. -I$(srcdir)
@@ -120,7 +138,9 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/PlatFOX.Plo $(DEPDIR)/ScintillaFOX.Plo
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/PlatFOX.Plo $(DEPDIR)/ScintillaFOX.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/libfxscintilla_la-PlatFOX.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/libfxscintilla_la-ScintillaFOX.Plo
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --mode=compile $(CXX) $(DEFS) \
@@ -130,9 +150,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXFLAGS = @CXXFLAGS@
-DIST_SOURCES = $(libfxscintilla_la_SOURCES)
+DIST_SOURCES = $(libfxscintilla_la_SOURCES) \
+	$(libfxscintillanolexer_la_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in
-SOURCES = $(libfxscintilla_la_SOURCES)
+SOURCES = $(libfxscintilla_la_SOURCES) $(libfxscintillanolexer_la_SOURCES)
 
 all: all-am
 
@@ -173,8 +194,12 @@ uninstall-libLTLIBRARIES:
 
 clean-libLTLIBRARIES:
 	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+libfxscintilla_la-PlatFOX.lo: PlatFOX.cxx
+libfxscintilla_la-ScintillaFOX.lo: ScintillaFOX.cxx
 libfxscintilla.la: $(libfxscintilla_la_OBJECTS) $(libfxscintilla_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libfxscintilla_la_LDFLAGS) $(libfxscintilla_la_OBJECTS) $(libfxscintilla_la_LIBADD) $(LIBS)
+libfxscintillanolexer.la: $(libfxscintillanolexer_la_OBJECTS) $(libfxscintillanolexer_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libfxscintillanolexer_la_LDFLAGS) $(libfxscintillanolexer_la_OBJECTS) $(libfxscintillanolexer_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT) core *.core
@@ -184,6 +209,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/PlatFOX.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/ScintillaFOX.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/libfxscintilla_la-PlatFOX.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/libfxscintilla_la-ScintillaFOX.Plo@am__quote@
 
 distclean-depend:
 	-rm -rf $(DEPDIR)
@@ -205,6 +232,42 @@ distclean-depend:
 @AMDEP_TRUE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LTCXXCOMPILE) -c -o $@ `test -f $< || echo '$(srcdir)/'`$<
+
+libfxscintilla_la-PlatFOX.o: PlatFOX.cxx
+@AMDEP_TRUE@	source='PlatFOX.cxx' object='libfxscintilla_la-PlatFOX.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.Po' tmpdepfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-PlatFOX.o `test -f PlatFOX.cxx || echo '$(srcdir)/'`PlatFOX.cxx
+
+libfxscintilla_la-PlatFOX.obj: PlatFOX.cxx
+@AMDEP_TRUE@	source='PlatFOX.cxx' object='libfxscintilla_la-PlatFOX.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.Po' tmpdepfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-PlatFOX.obj `cygpath -w PlatFOX.cxx`
+
+libfxscintilla_la-PlatFOX.lo: PlatFOX.cxx
+@AMDEP_TRUE@	source='PlatFOX.cxx' object='libfxscintilla_la-PlatFOX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.Plo' tmpdepfile='$(DEPDIR)/libfxscintilla_la-PlatFOX.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-PlatFOX.lo `test -f PlatFOX.cxx || echo '$(srcdir)/'`PlatFOX.cxx
+
+libfxscintilla_la-ScintillaFOX.o: ScintillaFOX.cxx
+@AMDEP_TRUE@	source='ScintillaFOX.cxx' object='libfxscintilla_la-ScintillaFOX.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.Po' tmpdepfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-ScintillaFOX.o `test -f ScintillaFOX.cxx || echo '$(srcdir)/'`ScintillaFOX.cxx
+
+libfxscintilla_la-ScintillaFOX.obj: ScintillaFOX.cxx
+@AMDEP_TRUE@	source='ScintillaFOX.cxx' object='libfxscintilla_la-ScintillaFOX.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.Po' tmpdepfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-ScintillaFOX.obj `cygpath -w ScintillaFOX.cxx`
+
+libfxscintilla_la-ScintillaFOX.lo: ScintillaFOX.cxx
+@AMDEP_TRUE@	source='ScintillaFOX.cxx' object='libfxscintilla_la-ScintillaFOX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.Plo' tmpdepfile='$(DEPDIR)/libfxscintilla_la-ScintillaFOX.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libfxscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libfxscintilla_la-ScintillaFOX.lo `test -f ScintillaFOX.cxx || echo '$(srcdir)/'`ScintillaFOX.cxx
 CXXDEPMODE = @CXXDEPMODE@
 uninstall-info-am:
 
