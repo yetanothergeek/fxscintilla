@@ -591,6 +591,13 @@ fun void RegisterImage=2405(int type, string xpmData)
 # Clear all the registered XPM images.
 fun void ClearRegisteredImages=2408(,)
 
+# Retrieve the auto-completion list type-separator character.
+get int AutoCGetTypeSeparator=2285(,)
+
+# Change the type-separator character in the string setting up an auto-completion list.
+# Default is '?' but can be changed if items contain '?'.
+set void AutoCSetTypeSeparator=2286(int separatorCharacter,)
+
 # Set the number of spaces used for one level of indentation.
 set void SetIndent=2122(int indentSize,)
 
@@ -1021,6 +1028,28 @@ get bool GetVScrollBar=2281(,)
 
 # Append a string to the end of the document without changing the selection.
 fun void AppendText=2282(int length, string text)
+
+# Is drawing done in two phases with backgrounds drawn before faoregrounds?
+get bool GetTwoPhaseDraw=2283(,)
+
+# In twoPhaseDraw mode, drawing is performed in two phases, first the background
+# and then the foreground. This avoids chopping off characters that overlap the next run.
+set void SetTwoPhaseDraw=2284(bool twoPhase,)
+
+# Make the target range start and end be the same as the selection range start and end.
+fun void TargetFromSelection=2287(,)
+
+# Join the lines in the target.
+# This is an experimental feature and may be changed or removed.
+fun void LinesJoin=2288(,)
+
+# Split the lines in the target into lines that are less wide than pixelWidth
+# where possible.
+fun void LinesSplit=2289(int pixelWidth,)
+
+# Set the colours used as a chequerboard pattern in the fold margin
+fun void SetFoldMarginColour=2290(bool useSetting, colour back)
+fun void SetFoldMarginHiColour=2291(bool useSetting, colour fore)
 
 ## New messages go here
 

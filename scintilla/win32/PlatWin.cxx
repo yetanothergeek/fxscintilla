@@ -42,6 +42,11 @@ static void SetWindowPointer(HWND hWnd, void *ptr) {
 
 static CRITICAL_SECTION crPlatformLock;
 static HINSTANCE hinstPlatformRes = 0;
+static bool onNT = false;
+
+bool IsNT() {
+	return onNT;
+}
 
 Point Point::FromLong(long lpoint) {
 	return Point(static_cast<short>(LOWORD(lpoint)), static_cast<short>(HIWORD(lpoint)));
@@ -276,6 +281,7 @@ class SurfaceImpl : public Surface {
 	HBITMAP bitmap;
 	HBITMAP bitmapOld;
 	HPALETTE paletteOld;
+	int maxWidthMeasure;
 	void BrushColor(ColourAllocated back);
 	void SetFont(Font &font_);
 
@@ -307,6 +313,7 @@ public:
 
 	void DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
 	void DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
+	void DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
 	void MeasureWidths(Font &font_, const char *s, int len, int *positions);
 	int WidthText(Font &font_, const char *s, int len);
 	int WidthChar(Font &font_, char ch);
@@ -333,6 +340,8 @@ SurfaceImpl::SurfaceImpl() :
 	font(0), 	fontOld(0),
 	bitmap(0), bitmapOld(0),
 	paletteOld(0) {
+	// Windows 9x has only a 16 bit coordinate system so break after 30000 pixels
+	maxWidthMeasure = IsNT() ? 1000000 : 30000;
 }
 
 SurfaceImpl::~SurfaceImpl() {
@@ -506,7 +515,7 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
 		static_cast<SurfaceImpl &>(surfaceSource).hdc, from.x, from.y, SRCCOPY);
 }
 
-#define MAX_US_LEN 5000
+#define MAX_US_LEN 10000
 
 void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
 	ColourAllocated fore, ColourAllocated back) {
@@ -546,6 +555,26 @@ void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const c
 	}
 }
 
+void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+	ColourAllocated fore) {
+	SetFont(font_);
+	::SetTextColor(hdc, fore.AsLong());
+	::SetBkMode(hdc, TRANSPARENT);
+	RECT rcw = RectFromPRectangle(rc);
+	if (unicodeMode) {
+		wchar_t tbuf[MAX_US_LEN];
+		int tlen = UCS2FromUTF8(s, len, tbuf, sizeof(tbuf)/sizeof(wchar_t)-1);
+		tbuf[tlen] = L'\0';
+		::ExtTextOutW(hdc, rc.left, ybase, 0, &rcw, tbuf, tlen, NULL);
+	} else {
+		// There appears to be a 16 bit string length limit in GDI
+		if (len > 65535)
+			len = 65535;
+		::ExtTextOut(hdc, rc.left, ybase, 0, &rcw, s, len, NULL);
+	}
+	::SetBkMode(hdc, OPAQUE);
+}
+
 int SurfaceImpl::WidthText(Font &font_, const char *s, int len) {
 	SetFont(font_);
 	SIZE sz={0,0};
@@ -570,7 +599,7 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
 		tbuf[tlen] = L'\0';
 		int poses[MAX_US_LEN];
 		fit = tlen;
-		if (!::GetTextExtentExPointW(hdc, tbuf, tlen, 30000, &fit, poses, &sz)) {
+		if (!::GetTextExtentExPointW(hdc, tbuf, tlen, maxWidthMeasure, &fit, poses, &sz)) {
 			// Likely to have failed because on Windows 9x where function not available
 			// So measure the character widths by measuring each initial substring
 			// Turns a linear operation into a qudratic but seems fast enough on test files
@@ -603,7 +632,7 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
 			positions[i++] = lastPos;
 		}
 	} else {
-		if (!::GetTextExtentExPoint(hdc, s, len, 30000, &fit, positions, &sz)) {
+		if (!::GetTextExtentExPoint(hdc, s, len, maxWidthMeasure, &fit, positions, &sz)) {
 			// Eeek - a NULL DC or other foolishness could cause this.
 			// The least we can do is set the positions to zero!
 			memset(positions, 0, len * sizeof(*positions));
@@ -817,13 +846,14 @@ public:
 	void Add(int index, int value) {
 		if (index >= maximum) {
 			if (index >= len) {
-				int lenNew = index * 2;
+				int lenNew = (index+1) * 2;
 				int *dataNew = new int[lenNew];
 				for (int i=0; i<maximum; i++) {
 					dataNew[i] = data[i];
 				}
 				delete []data;
 				data = dataNew;
+				len = lenNew;
 			}
 			while (maximum < index) {
 				data[maximum] = 0;
@@ -964,6 +994,7 @@ int ListBoxX::CaretFromEdge() {
 void ListBoxX::Clear() {
 	::SendMessage(lb, LB_RESETCONTENT, 0, 0);
 	maxItemCharacters = 0;
+	ltt.Clear();
 }
 
 void ListBoxX::Append(char *s, int type) {
@@ -972,7 +1003,7 @@ void ListBoxX::Append(char *s, int type) {
 	if (maxItemCharacters < len)
 		maxItemCharacters = len;
 	int count = ::SendMessage(lb, LB_GETCOUNT, 0, 0);
-	ltt.Add(count, type);
+	ltt.Add(count-1, type);
 }
 
 int ListBoxX::Length() {
@@ -1348,6 +1379,9 @@ int Platform::Clamp(int val, int minVal, int maxVal) {
 }
 
 void Platform_Initialise(void *hInstance) {
+	OSVERSIONINFO osv = {sizeof(OSVERSIONINFO),0,0,0,0,""};
+	::GetVersionEx(&osv);
+	onNT = osv.dwPlatformId == VER_PLATFORM_WIN32_NT;
 	::InitializeCriticalSection(&crPlatformLock);
 	hinstPlatformRes = reinterpret_cast<HINSTANCE>(hInstance);
 	ListBoxX_Register();

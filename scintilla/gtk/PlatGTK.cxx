@@ -1,6 +1,6 @@
 // Scintilla source code edit control
 // PlatGTK.cxx - implementation of platform facilities on GTK+/Linux
-// Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+// Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <string.h>
@@ -601,8 +601,10 @@ public:
 	void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back);
 	void Copy(PRectangle rc, Point from, Surface &surfaceSource);
 
+	void DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
 	void DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
 	void DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
+	void DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
 	void MeasureWidths(Font &font_, const char *s, int len, int *positions);
 	int WidthText(Font &font_, const char *s, int len);
 	int WidthChar(Font &font_, char ch);
@@ -821,9 +823,8 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
 
 #define MAX_US_LEN 5000
 
-void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                                 ColourAllocated fore, ColourAllocated back) {
-	FillRectangle(rc, back);
+void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+                                 ColourAllocated fore) {
 	PenColour(fore);
 	if (gc && drawable) {
 		// Draw text as a series of segments to avoid limitations in X servers
@@ -896,10 +897,23 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 	}
 }
 
+void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+                                 ColourAllocated fore, ColourAllocated back) {
+	FillRectangle(rc, back);
+	DrawTextBase(rc, font_, ybase, s, len, fore);
+}
+
 // On GTK+, exactly same as DrawTextNoClip
 void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len,
                                   ColourAllocated fore, ColourAllocated back) {
-	DrawTextNoClip(rc, font_, ybase, s, len, fore, back);
+	FillRectangle(rc, back);
+	DrawTextBase(rc, font_, ybase, s, len, fore);
+}
+
+// On GTK+, exactly same as DrawTextNoClip
+void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+                                  ColourAllocated fore) {
+	DrawTextBase(rc, font_, ybase, s, len, fore);
 }
 
 void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positions) {
@@ -1209,20 +1223,19 @@ void Window::SetFont(Font &) {
 }
 
 void Window::SetCursor(Cursor curs) {
-	GdkCursor *gdkCurs;
-
 	// We don't set the cursor to same value numerous times under gtk because
 	// it stores the cursor in the window once it's set
 	if (curs == cursorLast)
 		return;
-	cursorLast = curs;
 
+	cursorLast = curs;
+	GdkCursor *gdkCurs;
 	switch (curs) {
 	case cursorText:
 		gdkCurs = gdk_cursor_new(GDK_XTERM);
 		break;
 	case cursorArrow:
-		gdkCurs = gdk_cursor_new(GDK_ARROW);
+		gdkCurs = gdk_cursor_new(GDK_LEFT_PTR);
 		break;
 	case cursorUp:
 		gdkCurs = gdk_cursor_new(GDK_CENTER_PTR);
@@ -1231,10 +1244,10 @@ void Window::SetCursor(Cursor curs) {
 		gdkCurs = gdk_cursor_new(GDK_WATCH);
 		break;
 	case cursorReverseArrow:
-		gdkCurs = gdk_cursor_new(GDK_TOP_LEFT_ARROW);
+		gdkCurs = gdk_cursor_new(GDK_RIGHT_PTR);
 		break;
 	default:
-		gdkCurs = gdk_cursor_new(GDK_ARROW);
+		gdkCurs = gdk_cursor_new(GDK_LEFT_PTR);
 		cursorLast = cursorArrow;
 		break;
 	}
