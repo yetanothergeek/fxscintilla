@@ -32,8 +32,8 @@
 #include <ctype.h>
 #include <time.h>
 
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-# if defined(__CYGWIN__) || defined(__MINGW32__)
+#if !defined(WIN32) || defined(__CYGWIN__)
+# if defined(__CYGWIN__)
 #  include <windows.h>
 #  ifdef PIC
 #   define FOXDLL
@@ -47,9 +47,12 @@
 #  include <fox/fxkeys.h>
 # endif
 #else
+# if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
+#   define FOXDLL
+# endif
 # include <fx.h>
 # include <fxkeys.h>
-#endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#endif	// !defined(WIN32) || defined(__CYGWIN__)
 
 #include "Platform.h"
 
@@ -120,6 +123,9 @@ protected:
 	// Vertical scrollbar handling
 	int vsbMax;
 	int vsbPage;
+	
+	// Flag to prevent infinite loop with moveContents
+	bool inMoveContents;
 public:
 	ScintillaFOX(FXScintilla & fxsc);
 	virtual ~ScintillaFOX();
@@ -171,7 +177,8 @@ ScintillaFOX::ScintillaFOX(FXScintilla & fxsc) :
 	tryDrag(false),
 	dragWasDropped(false),
 	vsbMax(0),
-	vsbPage(0)
+	vsbPage(0),
+	inMoveContents(false)
 {
 	wMain = &_fxsc;
 	Initialise();
@@ -316,20 +323,22 @@ void ScintillaFOX::DisplayCursor(Window::Cursor c) {
 
 void ScintillaFOX::SetVerticalScrollPos()
 {
-	// Update the internals about vertical pos. Should not use
-	// _fxsc.setPosition(x, y) because it would trigger moveContents
-	_fxsc.verticalScrollbar()->setPosition(topLine * vs.lineHeight);
-	_fxsc.pos_y = -_fxsc.verticalScrollbar()->getPosition();
-	_fxsc.update();
+  if (inMoveContents) return;
+  // Update the scrollbar position only if this method is not called by
+  // moveContents (to prevent an infinite loop becaude setPosition
+  // triggers moveContents).
+  // BTW scrollbar should be up to date when in movecontents.
+	_fxsc.setPosition(_fxsc.getXPosition(), -topLine * vs.lineHeight);
 }
 
 void ScintillaFOX::SetHorizontalScrollPos()
 {
-	// Update the internals about horizontal pos. Should not use
-	// _fxsc.setPosition(x, y) because it would trigger moveContents
-	_fxsc.horizontalScrollbar()->setPosition(xOffset);
-	_fxsc.pos_x = -_fxsc.horizontalScrollbar()->getPosition();
-	_fxsc.update();
+  if (inMoveContents) return;
+  // Update the scrollbar position only if this method is not called by
+  // moveContents (to prevent an infinite loop becaude setPosition
+  // triggers moveContents).
+  // BTW scrollbar should be up to date when in movecontents.
+	_fxsc.setPosition(-xOffset, _fxsc.getYPosition());
 }
 
 void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
@@ -1184,6 +1193,7 @@ FXint FXScintilla::getContentHeight()
 
 void FXScintilla::moveContents(FXint x,FXint y)
 {
+  _scint->inMoveContents = true;
 	bool moved = false;
 	int line = (-y + _scint->vs.lineHeight / 2) / _scint->vs.lineHeight;
 	if (line != getYPosition()/_scint->vs.lineHeight) {
@@ -1197,6 +1207,7 @@ void FXScintilla::moveContents(FXint x,FXint y)
 	if (moved) {
 		FXScrollArea::moveContents(x, -line * _scint->vs.lineHeight);
 	}
+  _scint->inMoveContents = false;
 }
 
 long FXScintilla::onConfigure(FXObject *sender, FXSelector sel, void * ptr)
