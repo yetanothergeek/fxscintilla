@@ -66,7 +66,8 @@ protected:
 	Test() {}
 public:
 	enum {
-		ID_FONT = FXMainWindow::ID_LAST,
+		ID_SCINTILLA = FXMainWindow::ID_LAST,
+		ID_FONT,
 		ID_LAST
 	};
 public:
@@ -76,7 +77,7 @@ public:
 		new FXButton(this, "Change Font", NULL, this, ID_FONT);
 		
 		// FXScintilla widget
-		scint = new FXScintilla(this, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);	
+		scint = new FXScintilla(this, this, ID_SCINTILLA, LAYOUT_FILL_X|LAYOUT_FILL_Y);	
 		// Preparing the widget to do syntax coloring for Ruby
 		scint->sendMessage(SCI_SETLEXERLANGUAGE, 0, reinterpret_cast<long>("ruby"));
 		scint->sendMessage(SCI_SETKEYWORDS, 0, reinterpret_cast<long>(sRubyKeyWords));
@@ -87,6 +88,7 @@ public:
 		FXMainWindow::create();
 		// Feeding the widget with some initial text
 		scint->sendMessage(SCI_INSERTTEXT, 0, reinterpret_cast<long>(sInitialText));
+		scint->setFocus();
 	}
 	void setFont(const FXString & font, int size)
 	{
@@ -127,9 +129,18 @@ public:
 		}
 		return 1;
 	}
+	long onCmdScintilla(FXObject *, FXSelector, void * ptr)
+	{
+		SCNotification * scn = static_cast<SCNotification *>(ptr);
+		
+		// Add here stuff to handle Scintilla events
+		
+		return 1;
+	}
 };
 
 FXDEFMAP(Test) TestMap[]={
+  FXMAPFUNC(SEL_COMMAND, Test::ID_SCINTILLA, Test::onCmdScintilla),
   FXMAPFUNC(SEL_COMMAND, Test::ID_FONT, Test::onCmdFont),
 };
 
