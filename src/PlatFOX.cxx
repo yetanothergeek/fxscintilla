@@ -26,7 +26,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  **/
 
-#include <ltdl.h>
+extern "C" {
+# include "../ltdl/ltdl.h"
+}
 
 #include <string.h>
 #include <stdio.h>
@@ -111,7 +113,7 @@ void Palette::WantFind(ColourPair &cp, bool want) {
 	}
 }
 
-void Palette::Allocate(Window &w) {
+void Palette::Allocate(Window & /* w */) {
 // <FIXME/>
 }
 
@@ -331,7 +333,7 @@ public:
 	void FlushCachedState();
 
 	void SetUnicodeMode(bool unicodeMode_);
-	virtual void SetDBCSMode(int codePage) {}
+	virtual void SetDBCSMode(int /* codePage */) {}
 };
 
 SurfaceImpl * SurfaceImpl::s_dc_owner = NULL;
@@ -903,7 +905,7 @@ long PopupListBox::onListKeyPress(FXObject * sender, FXSelector sel, void * ptr)
 	return 1;
 }
 
-long PopupListBox::onDoubleClicked(FXObject * sender, FXSelector sel, void * ptr)
+long PopupListBox::onDoubleClicked(FXObject *, FXSelector, void *)
 {
 	if (listBox->doubleClickAction) {
 		listBox->doubleClickAction(listBox->doubleClickActionData);

@@ -10,7 +10,7 @@
 
 #if PLAT_WIN
 #define EXT_LEXER_DECL __stdcall
-#elif PLAT_GTK
+#elif PLAT_GTK || PLAT_FOX
 #define EXT_LEXER_DECL 
 #endif
 

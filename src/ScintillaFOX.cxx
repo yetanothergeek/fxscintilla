@@ -118,8 +118,10 @@ private:
 	// Virtual methods from ScintillaBase
 	virtual void Initialise();
 	virtual void Finalise();
+	virtual void DisplayCursor(Window::Cursor c);
 	virtual void SetVerticalScrollPos();
 	virtual void SetHorizontalScrollPos();
+	virtual void CopyToClipboard(const SelectionText &selectedText);
 	virtual void Copy();
 	virtual void Paste();
 	virtual void ClaimSelection();
@@ -184,7 +186,7 @@ sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 #ifdef SCI_LEXER
 	case SCI_LOADLEXERLIBRARY:
-		//LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
+		LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
 		break;
 #endif
 
@@ -290,6 +292,13 @@ void ScintillaFOX::Finalise()
 	ScintillaBase::Finalise();
 }
 
+void ScintillaFOX::DisplayCursor(Window::Cursor c) {
+	if (cursorMode == SC_CURSORNORMAL)
+		wMain.SetCursor(c);
+	else
+		wMain.SetCursor(static_cast<Window::Cursor>(cursorMode));
+}
+
 void ScintillaFOX::SetVerticalScrollPos()
 {
 	// Update the internals about vertical pos. Should not use
@@ -306,6 +315,12 @@ void ScintillaFOX::SetHorizontalScrollPos()
 	_fxsc.horizontalScrollbar()->setPosition(xOffset);
 	_fxsc.pos_x = -_fxsc.horizontalScrollbar()->getPosition();
 	_fxsc.update();
+}
+
+void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
+	if (_fxsc.acquireClipboard(&FXWindow::stringType, 1)) {
+		copyText.Copy(selectedText.s, selectedText.len);
+	}
 }
 
 void ScintillaFOX::Copy()
@@ -377,7 +392,7 @@ sptr_t ScintillaFOX::DefWndProc(unsigned int, uptr_t, sptr_t)
 	return 0;
 }
 
-void ScintillaFOX::CreateCallTipWindow(PRectangle rc)
+void ScintillaFOX::CreateCallTipWindow(PRectangle /* rc */)
 {
 	// <FIXME/>
 }
@@ -446,7 +461,7 @@ bool ScintillaFOX::ModifyScrollBars(int nMax, int nPage)
 	// Horizontal scrollbar
 	PRectangle rcText = GetTextRectangle();
 	unsigned int pageWidth = rcText.Width();
-	if ((_fxsc.horizontalScrollbar()->getPage() != pageWidth) ||
+	if ((_fxsc.horizontalScrollbar()->getPage() != int(pageWidth)) ||
 			(_fxsc.horizontalScrollbar()->getLine() != 10)) {
 		_fxsc.horizontalScrollbar()->setPage(pageWidth);
 		_fxsc.horizontalScrollbar()->setLine(10);
@@ -568,6 +583,7 @@ FXScintilla::~FXScintilla()
 void FXScintilla::create()
 {
   FXScrollArea::create();
+  _scint->wMain.SetCursor(Window::cursorArrow);
   if(!textType){textType=getApp()->registerDragType(textTypeName);}
   if(!urilistType){urilistType=getApp()->registerDragType(urilistTypeName);}
 	dropEnable();
@@ -578,27 +594,27 @@ FXbool FXScintilla::canFocus() const
 	return true;
 }
 
-long FXScintilla::onScintillaCommand(FXObject * obj, FXSelector sel, void * ptr)
+long FXScintilla::onScintillaCommand(FXObject *, FXSelector sel, void *)
 {
 	_scint->Command(SELID(sel)-SCID(0));
 	return 1;
 }
 
-long FXScintilla::onCommand(FXObject * obj, FXSelector sel, void * ptr)
+long FXScintilla::onCommand(FXObject *, FXSelector sel, void * ptr)
 {
 	if (target)
 		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
 	return 0;
 }
 
-long FXScintilla::onChanged(FXObject * obj, FXSelector sel, void * ptr)
+long FXScintilla::onChanged(FXObject *, FXSelector sel, void * ptr)
 {
 	if (target)
 		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
 	return 0;
 }
 
-long FXScintilla::onPaint(FXObject * obj, FXSelector sel, void * ptr)
+long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
 {
 	FXEvent   *ev=(FXEvent*)ptr;
 	PRectangle rcPaint(ev->rect.x, ev->rect.y, ev->rect.x + ev->rect.w - 1, ev->rect.y + ev->rect.h - 1);
@@ -627,7 +643,7 @@ long FXScintilla::onFocusOut(FXObject * sender, FXSelector sel, void * ptr)
 	return 1;
 }
 
-long FXScintilla::onMotion(FXObject * sender, FXSelector sel, void * ptr)
+long FXScintilla::onMotion(FXObject *, FXSelector, void * ptr)
 {
 	FXEvent * ev = static_cast<FXEvent *>(ptr);
 	if (_scint->tryDrag) {
@@ -644,11 +660,11 @@ long FXScintilla::onMotion(FXObject * sender, FXSelector sel, void * ptr)
 	return 1;
 }
 
-long FXScintilla::onLeftBtnPress(FXObject * sender, FXSelector sel, void * ptr)
+long FXScintilla::onLeftBtnPress(FXObject *, FXSelector, void * ptr)
 {
 //	if (FXScrollArea::onLeftBtnPress(sender, sel, ptr))
 //		return 1;
-  handle(this,MKUINT(0,SEL_FOCUS_SELF),ptr);
+	handle(this, MKUINT(0, SEL_FOCUS_SELF), ptr);
 	setFocus();
 	FXEvent * ev = static_cast<FXEvent *>(ptr);
 	Point pt;
@@ -685,7 +701,7 @@ long FXScintilla::onLeftBtnRelease(FXObject *, FXSelector, void * ptr)
 	return 1;
 }
 
-long FXScintilla::onRightBtnPress(FXObject * sender, FXSelector sel, void * ptr)
+long FXScintilla::onRightBtnPress(FXObject *, FXSelector sel, void * ptr)
 {
 //	if (FXScrollArea::onRightBtnPress(sender, sel, ptr))
 //		return 1;
@@ -698,7 +714,7 @@ long FXScintilla::onRightBtnPress(FXObject * sender, FXSelector sel, void * ptr)
 	return 1;
 }
 
-long FXScintilla::onMiddleBtnPress(FXObject * sender, FXSelector sel, void * ptr)
+long FXScintilla::onMiddleBtnPress(FXObject *, FXSelector, void * ptr)
 {
 //	if (FXScrollArea::onMiddleBtnPress(sender, sel, ptr))
 //		return 1;
@@ -1018,7 +1034,6 @@ long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 // Service requested DND data
 long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
-  FXuchar *data;
 
   // Perhaps the target wants to supply its own data
   if(FXScrollArea::onDNDRequest(sender,sel,ptr)) return 1;
