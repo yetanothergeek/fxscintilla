@@ -1,4 +1,4 @@
-FXScintilla depends on the FOX GUI toolkit version 1.0.x:
+FXScintilla depends on the FOX GUI toolkit version 1.0.x or 1.1.x:
 
 	http://fox-toolkit.org
 
@@ -13,8 +13,11 @@ Everything you need is in the VC++ workspace:
 
 	fxscintilla/windows/vcpp/win32.dsw
 
-IMPORTANT: Before building anything you have to adapt each project's
-compilation and link settings with the correct FOX install path.
+IMPORTANT:
+* Before building anything you have to adapt each project's
+  compilation and link settings with the correct FOX install path.
+* If you use FOX 1.1.x you must add the following define to
+  the compiler's settings: HAVE_FOX_1_1=1
 
 The library files are built into the lib directory:
 

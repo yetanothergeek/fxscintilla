@@ -1,11 +1,8 @@
 AC_DEFUN([CHECK_LIBFOX],
-# $1 = FOX MAJOR VERSION
-# $2 = FOX_MINOR_VERSION
-
+[
 #
 # Handle user hints
 #
-[
 AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox 1.0 includes from DIR],
         FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
 AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
@@ -58,6 +55,45 @@ if test x"$have_FOX" = xno; then
 fi
 
 #
+# End
+#
+CPPFLAGS=$FOX_OLD_CPPFLAGS
+LDFLAGS=$FOX_OLD_LDFLAGS
+AC_LANG_RESTORE
+AC_SUBST(FOX_INCLUDE_DIR)
+AC_SUBST(FOX_LIB_DIR)
+
+# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
+if test x"$have_FOX" = xyes; then
+        ifelse([$1],,AC_DEFINE(HAVE_FOX,1,[Define you have FOX library and header files.]),[$1])
+        :
+else
+        $2
+        :
+fi
+])
+
+AC_DEFUN([CHECK_LIBFOX_VERSION],
+# $1 = FOX MAJOR VERSION
+# $2 = FOX_MINOR_VERSION
+# $3 = ACTION-IF-OK
+# $4 = ACTION-IF-NOT-OK
+[
+#
+# FLAGS backup
+#
+FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_LDFLAGS=$LDFLAGS
+AC_LANG_SAVE
+
+#
+# Temporary FLAGS setting
+#
+CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
+AC_LANG_C
+
+#
 # Check Fox version
 #
 AC_MSG_CHECKING(FOX version $1.$2.x)
@@ -66,14 +102,21 @@ AC_TRY_RUN([
 	int main(int argc, char** argv) {
 		return (FOX_MAJOR == $1 && FOX_MINOR == $2) ? 0 : -1;
 	}
-	], AC_MSG_RESULT(yes), AC_MSG_RESULT(no); AC_MSG_ERROR(Incompatible FOX version), AC_MSG_WARN(Cross compiling))
+	], AC_MSG_RESULT(yes); check_libfox_version_ok=yes, AC_MSG_RESULT(no), AC_MSG_WARN(Cross compiling))
 
 #
-# End
+# Restore FLAGS
 #
 CPPFLAGS=$FOX_OLD_CPPFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 AC_LANG_RESTORE
-AC_SUBST(FOX_INCLUDE_DIR)
-AC_SUBST(FOX_LIB_DIR)
+
+# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
+if test x"$check_libfox_version_ok" = xyes; then
+        ifelse([$3],,AC_DEFINE(HAVE_FOX_$1_$2,1,[Define FOX version $1.$2.]),[$3])
+        :
+else
+        check_libfox_version_ok=no
+        $4
+fi
 ])

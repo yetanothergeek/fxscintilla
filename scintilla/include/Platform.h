@@ -48,15 +48,29 @@
 // Sometimes these need to be passed around by client code so they are defined here
 
 #if PLAT_FOX
+
+#if HAVE_FOX_1_1
+#define horizontalScrollbar horizontalScrollBar
+#define verticalScrollbar verticalScrollBar
+namespace FX {
+#endif
+
 class FXFont;
 class FXDrawable;
 class FXWindow;
 class FXMenuPane;
+class FXList;
 #ifndef WIN32
 class FXTimer;
 #else
 struct FXTimer;
 #endif	// WIN32
+
+#if HAVE_FOX_1_1 
+};
+using namespace FX;
+#endif
+
 typedef FXFont * FontID;
 typedef FXDrawable * SurfaceID;
 typedef FXWindow * WindowID;
@@ -364,10 +378,6 @@ private:
 /**
  * Listbox management.
  */
-#if PLAT_FOX
-class FXList;
-#endif
-
 class ListBox : public Window {
 private:
 #if PLAT_GTK
