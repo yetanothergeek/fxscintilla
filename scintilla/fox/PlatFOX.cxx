@@ -132,7 +132,7 @@ static const char *CharacterSetName(int characterSet) {
 	case SC_CHARSET_SYMBOL:
 		return "*-*";
 	case SC_CHARSET_TURKISH:
-		return "*-*";
+		return "*-9";
 	case SC_CHARSET_JOHAB:
 		return "*-*";
 	case SC_CHARSET_HEBREW:
@@ -142,7 +142,7 @@ static const char *CharacterSetName(int characterSet) {
 	case SC_CHARSET_VIETNAMESE:
 		return "*-*";
 	case SC_CHARSET_THAI:
-		return "*-*";
+		return "*-1";
 	default:
 		return "*-*";
 	}

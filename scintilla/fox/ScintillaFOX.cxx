@@ -270,7 +270,7 @@ void ScintillaFOX::SetHorizontalScrollPos()
 {
 	// Update the internals about horizontal pos. Should not use
 	// _fxsc.setPosition(x, y) because it would trigger moveContents
-	_fxsc.horizontalScrollbar()->setPosition(xOffset * _fxsc.getContentWidth() / 600);
+	_fxsc.horizontalScrollbar()->setPosition(xOffset);
 	_fxsc.pos_x = -_fxsc.horizontalScrollbar()->getPosition();
 	_fxsc.update();
 }
@@ -364,7 +364,9 @@ sptr_t ScintillaFOX::DirectFunction(
 }
 
 PRectangle ScintillaFOX::GetClientRectangle() {
-	PRectangle rc(0, 0, _fxsc.getViewportWidth(), _fxsc.getViewportHeight());
+	// Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
+	// to prevent infinite loop
+	PRectangle rc(0, 0, _fxsc.FXScrollArea::getViewportWidth(), _fxsc.FXScrollArea::getViewportHeight());
 	if (_fxsc.horizontalScrollbar()->shown())
 		rc.bottom -= _fxsc.horizontalScrollbar()->getDefaultHeight();
 	if (_fxsc.verticalScrollbar()->shown())
@@ -400,14 +402,19 @@ bool ScintillaFOX::ModifyScrollBars(int nMax, int nPage)
 			modified = true;
 		}
 	}
-	FXScrollbar * vsb = _fxsc.verticalScrollbar();
+	// Vertical scrollbar
 	int line = vs.lineHeight;
 	if (_fxsc.verticalScrollbar()->getLine() != line) {
 		_fxsc.verticalScrollbar()->setLine(line);
 		modified = true;
 	}
-	if (_fxsc.horizontalScrollbar()->getLine() != 20) {
-		_fxsc.horizontalScrollbar()->setLine(20);
+	// Horizontal scrollbar
+	PRectangle rcText = GetTextRectangle();
+	unsigned int pageWidth = rcText.Width();
+	if ((_fxsc.horizontalScrollbar()->getPage() != pageWidth) ||
+			(_fxsc.horizontalScrollbar()->getLine() != 10)) {
+		_fxsc.horizontalScrollbar()->setPage(pageWidth);
+		_fxsc.horizontalScrollbar()->setLine(10);
 		modified = true;
 	}
 	return modified;
@@ -1022,9 +1029,21 @@ long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 // Scrolling
 // ********************************************************************
 
+FXint FXScintilla::getViewportWidth()
+{
+	return _scint->GetTextRectangle().Width();
+	//return FXScrollArea::getViewportWidth();
+}
+
+FXint FXScintilla::getViewportHeight()
+{
+	//return (_scint) ? _scint->GetTextRectangle().Height() : FXScrollArea::getViewportHeight();
+	return FXScrollArea::getViewportHeight();
+}
+
 FXint FXScintilla::getContentWidth()
 {
-	return getWidth() * 10;
+	return FXMAX(_scint->scrollWidth, 0);
 }
 
 FXint FXScintilla::getContentHeight()
@@ -1050,7 +1069,7 @@ void FXScintilla::moveContents(FXint x,FXint y)
 	}
 	if (x != getXPosition()) {
 		moved = true;
-		_scint->HorizontalScrollTo(-x * 600 / getContentWidth());
+		_scint->HorizontalScrollTo(-x);
 	}
 	if (moved) {
 		FXScrollArea::moveContents(x, -line * _scint->vs.lineHeight);

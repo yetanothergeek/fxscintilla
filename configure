@@ -6221,11 +6221,7 @@ trap 'rm -fr `echo "\
 	scintilla/src/Makefile \
 	scintilla/fox/Makefile \
 	scintilla/Makefile \
-	scite/src/Makefile \
-	scite/fox/Makefile \
-	scite/Makefile \
-	Makefile
-	" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+	Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -6358,11 +6354,7 @@ CONFIG_FILES=\${CONFIG_FILES-"\
 	scintilla/src/Makefile \
 	scintilla/fox/Makefile \
 	scintilla/Makefile \
-	scite/src/Makefile \
-	scite/fox/Makefile \
-	scite/Makefile \
-	Makefile
-	"}
+	Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
@@ -6473,5 +6465,4 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
 

@@ -55,6 +55,7 @@ static DirectorExtension *pde = 0;
 static int fdDirector = 0;
 static int fdCorrespondent = 0;
 static bool startedByDirector = false;
+static bool shuttingDown = false;
 //static FILE *fdDebug = 0;
 
 static bool SendPipeCommand(const char *pipeCommand, int fdOutPipe) {
@@ -188,8 +189,10 @@ bool DirectorExtension::OnChar(char) {
 	return false;
 }
 
-bool DirectorExtension::OnExecute(const char *) {
-	return false;
+bool DirectorExtension::OnExecute(const char *cmd) {
+	CheckEnvironment(host);
+	::SendDirector("macro:run", cmd);
+	return true;
 }
 
 bool DirectorExtension::OnSavePointReached() {
@@ -243,8 +246,11 @@ void DirectorExtension::HandleStringMessage(const char *message) {
 		char *cmd = wlMessage[i];
 		if (isprefix(cmd, "closing:")) {
 			fdDirector = 0;
-			if (startedByDirector)
+			if (startedByDirector) {
+				shuttingDown = true;
 				host->ShutDown();
+				shuttingDown = false;
+			}
 		} else if (host) {
 			host->Perform(cmd);
 		}
@@ -344,8 +350,6 @@ bool DirectorExtension::CreatePipe(bool forceNew) {
 			//there is so just open it (and we don't want out own)
 			else if (forceNew == false) {
 				//fprintf(fdDebug, "Another one there - opening\n");
-	
-				fdReceiver = open(pipeName, O_RDWR | O_NONBLOCK);
 	
 				//there is already another pipe so set it to true for the return value
 				anotherPipe = true;

@@ -1,1 +1,1 @@
-SUBDIRS = scintilla scite .
+SUBDIRS = scintilla .

@@ -292,6 +292,8 @@ protected:
 	virtual void SaveAsHTML();
 	virtual void SaveAsRTF();
 	virtual void SaveAsPDF();
+	virtual void SaveACopy() {}
+	virtual void SaveAsTEX() {}
 	virtual void Print();
 	virtual void PrintSetup();
 

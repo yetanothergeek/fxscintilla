@@ -1,5 +1,4 @@
 FXScintilla is a port to the FOX GUI toolkit of the Scintilla widget.
-It also provides a FOX port of the demonstrating SciTE editor (FXSciTE).
 
 *** Linux version ***
 
@@ -14,7 +13,6 @@ as usual. Please read INSTALL for detailed instructions.
 
 *** Windows version ***
 
-Only FXScintilla is currently available under Windows.
 You must first have FOX 1.0.x and Visual C++ 6.0 installed.
 Other C++ compilers may work but may require tweaking the make file.
 

@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # usage:
-#		tarball devel|release [<scite_release> <fox_release>]
+#		tarball devel|release [<scintilla_release> <fox_release>]
 # example:
 #		tarball 1_40 3
 # produces
@@ -21,7 +21,7 @@ if [ ! -d snapshot ]; then
 fi
 cd snapshot
 
-rm -fr scintilla
+rm -fr fxscintilla
 
 if [ ! -z $major ]; then
 		cvs -w export -r "FXSCINTILLA-${major}_${minor}" fxscintilla
@@ -29,7 +29,7 @@ else
 		cvs -w export -r HEAD fxscintilla
 fi
 
-find scintilla -type f ! \( \
+find fxscintilla -type f ! \( \
 		-name makefile -o \
 		-name '*.png' -o \
 		-name '*.ico' -o \
@@ -41,8 +41,8 @@ find scintilla -type f ! \( \
 cd fxscintilla
 
 if [ "$devel" = "false" ]; then
+		rm -fr scite
 		rm -fr scintilla/gtk scintilla/win32
-		rm -fr scite/gtk scite/win32
 		rm -f scintilla/scintilla.dsp
 		rm -f scintilla/scintilla.dsw
 		rm -f scintilla/fox/scintilla.dsp
@@ -57,7 +57,7 @@ fi
 rm -f $name
 
 if [ "$devel" = "false" ]; then
-		tar cvzf $name scintilla scite
+		tar cvzf $name scintilla
 else
 		tar cvzf $name .
 fi

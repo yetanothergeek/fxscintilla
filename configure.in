@@ -51,9 +51,4 @@ AC_OUTPUT( \
 	scintilla/src/Makefile \
 	scintilla/fox/Makefile \
 	scintilla/Makefile \
-	scite/src/Makefile \
-	scite/fox/Makefile \
-	scite/Makefile \
-	Makefile
-	)
-
+	Makefile)

@@ -76,6 +76,8 @@ public:
 	// From FXScrollArea
 	virtual void create();
   virtual FXbool canFocus() const;
+	virtual FXint getViewportWidth();
+	virtual FXint getViewportHeight();
 	virtual FXint getContentWidth();
 	virtual FXint getContentHeight();
   virtual void moveContents(FXint x,FXint y);
