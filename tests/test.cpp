@@ -1,4 +1,4 @@
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if !defined(WIN32) || defined(__CYGWIN__)
 # if HAVE_FOX_1_1
 #  include <fox-1.1/fx.h>
 # else
@@ -6,7 +6,7 @@
 # endif
 #else
 # include <fx.h>
-#endif // !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#endif // !defined(WIN32) || defined(__CYGWIN__)
 #include <Scintilla.h>
 #include <SciLexer.h>
 #include <FXScintilla.h>

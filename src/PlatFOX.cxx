@@ -26,16 +26,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  **/
 
-extern "C" {
-# include "../ltdl/ltdl.h"
-}
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-# if defined(__CYGWIN__) || defined(__MINGW32__)
+#if !defined(WIN32) || defined(__CYGWIN__)
+# if defined(__CYGWIN__)
 #  include <windows.h>
 #  ifdef PIC
 #   define FOXDLL
@@ -50,11 +46,14 @@ extern "C" {
 #  include <fox/fxkeys.h>
 # endif
 #else
+# if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
+#   define FOXDLL
+# endif
 # include <time.h>
 # include <windows.h>
 # include <fx.h>
 # include <fxkeys.h>
-#endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#endif	// !defined(WIN32) || defined(__CYGWIN__)
 
 #include "Platform.h"
 
@@ -1245,7 +1244,11 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 
 // For Fox 1.0, I'd like to use libltdl for both Unix and Win32 but I haven't
 // succeded yet using it under Win32
-#elif !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#elif !defined(WIN32) || defined(__CYGWIN__)
+extern "C" {
+# include "../ltdl/ltdl.h"
+}
+
 
 class DynamicLibraryImpl : public DynamicLibrary {
 protected:
@@ -1279,7 +1282,7 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
 }
 
-#else // !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#else // !defined(WIN32) || defined(__CYGWIN__)
 
 class DynamicLibraryImpl : public DynamicLibrary {
 protected:
@@ -1312,7 +1315,7 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
 }
 
-#endif // !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#endif // !defined(WIN32) || defined(__CYGWIN__)
 
 // ====================================================================
 // Platform
