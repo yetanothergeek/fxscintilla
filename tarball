@@ -1,9 +1,9 @@
 #! /bin/bash
 
 # usage:
-#		tarball devel|release [<scintilla_release> <fox_release>]
+#		tarball devel|release [<scintilla_release> [<minor_release>]]
 # example:
-#		tarball 1_40 3
+#		tarball release 1_40 3
 # produces
 #		snapshot/fxscintilla-1.40.3.tgz
 
@@ -24,9 +24,13 @@ cd snapshot
 rm -fr fxscintilla
 
 if [ ! -z $major ]; then
-		cvs -w export -P -r "FXSCINTILLA-${major}_${minor}" fxscintilla
+		tag="FXSCINTILLA-${major}"
+		if [ ! -z $minor ]; then
+				tag="${tag}_${minor}"
+		fi
+		cvs -w export -r "${tag}" fxscintilla
 else
-		cvs -w export -P -r HEAD fxscintilla
+		cvs -w export -r HEAD fxscintilla
 fi
 
 find fxscintilla -type f ! \( \
@@ -49,7 +53,11 @@ if [ "$devel" = "false" ]; then
 fi
 
 if [ ! -z $major ]; then
-		name="../fxscintilla-"`echo $major | sed 's/_/./'`".${minor}.tgz"
+		name="../fxscintilla-"`echo $major | sed 's/_/./'`
+		if [ ! -z $minor ]; then
+				name="${name}.${minor}"
+		fi
+		name = "${name}.tgz"
 else
 		name="../fxscintilla.tgz"
 fi
