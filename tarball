@@ -44,7 +44,7 @@ fi
 cd snapshot
 
 rm -fr fxscintilla
-cvs -w export -r "${tag}" fxscintilla
+cvs -z3 -w export -r "${tag}" fxscintilla
 
 find fxscintilla/scintilla -type f ! \( \
 		-name 'Makefile.*' -o \
