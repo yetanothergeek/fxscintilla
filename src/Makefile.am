@@ -1,4 +1,9 @@
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include -I$(top_srcdir)/scintilla/src
+INCLUDES = \
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/scintilla/include \
+	-I$(top_srcdir)/scintilla/src \
+	-I$(FOX_INCLUDE_DIR)
+
 AM_CXXFLAGS = -W -Wall -DFOX
 
 libfxscintilla_la_SOURCES = \

@@ -1,5 +1,7 @@
 FXScintilla depends on the FOX GUI toolkit version 1.0.x:
+
 	http://fox-toolkit.org
+
 The instructions below assume you have FOX installed on your box.
 
 
@@ -7,14 +9,23 @@ For Win32 systems
 =================
 
 You must first have Visual C++ 6.0 installed.
-Other C++ compilers may work but may require tweaking the make file.
+Everything you need is in the VC++ workspace:
 
-To build FXScintilla, use the makefile scintilla\fox\scintilla.mak with
-nmake (you may have to first edit the makefile to change the value of
-FOX_TOP):
-	cd scintilla\fox
-	nmake /f scintilla.mak
-That should build the static lib scintilla/bin/scintilla-static.lib.
+	fxscintilla/windows/vcpp/win32.dsw
+
+IMPORTANT: Before building anything you have to adapt each project's
+compilation and link settings with the correct FOX install path.
+
+The library files are built into the lib directory:
+
+	fxscintilla/lib
+
+Include files are in:
+
+	fxscintilla/include
+
+
+I don't have any other Win32 compiler. Any contribution is welcome.
 
 
 For most UNIX systems (including Linux)
