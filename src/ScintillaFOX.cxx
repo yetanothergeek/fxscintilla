@@ -39,9 +39,9 @@
 #   define FOXDLL
 #  endif
 # endif
-# if HAVE_FOX_1_1
-#  include <fox-1.1/fx.h>
-#  include <fox-1.1/fxkeys.h>
+# if HAVE_FOX_1_2
+#  include <fox-1.2/fx.h>
+#  include <fox-1.2/fxkeys.h>
 # else
 #  include <fox/fx.h>
 #  include <fox/fxkeys.h>
@@ -95,7 +95,7 @@
 #pragma warning(disable: 4127)
 #endif
 
-#if HAVE_FOX_1_1
+#if HAVE_FOX_1_2
 # define SELID FXSELID
 # define SELTYPE FXSELTYPE
 # define addTimeout(delay,tgt,msg) addTimeout(tgt,msg,delay)

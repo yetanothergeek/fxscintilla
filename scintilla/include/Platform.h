@@ -49,7 +49,7 @@
 
 #if PLAT_FOX
 
-# if HAVE_FOX_1_1
+# if HAVE_FOX_1_2
 #  define horizontalScrollbar horizontalScrollBar
 #  define verticalScrollbar verticalScrollBar
 namespace FX {
@@ -67,7 +67,7 @@ class FXTimer;
 struct FXTimer;
 # endif	// WIN32
 
-# if HAVE_FOX_1_1 
+# if HAVE_FOX_1_2 
 };
 using namespace FX;
 # endif

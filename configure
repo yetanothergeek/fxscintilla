@@ -463,7 +463,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE HAVE_MINGW32_TRUE HAVE_MINGW32_FALSE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP CXX CXXFLAGS ac_ct_CXX CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MAJOR_VERSION MINOR_VERSION PATCH_LEVEL INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LT_FXSCINTILLA_CURRENT LT_FXSCINTILLA_REVISION LT_FXSCINTILLA_AGE LT_FXSCINTILLANOLEXER_CURRENT LT_FXSCINTILLANOLEXER_REVISION LT_FXSCINTILLANOLEXER_AGE INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL NOLEXER_TRUE NOLEXER_FALSE PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS FOX_INCLUDE_DIR FOX_LIB_DIR HAVE_FOX_1_0_TRUE HAVE_FOX_1_0_FALSE HAVE_FOX_1_1_TRUE HAVE_FOX_1_1_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE HAVE_MINGW32_TRUE HAVE_MINGW32_FALSE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP CXX CXXFLAGS ac_ct_CXX CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MAJOR_VERSION MINOR_VERSION PATCH_LEVEL INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LT_FXSCINTILLA_CURRENT LT_FXSCINTILLA_REVISION LT_FXSCINTILLA_AGE LT_FXSCINTILLANOLEXER_CURRENT LT_FXSCINTILLANOLEXER_REVISION LT_FXSCINTILLANOLEXER_AGE INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL NOLEXER_TRUE NOLEXER_FALSE PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS FOX_INCLUDE_DIR FOX_LIB_DIR HAVE_FOX_1_0_TRUE HAVE_FOX_1_0_FALSE HAVE_FOX_1_2_TRUE HAVE_FOX_1_2_FALSE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1043,7 +1043,7 @@ Optional Packages:
                           both]
   --with-tags[=TAGS]
                           include additional configurations [automatic]
-  --with-fox-1-1   use Fox 1.1
+  --with-fox-1-2   use Fox 1.2
   --with-foxinclude=DIR   use Fox includes from DIR
   --with-foxlib=DIR       use Fox libs from DIR
 
@@ -22190,10 +22190,10 @@ esac
 # Handle user hints
 #
 
-# Check whether --with-fox-1-1 or --without-fox-1-1 was given.
-if test "${with_fox_1_1+set}" = set; then
-  withval="$with_fox_1_1"
-  WITH_FOX_1_1=$withval
+# Check whether --with-fox-1-2 or --without-fox-1-2 was given.
+if test "${with_fox_1_2+set}" = set; then
+  withval="$with_fox_1_2"
+  WITH_FOX_1_2=$withval
 else
   FOX_INCLUDE_DIR=/usr/local/include
 fi;
@@ -22214,7 +22214,7 @@ else
   FOX_LIB_DIR=/usr/local/lib
 fi;
 
-if test x"$WITH_FOX_1_1" != xyes; then
+if test x"$WITH_FOX_1_2" != xyes; then
 	#
 # Internal Function to check a given Fox version
 #
@@ -22968,7 +22968,7 @@ fi
 
 have_FOX_1_0=$have_FOX
 
-if test x"$WITH_FOX_1_1" != xno; then
+if test x"$WITH_FOX_1_2" != xno; then
 	if test x"$have_FOX" != xyes; then
 		#
 # Internal Function to check a given Fox version
@@ -22988,7 +22988,7 @@ FOX_OLD_LIBS=$LIBS
 #
 CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
-LIBS=-lFOX-1.1
+LIBS=-lFOX-1.2
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23006,18 +23006,18 @@ fi
 #
 # Check Fox headers
 #
-if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
-  echo "$as_me:$LINENO: checking for fox-1.1/fx.h" >&5
-echo $ECHO_N "checking for fox-1.1/fx.h... $ECHO_C" >&6
-if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
+if test "${ac_cv_header_fox_1_2_fx_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for fox-1.2/fx.h" >&5
+echo $ECHO_N "checking for fox-1.2/fx.h... $ECHO_C" >&6
+if test "${ac_cv_header_fox_1_2_fx_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 fi
-echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_1_fx_h" >&5
-echo "${ECHO_T}$ac_cv_header_fox_1_1_fx_h" >&6
+echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_2_fx_h" >&5
+echo "${ECHO_T}$ac_cv_header_fox_1_2_fx_h" >&6
 else
   # Is the header compilable?
-echo "$as_me:$LINENO: checking fox-1.1/fx.h usability" >&5
-echo $ECHO_N "checking fox-1.1/fx.h usability... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking fox-1.2/fx.h usability" >&5
+echo $ECHO_N "checking fox-1.2/fx.h usability... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -23025,7 +23025,7 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 $ac_includes_default
-#include <fox-1.1/fx.h>
+#include <fox-1.2/fx.h>
 _ACEOF
 rm -f conftest.$ac_objext
 if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
@@ -23060,15 +23060,15 @@ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
 echo "${ECHO_T}$ac_header_compiler" >&6
 
 # Is the header present?
-echo "$as_me:$LINENO: checking fox-1.1/fx.h presence" >&5
-echo $ECHO_N "checking fox-1.1/fx.h presence... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking fox-1.2/fx.h presence" >&5
+echo $ECHO_N "checking fox-1.2/fx.h presence... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <fox-1.1/fx.h>
+#include <fox-1.2/fx.h>
 _ACEOF
 if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
   (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
@@ -23102,25 +23102,25 @@ echo "${ECHO_T}$ac_header_preproc" >&6
 # So?  What about this header?
 case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
   yes:no: )
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: accepted by the compiler, rejected by the preprocessor!" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: proceeding with the compiler's result" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: proceeding with the compiler's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: proceeding with the compiler's result" >&2;}
     ac_header_preproc=yes
     ;;
   no:yes:* )
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: present but cannot be compiled" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: present but cannot be compiled" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h:     check for missing prerequisite headers?" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h:     check for missing prerequisite headers?" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: see the Autoconf documentation" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: see the Autoconf documentation" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h:     section \"Present But Cannot Be Compiled\"" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h:     section \"Present But Cannot Be Compiled\"" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: proceeding with the preprocessor's result" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: proceeding with the preprocessor's result" >&2;}
-    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: in the future, the compiler will take precedence" >&5
-echo "$as_me: WARNING: fox-1.1/fx.h: in the future, the compiler will take precedence" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.2/fx.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: fox-1.2/fx.h: in the future, the compiler will take precedence" >&2;}
     (
       cat <<\_ASBOX
 ## ------------------------------------------ ##
@@ -23131,18 +23131,18 @@ _ASBOX
       sed "s/^/$as_me: WARNING:     /" >&2
     ;;
 esac
-echo "$as_me:$LINENO: checking for fox-1.1/fx.h" >&5
-echo $ECHO_N "checking for fox-1.1/fx.h... $ECHO_C" >&6
-if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
+echo "$as_me:$LINENO: checking for fox-1.2/fx.h" >&5
+echo $ECHO_N "checking for fox-1.2/fx.h... $ECHO_C" >&6
+if test "${ac_cv_header_fox_1_2_fx_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_cv_header_fox_1_1_fx_h=$ac_header_preproc
+  ac_cv_header_fox_1_2_fx_h=$ac_header_preproc
 fi
-echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_1_fx_h" >&5
-echo "${ECHO_T}$ac_cv_header_fox_1_1_fx_h" >&6
+echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_2_fx_h" >&5
+echo "${ECHO_T}$ac_cv_header_fox_1_2_fx_h" >&6
 
 fi
-if test $ac_cv_header_fox_1_1_fx_h = yes; then
+if test $ac_cv_header_fox_1_2_fx_h = yes; then
   have_FOX=yes
 else
   have_FOX=no
@@ -23706,7 +23706,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 		if test x"$have_FOX" = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_FOX_1_1 1
+#define HAVE_FOX_1_2 1
 _ACEOF
 
 		fi
@@ -23715,11 +23715,11 @@ fi
 
 
 if test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes; then
-  HAVE_FOX_1_1_TRUE=
-  HAVE_FOX_1_1_FALSE='#'
+  HAVE_FOX_1_2_TRUE=
+  HAVE_FOX_1_2_FALSE='#'
 else
-  HAVE_FOX_1_1_TRUE='#'
-  HAVE_FOX_1_1_FALSE=
+  HAVE_FOX_1_2_TRUE='#'
+  HAVE_FOX_1_2_FALSE=
 fi
 
 
@@ -23919,10 +23919,10 @@ echo "$as_me: error: conditional \"HAVE_FOX_1_0\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_FOX_1_1_TRUE}" && test -z "${HAVE_FOX_1_1_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_FOX_1_1\" was never defined.
+if test -z "${HAVE_FOX_1_2_TRUE}" && test -z "${HAVE_FOX_1_2_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_FOX_1_2\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_FOX_1_1\" was never defined.
+echo "$as_me: error: conditional \"HAVE_FOX_1_2\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -24547,8 +24547,8 @@ s,@FOX_INCLUDE_DIR@,$FOX_INCLUDE_DIR,;t t
 s,@FOX_LIB_DIR@,$FOX_LIB_DIR,;t t
 s,@HAVE_FOX_1_0_TRUE@,$HAVE_FOX_1_0_TRUE,;t t
 s,@HAVE_FOX_1_0_FALSE@,$HAVE_FOX_1_0_FALSE,;t t
-s,@HAVE_FOX_1_1_TRUE@,$HAVE_FOX_1_1_TRUE,;t t
-s,@HAVE_FOX_1_1_FALSE@,$HAVE_FOX_1_1_FALSE,;t t
+s,@HAVE_FOX_1_2_TRUE@,$HAVE_FOX_1_2_TRUE,;t t
+s,@HAVE_FOX_1_2_FALSE@,$HAVE_FOX_1_2_FALSE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

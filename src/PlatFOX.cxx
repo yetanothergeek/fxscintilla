@@ -49,9 +49,9 @@ extern "C" {
 #  endif
 # endif
 # include <sys/time.h>
-# if HAVE_FOX_1_1
-#  include <fox-1.1/fx.h>
-#  include <fox-1.1/fxkeys.h>
+# if HAVE_FOX_1_2
+#  include <fox-1.2/fx.h>
+#  include <fox-1.2/fxkeys.h>
 # else
 #  include <fox/fx.h>
 #  include <fox/fxkeys.h>
@@ -71,7 +71,7 @@ extern "C" {
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
-#if HAVE_FOX_1_1
+#if HAVE_FOX_1_2
 #define getRoot getRootWindow
 #define setTextFont setFont
 #endif
@@ -882,7 +882,7 @@ PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
 	FXPopup(parent), listBox(lb)
 {
 	list = new FXList(this,
-#if !HAVE_FOX_1_1
+#if !HAVE_FOX_1_2
 		0,
 #endif
 		this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
@@ -1218,17 +1218,17 @@ double ElapsedTime::Duration(bool reset) {
 
 // ====================================================================
 // Dynamic library handling. Three ways:
-// - fxdllXxx API with Fox 1.1
+// - fxdllXxx API with Fox 1.2
 // - libltdl with Fox 1.0 under autotools platforms
 // - Win32 API with Fox 1.0 and Win32 platforms without autotools (VC++)
 // ====================================================================
 
-// Fox 1.1 has dynamic librarie handling
-#if HAVE_FOX_1_1
+// Fox 1.2 has dynamic librarie handling
+#if HAVE_FOX_1_2
 
 # if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-#  if HAVE_FOX_1_1
-#   include <fox-1.1/FXDLL.h>
+#  if HAVE_FOX_1_2
+#   include <fox-1.2/FXDLL.h>
 #  else
 #   include <fox/FXDLL.h>
 #  endif

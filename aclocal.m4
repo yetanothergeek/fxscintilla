@@ -7230,14 +7230,14 @@ esac
 #
 # Handle user hints
 #
-AC_ARG_WITH(fox-1-1, [  --with-fox-1-1   use Fox 1.1],
-        WITH_FOX_1_1=$withval, FOX_INCLUDE_DIR=/usr/local/include)
+AC_ARG_WITH(fox-1-2, [  --with-fox-1-2   use Fox 1.2],
+        WITH_FOX_1_2=$withval, FOX_INCLUDE_DIR=/usr/local/include)
 AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox includes from DIR],
         FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
 AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox libs from DIR],
         FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
 
-if test x"$WITH_FOX_1_1" != xyes; then
+if test x"$WITH_FOX_1_2" != xyes; then
 	CHECK_LIBFOX__()
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
@@ -7246,15 +7246,15 @@ fi
 AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX" = xyes)
 have_FOX_1_0=$have_FOX
 
-if test x"$WITH_FOX_1_1" != xno; then
+if test x"$WITH_FOX_1_2" != xno; then
 	if test x"$have_FOX" != xyes; then
-		CHECK_LIBFOX__(-1.1)
+		CHECK_LIBFOX__(-1.2)
 		if test x"$have_FOX" = xyes; then
-			AC_DEFINE(HAVE_FOX_1_1,1,[Define FOX version 1.1.])
+			AC_DEFINE(HAVE_FOX_1_2,1,[Define FOX version 1.2.])
 		fi
 	fi
 fi
-AM_CONDITIONAL(HAVE_FOX_1_1, test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes)
+AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes)
 
 #
 # Abort if no FOX lib
@@ -7300,7 +7300,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.69 2004/05/11 20:11:26 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.70 2004/05/24 20:28:53 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [

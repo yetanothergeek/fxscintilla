@@ -5,8 +5,8 @@ if HAVE_FOX_1_0
 LDADD += -lFOX
 endif
 
-if HAVE_FOX_1_1
-LDADD += -lFOX-1.1
+if HAVE_FOX_1_2
+LDADD += -lFOX-1.2
 endif
 
 AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER

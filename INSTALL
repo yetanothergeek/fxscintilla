@@ -34,8 +34,8 @@ To build using Visual C++ 6.0 everything you need is in the VC++ workspace:
 IMPORTANT:
 * Before building anything you have to adapt each project's
   compilation and link settings with the correct FOX install path.
-* If you use FOX 1.1.x you must add the following define to
-  the compiler's settings: HAVE_FOX_1_1=1
+* If you use FOX 1.2.x you must add the following define to
+  the compiler's settings: HAVE_FOX_1_2=1
 
 The library files are built into the lib directory:
 
