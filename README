@@ -1,33 +1,50 @@
-FXScintilla is a port to the FOX GUI toolkit of the Scintilla widget.
+What is FXScintilla ?
+---------------------
 
-*** Linux version ***
+Scintilla is a free source code editing component for Win32 and GTK+
+developped by Neil Hodgson.
+For more information about Scintilla, see http://www.scintilla.org.
 
-You must first have FOX 1.0.x and GCC (2.8 or better) installed.
-Other C++ compilers may work but may require tweaking the make file.
+The FOX GUI toolkit is a platform independent GUI library developped
+by Jeroen van der Zijp.
+For more information about FOX, see http://fox-toolkit.org.
 
-Then use
-  ./configure
-  make
-  make install
-as usual. Please read INSTALL for detailed instructions.
-
-*** Windows version ***
-
-You must first have FOX 1.0.x and Visual C++ 6.0 installed.
-Other C++ compilers may work but may require tweaking the make file.
-
-To build FXScintilla, use the makefile scintilla\fox\scintilla.mak with nmake
-(you may have to first edit the makefile to change the value of FOX_TOP)
-	cd scintilla\fox
-	nmake /f scintilla.mak
-That should build the static lib scintilla/bin/scintilla-static.lib
+FXScintilla is an implementation of Scintilla for the FOX GUI Library.
 
 
-*** Usage ***
+Where to get it ?
+-----------------
+
+FXScintilla can be downloaded from the FXScintilla project pages on
+Savannah:
+
+	http://savannah.gnu.org/projects/fxscintilla/
+
+
+Mailing list
+------------
+
+There is two mailing lists related to FXScintilla:
+- fxscintilla-announce : FXScintilla new release and events announcement
+- fxscintilla-users    : FXScintilla end users questions and discussions
+To subscribe to any of these lists, please see instuctions on the
+FXScintilla project page (http://savannah.gnu.org/projects/fxscintilla/).
+
+
+Installation
+------------
+
+Please refer to the file INSTALL.
+FXScintilla should compile on every platform where both FOX and Scintilla
+are available : Win32 and Unix systems.
+
+
+Getting started
+---------------
 
 here is a rough sample of how to integrate FXScintilla into a FOX app
 
-//=======================================================
+//--------------------------------------------------------
 #include <fx.h>
 #include <Scintilla.h>
 #include <FXScintilla.h>
@@ -52,4 +69,32 @@ int main(int argc, char ** argv)
 	application.run();
 	return 0;
 }
-//=======================================================
+//--------------------------------------------------------
+
+Bugs
+----
+
+Please file bugs and questions to the mailing list fxscintilla-users.
+
+
+License
+-------
+
+FXScintilla is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.
+
+FXScintilla is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with FXScintilla; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+
+_______Gilles Filippini <gilles.filippini@free.fr>_______
