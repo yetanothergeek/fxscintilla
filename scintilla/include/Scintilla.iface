@@ -221,6 +221,9 @@ get int GetTabWidth=2121(,)
 # This is the same value as CP_UTF8 in Windows
 val SC_CP_UTF8=65001
 
+# The SC_CP_DBCS value can be used to indicate a DBCS mode for GTK+.
+val SC_CP_DBCS=1
+
 # Set the code page used to interpret the bytes of the document as characters.
 # The SC_CP_UTF8 value can be used to enter Unicode mode.
 set void SetCodePage=2037(int codePage,)
@@ -582,6 +585,12 @@ set void AutoCSetDropRestOfWord=2270(bool dropRestOfWord,)
 # after the inserted text upon completion.
 get bool AutoCGetDropRestOfWord=2271(,)
 
+# Register an XPM image for use in autocompletion lists.
+fun void RegisterImage=2405(int type, string xpmData)
+
+# Clear all the registered XPM images.
+fun void ClearRegisteredImages=2408(,)
+
 # Set the number of spaces used for one level of indentation.
 set void SetIndent=2122(int indentSize,)
 
@@ -877,6 +886,10 @@ enu FoldLevel=SC_FOLDLEVEL
 val SC_FOLDLEVELBASE=0x400
 val SC_FOLDLEVELWHITEFLAG=0x1000
 val SC_FOLDLEVELHEADERFLAG=0x2000
+val SC_FOLDLEVELBOXHEADERFLAG=0x4000
+val SC_FOLDLEVELBOXFOOTERFLAG=0x8000
+val SC_FOLDLEVELCONTRACTED=0x10000
+val SC_FOLDLEVELUNINDENT=0x20000
 val SC_FOLDLEVELNUMBERMASK=0x0FFF
 
 # Set the fold level of a line.
@@ -914,7 +927,15 @@ fun void ToggleFold=2231(int line,)
 # Ensure a particular line is visible by expanding any header line hiding it.
 fun void EnsureVisible=2232(int line,)
 
-# Set some debugging options for folding.
+enu FoldFlag=SC_FOLDFLAG_
+val SC_FOLDFLAG_LINEBEFORE_EXPANDED=0x0002
+val SC_FOLDFLAG_LINEBEFORE_CONTRACTED=0x0004
+val SC_FOLDFLAG_LINEAFTER_EXPANDED=0x0008
+val SC_FOLDFLAG_LINEAFTER_CONTRACTED=0x0010
+val SC_FOLDFLAG_LEVELNUMBERS=0x0040
+val SC_FOLDFLAG_BOX=0x0001
+
+# Set some style options for folding.
 fun void SetFoldFlags=2233(int flags,)
 
 # Ensure a particular line is visible by expanding any header line hiding it.
@@ -1125,6 +1146,9 @@ fun void LineDelete=2338(,)
 
 # Switch the current line with the previous.
 fun void LineTranspose=2339(,)
+
+# Duplicate the current line.
+fun void LineDuplicate=2404(,)
 
 # Transform the selection to lower case.
 fun void LowerCase=2340(,)
@@ -1345,6 +1369,12 @@ fun void SetXCaretPolicy=2402(int caretPolicy, int caretSlop)
 # The exclusion zone is given in lines.
 fun void SetYCaretPolicy=2403(int caretPolicy, int caretSlop)
 
+# Set printing to line wrapped (SC_WRAP_WORD) or not line wrapped (SC_WRAP_NONE).
+set void SetPrintWrapMode=2406(int mode,)
+
+# Is printing line wrapped.
+get int GetPrintWrapMode=2407(,)
+
 # Start notifying the container of all key presses and commands.
 fun void StartRecord=3001(,)
 
@@ -1464,6 +1494,7 @@ val SCLEX_ASM=34
 val SCLEX_CPPNOCASE=35
 val SCLEX_FORTRAN=36
 val SCLEX_F77=37
+val SCLEX_CSS=38
 
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a
 # value assigned in sequence from SCLEX_AUTOMATIC+1.
@@ -1777,13 +1808,17 @@ val SCE_AVE_DEFAULT=0
 val SCE_AVE_COMMENT=1
 val SCE_AVE_NUMBER=2
 val SCE_AVE_WORD=3
-val SCE_AVE_KEYWORD=4
-val SCE_AVE_STATEMENT=5
 val SCE_AVE_STRING=6
 val SCE_AVE_ENUM=7
 val SCE_AVE_STRINGEOL=8
 val SCE_AVE_IDENTIFIER=9
 val SCE_AVE_OPERATOR=10
+val SCE_AVE_WORD1=11
+val SCE_AVE_WORD2=12
+val SCE_AVE_WORD3=13
+val SCE_AVE_WORD4=14
+val SCE_AVE_WORD5=15
+val SCE_AVE_WORD6=16
 # Lexical states for SCLEX_ADA
 lex Ada=SCLEX_ADA SCE_ADA_
 val SCE_ADA_DEFAULT=0
@@ -1909,6 +1944,21 @@ val SCE_F_PREPROCESSOR=11
 val SCE_F_OPERATOR2=12
 val SCE_F_LABEL=13
 val SCE_F_CONTINUATION=14
+# Lexical states for SCLEX_CSS
+lex CSS=SCLEX_CSS SCE_CSS_
+val SCE_CSS_DEFAULT=0
+val SCE_CSS_TAG=1
+val SCE_CSS_CLASS=2
+val SCE_CSS_PSEUDOCLASS=3
+val SCE_CSS_UNKNOWN_PSEUDOCLASS=4
+val SCE_CSS_OPERATOR=5
+val SCE_CSS_IDENTIFIER=6
+val SCE_CSS_UNKNOWN_IDENTIFIER=7
+val SCE_CSS_VALUE=8
+val SCE_CSS_COMMENT=9
+val SCE_CSS_ID=10
+val SCE_CSS_IMPORTANT=11
+val SCE_CSS_DIRECTIVE=12
 
 # Events
 
