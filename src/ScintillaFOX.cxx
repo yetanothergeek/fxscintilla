@@ -244,7 +244,11 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin)
 				PasteRectangular(selStart, (const char *)data, len);
 			} else */{
 #ifdef WIN32
-				len--;
+				// len--;
+				// Fix from Rafael AT enq DOT ufrgs DOT br
+				len=0;
+				while(data[len])
+					len++;
 #endif	// WIN32
 				pdoc->InsertString(currentPos, (const char *)data, len);
 				SetEmptySelection(currentPos + len);
