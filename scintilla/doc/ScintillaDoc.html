@@ -898,6 +898,8 @@ struct TextToFind {
      <a class="message" href="#SCI_SELECTIONISRECTANGLE">SCI_SELECTIONISRECTANGLE</a><br />
      <a class="message" href="#SCI_SETSELECTIONMODE">SCI_SETSELECTIONMODE</a><br />
      <a class="message" href="#SCI_GETSELECTIONMODE">SCI_GETSELECTIONMODE</a><br />
+     <a class="message" href="#SCI_GETLINESELSTARTPOSITION">SCI_GETLINESELSTARTPOSITION(int line)</a><br />
+     <a class="message" href="#SCI_GETLINESELENDPOSITION">SCI_GETLINESELENDPOSITION(int line)</a><br />
      <a class="message" href="#SCI_MOVECARETINSIDEVIEW">SCI_MOVECARETINSIDEVIEW</a><br />
      <a class="message" href="#SCI_WORDENDPOSITION">SCI_WORDENDPOSITION(int position, bool
     onlyWordCharacters)</a><br />
@@ -1054,7 +1056,7 @@ struct TextToFind {
     <b id="SCI_GETSELTEXT">SCI_GETSELTEXT(&lt;unused&gt;, char *text)</b><br />
      This copies the currently selected text and a terminating 0 byte to the <code>text</code>
     buffer. The buffer must be at least
-    <code>SCI_GETSELECTIONEND()-SCI_SETSELECTIONSTART()+1</code> bytes long. <br />
+    <code>SCI_GETSELECTIONEND()-SCI_GETSELECTIONSTART()+1</code> bytes long. <br />
      <br />
 
     <p>See also: <code><a class="message" href="#SCI_GETCURLINE">SCI_GETCURLINE</a>, <a
@@ -1088,6 +1090,11 @@ struct TextToFind {
      until the mode is cancelled by a call with same value or with <code>SCI_CANCEL</code>.
      The get function returns the current mode even if the selection was made by mouse
      or with regular extended moves.</p>
+
+    <p><b id="SCI_GETLINESELSTARTPOSITION">SCI_GETLINESELSTARTPOSITION(int line)</b><br />
+    <b id="SCI_GETLINESELENDPOSITION">SCI_GETLINESELENDPOSITION(int line)</b><br />
+    Retrieve the position of the start and end of the selection at the given line with
+    INVALID_POSITION returned if no selection on this line.</p>
 
     <p><b id="SCI_MOVECARETINSIDEVIEW">SCI_MOVECARETINSIDEVIEW</b><br />
      If the caret is off the top or bottom of the view, it is moved to the nearest line that is
@@ -2029,6 +2036,7 @@ struct TextToFind {
      <a class="message" href="#SCI_SETHOTSPOTACTIVEFORE">SCI_SETHOTSPOTACTIVEFORE</a><br />
      <a class="message" href="#SCI_SETHOTSPOTACTIVEBACK">SCI_SETHOTSPOTACTIVEBACK</a><br />
      <a class="message" href="#SCI_SETHOTSPOTACTIVEUNDERLINE">SCI_SETHOTSPOTACTIVEUNDERLINE</a><br />
+     <a class="message" href="#SCI_SETHOTSPOTSINGLELINE">SCI_SETHOTSPOTSINGLELINE</a><br />
      <a class="message" href="#SCI_SETCONTROLCHARSYMBOL">SCI_SETCONTROLCHARSYMBOL(int
     symbol)</a><br />
      <a class="message" href="#SCI_GETCONTROLCHARSYMBOL">SCI_GETCONTROLCHARSYMBOL</a><br />
@@ -2081,8 +2089,10 @@ struct TextToFind {
      <b id="SCI_SETHOTSPOTACTIVEBACK">SCI_SETHOTSPOTACTIVEBACK(bool useHotSpotBackColour, int <a class="jump"
     href="#colour">colour</a>)</b><br />
      <b id="SCI_SETHOTSPOTACTIVEUNDERLINE">SCI_SETHOTSPOTACTIVEUNDERLINE(bool underline,)</b><br />
+     <b id="SCI_SETHOTSPOTSINGLELINE">SCI_SETHOTSPOTSINGLELINE(bool singleLine,)</b><br />
      While the cursor hovers over text in a style with the hotspot attribute set,
-     the default colouring can be modified and an underline drawn with these settings.</p>
+     the default colouring can be modified and an underline drawn with these settings.
+     Single line mode stops a hotspot from wrapping onto next line.</p>
 
     <p><b id="SCI_SETCONTROLCHARSYMBOL">SCI_SETCONTROLCHARSYMBOL(int symbol)</b><br />
      <b id="SCI_GETCONTROLCHARSYMBOL">SCI_GETCONTROLCHARSYMBOL</b><br />
@@ -2217,6 +2227,9 @@ struct TextToFind {
      <a class="message" href="#SCI_GETCODEPAGE">SCI_GETCODEPAGE</a><br />
      <a class="message" href="#SCI_SETWORDCHARS">SCI_SETWORDCHARS(&lt;unused&gt;, const char
     *chars)</a><br />
+     <a class="message" href="#SCI_SETWHITESPACECHARS">SCI_SETWHITESPACECHARS(&lt;unused&gt;, const char
+    *chars)</a><br />
+     <a class="message" href="#SCI_SETCHARSDEFAULT">SCI_SETCHARSDEFAULT</a><br />
      <a class="message" href="#SCI_GRABFOCUS">SCI_GRABFOCUS</a><br />
      <a class="message" href="#SCI_SETFOCUS">SCI_SETFOCUS(bool focus)</a><br />
      <a class="message" href="#SCI_GETFOCUS">SCI_GETFOCUS</a><br />
@@ -2303,10 +2316,24 @@ struct TextToFind {
     <p><b id="SCI_SETWORDCHARS">SCI_SETWORDCHARS(&lt;unused&gt;, const char *chars)</b><br />
      Scintilla has several functions that operate on words, which are defined to be contiguous
     sequences of characters from a particular set of characters. This message defines which
-    characters are members of that set. If <code>chars</code> is null then the default set,
-    alphanumeric and '_', is used. For example, if you don't allow '_' in your set of characters
+    characters are members of that set. The character sets are set to default values before processing this
+    function.
+    For example, if you don't allow '_' in your set of characters
     use:<br />
      <code>SCI_SETWORDCHARS(0, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")</code>;</p>
+
+    <p><b id="SCI_SETWHITESPACECHARS">SCI_SETWHITESPACECHARS(&lt;unused&gt;, const char *chars)</b><br />
+     Similar to <code>SCI_SETWORDCHARS</code>, this message allows the user to define which chars Scintilla considers
+	as whitespace.  Setting the whitespace chars allows the user to fine-tune Scintilla's behaviour doing
+	such things as moving the cursor to the start or end of a word; for example, by defining punctuation chars
+	as whitespace, they will be skipped over when the user presses ctrl+left or ctrl+right.
+	This function should be called after <code>SCI_SETWORDCHARS</code> as it will
+	reset the whitespace characters to the default set.</p>
+    <p><b id="SCI_SETCHARSDEFAULT">SCI_SETCHARSDEFAULT</b><br />
+     Use the default sets of word and whitespace characters. This sets whitespace to space, tab and other
+     characters with codes less than 0x20, with word characters set to alphanumeric and '_'.
+    </p>
+
 
     <p><b id="SCI_GRABFOCUS">SCI_GRABFOCUS</b><br />
      <b id="SCI_SETFOCUS">SCI_SETFOCUS(bool focus)</b><br />
@@ -3148,6 +3175,16 @@ struct TextToFind {
         </tr>
 
         <tr>
+          <td><code>SCI_WORDLEFTEND</code></td>
+
+          <td><code>SCI_WORDLEFTENDEXTEND</code></td>
+
+          <td><code>SCI_WORDRIGHTEND</code></td>
+
+          <td><code>SCI_WORDRIGHTENDEXTEND</code></td>
+        </tr>
+
+        <tr>
           <td><code>SCI_WORDPARTLEFT</code></td>
 
           <td><code>SCI_WORDPARTLEFTEXTEND</code></td>
@@ -3231,6 +3268,19 @@ struct TextToFind {
           <td><code>SCI_PAGEDOWNEXTEND</code></td>
 
           <td><code>SCI_PAGEDOWNRECTEXTEND</code></td>
+        </tr>
+
+
+        <tr>
+          <td><code>SCI_STUTTEREDPAGEUP</code></td>
+
+          <td><code>SCI_STUTTEREDPAGEUPEXTEND</code></td>
+        </tr>
+
+        <tr>
+          <td><code>SCI_STUTTEREDPAGEDOWN</code></td>
+
+          <td><code>SCI_STUTTEREDPAGEDOWNEXTEND</code></td>
         </tr>
 
         <tr>

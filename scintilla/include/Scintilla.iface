@@ -446,6 +446,7 @@ get int GetCaretPeriod=2075(,)
 set void SetCaretPeriod=2076(int periodMilliseconds,)
 
 # Set the set of characters making up words for when moving or selecting by word.
+# First sets deaults like SetCharsDefault.
 set void SetWordChars=2077(, string characters)
 
 # Start a sequence of actions that is undone and redone as a unit.
@@ -1475,10 +1476,10 @@ set void SetSelectionMode=2422(int mode,)
 # Get the mode of the current selection.
 get int GetSelectionMode=2423(,)
 
-# Retrieve the position of the start of the selection at the given line (INVALID_POSITION of no selection on this line).
+# Retrieve the position of the start of the selection at the given line (INVALID_POSITION if no selection on this line).
 fun position GetLineSelStartPosition=2424(int line,)
 
-# Retrieve the position of the end of the selection at the given line (INVALID_POSITION of no selection on this line).
+# Retrieve the position of the end of the selection at the given line (INVALID_POSITION if no selection on this line).
 fun position GetLineSelEndPosition=2425(int line,)
 
 
@@ -1512,6 +1513,38 @@ fun void PageUpRectExtend=2433(,)
 # Move caret one page down, extending rectangular selection to new caret position.
 fun void PageDownRectExtend=2434(,)
 
+
+# Move caret to top of page, or one page up if already at top of page.
+fun void StutteredPageUp=2435(,)
+
+# Move caret to top of page, or one page up if already at top of page, extending selection to new caret position.
+fun void StutteredPageUpExtend=2436(,)
+
+# Move caret to bottom of page, or one page down if already at bottom of page.
+fun void StutteredPageDown=2437(,)
+
+# Move caret to bottom of page, or one page down if already at bottom of page, extending selection to new caret position.
+fun void StutteredPageDownExtend=2438(,)
+
+
+# Move caret left one word, position cursor at end of word.
+fun void WordLeftEnd=2439(,)
+
+# Move caret left one word, position cursor at end of word, extending selection to new caret position.
+fun void WordLeftEndExtend=2440(,)
+
+# Move caret right one word, position cursor at end of word.
+fun void WordRightEnd=2441(,)
+
+# Move caret right one word, position cursor at end of word, extending selection to new caret position.
+fun void WordRightEndExtend=2442(,)
+
+# Set the set of characters making up whitespace for when moving or selecting by word.
+# Should be called after SetWordChars.
+set void SetWhitespaceChars=2443(, string characters)
+
+# Reset the set of characters for whitespace and word characters to the defaults.
+fun void SetCharsDefault=2444(,)
 
 # Start notifying the container of all key presses and commands.
 fun void StartRecord=3001(,)
@@ -1653,6 +1686,7 @@ val SCLEX_TEX=49
 val SCLEX_METAPOST=50
 val SCLEX_POWERBASIC=51
 val SCLEX_FORTH=52
+val SCLEX_ERLANG=53
 
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a
 # value assigned in sequence from SCLEX_AUTOMATIC+1.
@@ -2292,6 +2326,23 @@ val SCE_METAPOST_SYMBOL=3
 val SCE_METAPOST_COMMAND=4
 val SCE_METAPOST_TEXT=5
 val SCE_METAPOST_EXTRA=6
+# Lexical states for SCLEX_ERLANG
+lex Erlang=SCLEX_ERLANG SCE_ERLANG_
+val SCE_ERLANG_DEFAULT=0
+val SCE_ERLANG_COMMENT=1
+val SCE_ERLANG_VARIABLE=2
+val SCE_ERLANG_NUMBER=3
+val SCE_ERLANG_KEYWORD=4
+val SCE_ERLANG_STRING=5
+val SCE_ERLANG_OPERATOR=6
+val SCE_ERLANG_ATOM=7
+val SCE_ERLANG_FUNCTION_NAME=8
+val SCE_ERLANG_CHARACTER=9
+val SCE_ERLANG_MACRO=10
+val SCE_ERLANG_RECORD=11
+val SCE_ERLANG_SEPARATOR=12
+val SCE_ERLANG_NODE_NAME=13
+val SCE_ERLANG_UNKNOWN=31
 
 # Events
 

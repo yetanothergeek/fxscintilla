@@ -380,6 +380,7 @@ Editor::Editor() {
 	wrapWidth = LineLayout::wrapWidthInfinite;
 	docLineLastWrapped = -1;
 	docLastLineToWrap = -1;
+	backgroundWrapEnabled = true;
 
 	hsStart = -1;
 	hsEnd = -1;
@@ -1122,7 +1123,7 @@ This way, we favour the displaying of useful information: the begining of lines,
 where most code reside, and the lines after the caret, eg. the body of a function.
 
      |        |       |      |                                            |
-slop | strict | jumps | even | Caret can go to the margin                 | When reaching limit (caret going out of
+slop | strict | jumps | even | Caret can go to the margin                 | When reaching limitÝ(caret going out of
      |        |       |      |                                            | visibility or going into the UZ) display is...
 -----+--------+-------+------+--------------------------------------------+--------------------------------------------------------------
   0  |   0    |   0   |   0  | Yes                                        | moved to put caret on top/on right
@@ -1410,7 +1411,7 @@ void Editor::NeedWrapping(int docLineStartWrapping, int docLineEndWrapping) {
 			docLastLineToWrap = pdoc->LinesTotal();
 	}
 	// Wrap lines during idle.
-	if (docLastLineToWrap != docLineLastWrapped) {
+	if (backgroundWrapEnabled && docLastLineToWrap != docLineLastWrapped ) {
 		SetIdle(true);
 	}
 }
@@ -1426,11 +1427,12 @@ void Editor::NeedWrapping(int docLineStartWrapping, int docLineEndWrapping) {
 // condition is called only from idler).
 // Return true if wrapping occurred.
 bool Editor::WrapLines(bool fullWrap, int priorityWrapLineStart) {
-	// If there are any pending wraps do them during idle.
+	// If there are any pending wraps, do them during idle if possible.
 	if (wrapState != eWrapNone) {
 		if (docLineLastWrapped < docLastLineToWrap) {
-			if (!SetIdle(true)) {
-				// If platform does not have Idle events, perform full wrap
+			if (!(backgroundWrapEnabled && SetIdle(true))) {
+				// Background wrapping is disabled, or idle processing
+				// not supported.  A full wrap is required.
 				fullWrap = true;
 			}
 		}
@@ -1441,9 +1443,6 @@ bool Editor::WrapLines(bool fullWrap, int priorityWrapLineStart) {
 			// No priority wrap pending
 			return false;
 		}
-	} else {
-		// If there is no wrap, disable the idle call.
-		SetIdle(false);
 	}
 	int goodTopLine = topLine;
 	bool wrapOccurred = false;
@@ -1467,6 +1466,7 @@ bool Editor::WrapLines(bool fullWrap, int priorityWrapLineStart) {
 			wrapWidth = rcTextArea.Width();
 			// Ensure all of the document is styled.
 			pdoc->EnsureStyledTo(pdoc->Length());
+			RefreshStyleData();
 			AutoSurface surface(this);
 			if (surface) {
 				bool priorityWrap = false;
@@ -3494,7 +3494,9 @@ void Editor::NotifyModified(Document*, DocModification mh, void *) {
 			} else {
 				cs.DeleteLines(lineOfPos, -mh.linesAdded);
 			}
-			CheckModificationForWrap(mh);
+		}
+		CheckModificationForWrap(mh);
+		if (mh.linesAdded != 0) {
 			// Avoid scrolling of display if change before current display
 			if (mh.position < posTopLine) {
 				int newTop = Platform::Clamp(topLine + mh.linesAdded, 0, MaxScrollPos());
@@ -3593,6 +3595,10 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, unsigned long wParam, long
 	case SCI_WORDPARTLEFTEXTEND:
 	case SCI_WORDPARTRIGHT:
 	case SCI_WORDPARTRIGHTEXTEND:
+	case SCI_WORDLEFTEND:
+	case SCI_WORDLEFTENDEXTEND:
+	case SCI_WORDRIGHTEND:
+	case SCI_WORDRIGHTENDEXTEND:
 	case SCI_HOME:
 	case SCI_HOMEEXTEND:
 	case SCI_LINEEND:
@@ -3605,6 +3611,10 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, unsigned long wParam, long
 	case SCI_DOCUMENTSTARTEXTEND:
 	case SCI_DOCUMENTEND:
 	case SCI_DOCUMENTENDEXTEND:
+	case SCI_STUTTEREDPAGEUP:
+	case SCI_STUTTEREDPAGEUPEXTEND:
+	case SCI_STUTTEREDPAGEDOWN:
+	case SCI_STUTTEREDPAGEDOWNEXTEND:
 	case SCI_PAGEUP:
 	case SCI_PAGEUPEXTEND:
 	case SCI_PAGEDOWN:
@@ -3668,13 +3678,35 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, unsigned long wParam, long
 
 /**
  * Force scroll and keep position relative to top of window.
+ *
+ * If stuttered = true and not already at first/last row, move to first/last row of window.
+ * If stuttered = true and already at first/last row, scroll as normal.
  */
-void Editor::PageMove(int direction, selTypes sel) {
-	Point pt = LocationFromPosition(currentPos);
-	int topLineNew = Platform::Clamp(
+void Editor::PageMove(int direction, selTypes sel, bool stuttered) {
+	int topLineNew, newPos;
+
+	// I consider only the caretYSlop, and ignore the caretYPolicy-- is that a problem?
+	int currentLine = pdoc->LineFromPosition(currentPos);
+	int topStutterLine = topLine + caretYSlop;
+	int bottomStutterLine = topLine + LinesToScroll() - caretYSlop;
+
+	if (stuttered && (direction < 0 && currentLine > topStutterLine)) {
+		topLineNew = topLine;
+		newPos = PositionFromLocation(Point(lastXChosen, vs.lineHeight * caretYSlop));
+
+	} else if (stuttered && (direction > 0 && currentLine < bottomStutterLine)) {
+		topLineNew = topLine;
+		newPos = PositionFromLocation(Point(lastXChosen, vs.lineHeight * (LinesToScroll() - caretYSlop)));
+
+	} else {
+		Point pt = LocationFromPosition(currentPos);
+
+		topLineNew = Platform::Clamp(
 	                     topLine + direction * LinesToScroll(), 0, MaxScrollPos());
-	int newPos = PositionFromLocation(
+		newPos = PositionFromLocation(
 	                 Point(lastXChosen, pt.y + direction * (vs.lineHeight * LinesToScroll())));
+	}
+
 	if (topLineNew != topLine) {
 		SetTopLine(topLineNew);
 		MovePositionTo(newPos, sel);
@@ -3910,6 +3942,24 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		MovePositionTo(MovePositionSoVisible(pdoc->NextWordStart(currentPos, 1), 1), selStream);
 		SetLastXChosen();
 		break;
+
+	case SCI_WORDLEFTEND:
+		MovePositionTo(MovePositionSoVisible(pdoc->NextWordEnd(currentPos, -1), -1));
+		SetLastXChosen();
+		break;
+	case SCI_WORDLEFTENDEXTEND:
+		MovePositionTo(MovePositionSoVisible(pdoc->NextWordEnd(currentPos, -1), -1), selStream);
+		SetLastXChosen();
+		break;
+	case SCI_WORDRIGHTEND:
+		MovePositionTo(MovePositionSoVisible(pdoc->NextWordEnd(currentPos, 1), 1));
+		SetLastXChosen();
+		break;
+	case SCI_WORDRIGHTENDEXTEND:
+		MovePositionTo(MovePositionSoVisible(pdoc->NextWordEnd(currentPos, 1), 1), selStream);
+		SetLastXChosen();
+		break;
+
 	case SCI_HOME:
 		MovePositionTo(pdoc->LineStart(pdoc->LineFromPosition(currentPos)));
 		SetLastXChosen();
@@ -3981,6 +4031,18 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	case SCI_DOCUMENTENDEXTEND:
 		MovePositionTo(pdoc->Length(), selStream);
 		SetLastXChosen();
+		break;
+	case SCI_STUTTEREDPAGEUP:
+		PageMove(-1, noSel, true);
+		break;
+	case SCI_STUTTEREDPAGEUPEXTEND:
+		PageMove(-1, selStream, true);
+		break;
+	case SCI_STUTTEREDPAGEDOWN:
+		PageMove(1, noSel, true);
+		break;
+	case SCI_STUTTEREDPAGEDOWNEXTEND:
+		PageMove(1, selStream, true);
 		break;
 	case SCI_PAGEUP:
 		PageMove(-1);
@@ -4988,17 +5050,24 @@ void Editor::Tick() {
 
 bool Editor::Idle() {
 
-	bool idleDone = false;
-	// Wrap lines during idle.
-	WrapLines(false, -1);
-	// No more wrapping
-	if (docLineLastWrapped == docLastLineToWrap)
-		idleDone = true;
+	bool idleDone;
+
+	bool wrappingDone = (wrapState == eWrapNone) || (!backgroundWrapEnabled);
+
+	if (!wrappingDone) {
+		// Wrap lines during idle.
+		WrapLines(false, -1);
+		// No more wrapping
+		if (docLineLastWrapped == docLastLineToWrap)
+			wrappingDone = true;
+	}
 
 	// Add more idle things to do here, but make sure idleDone is
 	// set correctly before the function returns. returning
 	// false will stop calling this idle funtion until SetIdle() is
 	// called again.
+
+	idleDone = wrappingDone; // && thatDone && theOtherThingDone...
 
 	return !idleDone;
 }
@@ -5419,7 +5488,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			if (selectedText.len) {
 				for (; iChar < selectedText.len; iChar++)
 					ptr[iChar] = selectedText.s[iChar];
-				ptr[iChar] = '\0';
 			} else {
 				ptr[0] = '\0';
 			}
@@ -5669,10 +5737,22 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETWORDCHARS: {
+			pdoc->SetDefaultCharClasses();
 			if (lParam == 0)
 				return 0;
-			pdoc->SetWordChars(reinterpret_cast<unsigned char *>(lParam));
+			pdoc->SetCharClasses(reinterpret_cast<unsigned char *>(lParam), Document::ccWord);
 		}
+		break;
+
+	case SCI_SETWHITESPACECHARS: {
+			if (lParam == 0)
+				return 0;
+			pdoc->SetCharClasses(reinterpret_cast<unsigned char *>(lParam), Document::ccSpace);
+		}
+		break;
+
+	case SCI_SETCHARSDEFAULT:
+		pdoc->SetDefaultCharClasses();
 		break;
 
 	case SCI_GETLENGTH:
@@ -6106,8 +6186,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETMARGINWIDTHN:
 		if (ValidMargin(wParam)) {
-			vs.ms[wParam].width = lParam;
-			InvalidateStyleRedraw();
+			// Short-circuit if the width is unchanged, to avoid unnecessary redraw.
+			if (vs.ms[wParam].width != lParam) {
+				vs.ms[wParam].width = lParam;
+				InvalidateStyleRedraw();
+			}
 		}
 		break;
 
@@ -6455,6 +6538,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_WORDLEFTEXTEND:
 	case SCI_WORDRIGHT:
 	case SCI_WORDRIGHTEXTEND:
+	case SCI_WORDLEFTEND:
+	case SCI_WORDLEFTENDEXTEND:
+	case SCI_WORDRIGHTEND:
+	case SCI_WORDRIGHTENDEXTEND:
 	case SCI_HOME:
 	case SCI_HOMEEXTEND:
 	case SCI_LINEEND:
@@ -6467,6 +6554,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_DOCUMENTSTARTEXTEND:
 	case SCI_DOCUMENTEND:
 	case SCI_DOCUMENTENDEXTEND:
+
+	case SCI_STUTTEREDPAGEUP:
+	case SCI_STUTTEREDPAGEUPEXTEND:
+	case SCI_STUTTEREDPAGEDOWN:
+	case SCI_STUTTEREDPAGEDOWNEXTEND:
+
 	case SCI_PAGEUP:
 	case SCI_PAGEUPEXTEND:
 	case SCI_PAGEDOWN:

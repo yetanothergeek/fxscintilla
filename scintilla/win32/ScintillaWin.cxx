@@ -76,6 +76,8 @@
 #define MK_ALT 32
 #endif
 
+#define SC_WIN_IDLE 5001
+
 // Functions imported from PlatWin
 extern bool IsNT();
 extern void Platform_Initialise(void *hInstance);
@@ -171,10 +173,13 @@ class ScintillaWin :
 	static sptr_t PASCAL CTWndProc(
 		    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam);
 
+	enum { invalidTimerID, standardTimerID, idleTimerID };
+
 	virtual void StartDrag();
 	sptr_t WndPaint(uptr_t wParam);
 	sptr_t HandleComposition(uptr_t wParam, sptr_t lParam);
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+	virtual bool SetIdle(bool on);
 	virtual void SetTicking(bool on);
 	virtual void SetMouseCapture(bool on);
 	virtual bool HaveMouseCapture();
@@ -282,6 +287,7 @@ void ScintillaWin::Initialise() {
 void ScintillaWin::Finalise() {
 	ScintillaBase::Finalise();
 	SetTicking(false);
+	SetIdle(false);
 	::RevokeDragDrop(MainHWND());
 	::OleUninitialize();
 }
@@ -577,7 +583,37 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		return 0;
 
 	case WM_TIMER:
-		Tick();
+		if (wParam == standardTimerID && timer.ticking) {
+			Tick();
+		} else if (wParam == idleTimerID && idler.state) {
+			SendMessage(MainHWND(), SC_WIN_IDLE, 0, 1);
+		} else {
+			return 1;
+		}
+		break;
+
+	case SC_WIN_IDLE:
+		// wParam=dwTickCountInitial, or 0 to initialize.  lParam=bSkipUserInputTest
+		if (idler.state) {
+			if (lParam || (WAIT_TIMEOUT==MsgWaitForMultipleObjects(0,0,0,0, QS_INPUT|QS_HOTKEY))) {
+				if (Idle()) {
+					// User input was given priority above, but all events do get a turn.  Other
+					// messages, notifications, etc. will get interleaved with the idle messages.
+
+					// However, some things like WM_PAINT are a lower priority, and will not fire
+					// when there's a message posted.  So, several times a second, we stop and let
+					// the low priority events have a turn (after which the timer will fire again).
+
+					DWORD dwCurrent = GetTickCount();
+					DWORD dwStart = wParam ? wParam : dwCurrent;
+
+					if (dwCurrent >= dwStart && dwCurrent > 200 && dwCurrent - 200 < dwStart)
+						PostMessage(MainHWND(), SC_WIN_IDLE, dwStart, 0);
+				} else {
+					SetIdle(false);
+				}
+			}
+		}
 		break;
 
 	case WM_GETMINMAXINFO:
@@ -887,13 +923,31 @@ void ScintillaWin::SetTicking(bool on) {
 	if (timer.ticking != on) {
 		timer.ticking = on;
 		if (timer.ticking) {
-			timer.tickerID = reinterpret_cast<TickerID>(::SetTimer(MainHWND(), 1, timer.tickSize, NULL));
+			timer.tickerID = ::SetTimer(MainHWND(), standardTimerID, timer.tickSize, NULL)
+				? reinterpret_cast<TickerID>(standardTimerID) : 0;
 		} else {
 			::KillTimer(MainHWND(), reinterpret_cast<uptr_t>(timer.tickerID));
 			timer.tickerID = 0;
 		}
 	}
 	timer.ticksToWait = caret.period;
+}
+
+bool ScintillaWin::SetIdle(bool on) {
+	// On Win32 the Idler is implemented as a Timer on the Scintilla window.  This
+	// takes advantage of the fact that WM_TIMER messages are very low priority,
+	// and are only posted when the message queue is empty, i.e. during idle time.
+	if (idler.state != on) {
+		if (on) {
+			idler.idlerID = ::SetTimer(MainHWND(), idleTimerID, 10, NULL)
+				? reinterpret_cast<IdlerID>(idleTimerID) : 0;
+		} else {
+			::KillTimer(MainHWND(), reinterpret_cast<uptr_t>(idler.idlerID));
+			idler.idlerID = 0;
+		}
+		idler.state = idler.idlerID != 0;
+	}
+	return idler.state;
 }
 
 void ScintillaWin::SetMouseCapture(bool on) {
@@ -1530,11 +1584,10 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	::EmptyClipboard();
 
 	HGLOBAL hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
-		selectedText.len + 1);
+		selectedText.len);
 	if (hand) {
 		char *ptr = static_cast<char *>(::GlobalLock(hand));
 		memcpy(ptr, selectedText.s, selectedText.len);
-		ptr[selectedText.len] = '\0';
 		::GlobalUnlock(hand);
 	}
 	::SetClipboardData(CF_TEXT, hand);
@@ -1542,11 +1595,10 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	if (IsUnicodeMode()) {
 		int uchars = UCS2Length(selectedText.s, selectedText.len);
 		HGLOBAL uhand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
-			2 * (uchars + 1));
+			2 * (uchars));
 		if (uhand) {
 			wchar_t *uptr = static_cast<wchar_t *>(::GlobalLock(uhand));
 			UCS2FromUTF8(selectedText.s, selectedText.len, uptr, uchars);
-			uptr[uchars] = 0;
 			::GlobalUnlock(uhand);
 		}
 		::SetClipboardData(CF_UNICODETEXT, uhand);
@@ -1841,20 +1893,18 @@ STDMETHODIMP ScintillaWin::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 	HGLOBAL hand;
 	if (pFEIn->cfFormat == CF_UNICODETEXT) {
 		int uchars = UCS2Length(drag.s, drag.len);
-		hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, 2 * (uchars + 1));
+		hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, 2 * (uchars));
 		if (hand) {
 			wchar_t *uptr = static_cast<wchar_t *>(::GlobalLock(hand));
 			UCS2FromUTF8(drag.s, drag.len, uptr, uchars);
-			uptr[uchars] = 0;
 		}
 	} else {
-		hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, drag.len + 1);
+		hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, drag.len);
 		if (hand) {
 			char *ptr = static_cast<char *>(::GlobalLock(hand));
 			for (int i = 0; i < drag.len; i++) {
 				ptr[i] = drag.s[i];
 			}
-			ptr[drag.len] = '\0';
 		}
 	}
 	::GlobalUnlock(hand);
