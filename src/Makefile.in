@@ -37,7 +37,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
 @HAVE_CYGWIN_TRUE@am__append_1 = -DWIN32
-@NOLEXER_TRUE@am__append_2 = libfxscintillanolexer.la
+@HAVE_FOX_1_0_TRUE@am__append_2 = \
+@HAVE_FOX_1_0_TRUE@	$(top_builddir)/ltdl/libltdl.la
+
+@NOLEXER_TRUE@am__append_3 = libfxscintillanolexer.la
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -73,6 +76,8 @@ FOX_INCLUDE_DIR = @FOX_INCLUDE_DIR@
 FOX_LIB_DIR = @FOX_LIB_DIR@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
+HAVE_FOX_1_0_FALSE = @HAVE_FOX_1_0_FALSE@
+HAVE_FOX_1_0_TRUE = @HAVE_FOX_1_0_TRUE@
 HAVE_MINGW32_FALSE = @HAVE_MINGW32_FALSE@
 HAVE_MINGW32_TRUE = @HAVE_MINGW32_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -168,7 +173,7 @@ AM_CXXFLAGS = -W -Wall -DFOX $(am__append_1)
 
 @HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
 
-lib_LTLIBRARIES = libfxscintilla.la $(am__append_2)
+lib_LTLIBRARIES = libfxscintilla.la $(am__append_3)
 
 libfxscintilla_la_SOURCES = \
 	PlatFOX.cxx \
@@ -176,9 +181,8 @@ libfxscintilla_la_SOURCES = \
 
 
 libfxscintilla_la_LIBADD = \
-	$(top_builddir)/scintilla/src/libscintilla.la \
-	$(top_builddir)/ltdl/libltdl.la
-
+	$(top_builddir)/scintilla/src/libscintilla.la\
+$(am__append_2)
 
 libfxscintilla_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
@@ -202,9 +206,11 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES = version.h
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
-libfxscintilla_la_DEPENDENCIES = \
-	$(top_builddir)/scintilla/src/libscintilla.la \
-	$(top_builddir)/ltdl/libltdl.la
+@HAVE_FOX_1_0_TRUE@libfxscintilla_la_DEPENDENCIES = \
+@HAVE_FOX_1_0_TRUE@	$(top_builddir)/scintilla/src/libscintilla.la \
+@HAVE_FOX_1_0_TRUE@	$(top_builddir)/ltdl/libltdl.la
+@HAVE_FOX_1_0_FALSE@libfxscintilla_la_DEPENDENCIES = \
+@HAVE_FOX_1_0_FALSE@	$(top_builddir)/scintilla/src/libscintilla.la
 am_libfxscintilla_la_OBJECTS = libfxscintilla_la-PlatFOX.lo \
 	libfxscintilla_la-ScintillaFOX.lo
 libfxscintilla_la_OBJECTS = $(am_libfxscintilla_la_OBJECTS)

@@ -36,7 +36,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-@HAVE_CYGWIN_TRUE@am__append_1 = -DWIN32
+@HAVE_CYGWIN_TRUE@@HAVE_FOX_1_0_TRUE@am__append_1 = -DWIN32
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -72,6 +72,8 @@ FOX_INCLUDE_DIR = @FOX_INCLUDE_DIR@
 FOX_LIB_DIR = @FOX_LIB_DIR@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
+HAVE_FOX_1_0_FALSE = @HAVE_FOX_1_0_FALSE@
+HAVE_FOX_1_0_TRUE = @HAVE_FOX_1_0_TRUE@
 HAVE_MINGW32_FALSE = @HAVE_MINGW32_FALSE@
 HAVE_MINGW32_TRUE = @HAVE_MINGW32_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -156,14 +158,14 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AM_CFLAGS = -W -Wall $(am__append_1)
-@HAVE_CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 
-@HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
+@HAVE_FOX_1_0_TRUE@@HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
+@HAVE_CYGWIN_TRUE@@HAVE_FOX_1_0_TRUE@AM_LDFLAGS = -mwindows
 
-noinst_LTLIBRARIES = libltdl.la
+@HAVE_FOX_1_0_TRUE@noinst_LTLIBRARIES = libltdl.la
 
-libltdl_la_SOURCES = \
-	ltdl.c
+@HAVE_FOX_1_0_TRUE@libltdl_la_SOURCES = \
+@HAVE_FOX_1_0_TRUE@	ltdl.c
 
 subdir = ltdl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -173,7 +175,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 
 libltdl_la_LDFLAGS =
 libltdl_la_LIBADD =
-am_libltdl_la_OBJECTS = ltdl.lo
+am__libltdl_la_SOURCES_DIST = ltdl.c
+@HAVE_FOX_1_0_TRUE@am_libltdl_la_OBJECTS = ltdl.lo
 libltdl_la_OBJECTS = $(am_libltdl_la_OBJECTS)
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir)
@@ -187,7 +190,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-DIST_SOURCES = $(libltdl_la_SOURCES)
+DIST_SOURCES = $(am__libltdl_la_SOURCES_DIST)
 DIST_COMMON = Makefile.am Makefile.in
 SOURCES = $(libltdl_la_SOURCES)
 
