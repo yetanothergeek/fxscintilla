@@ -45,4 +45,4 @@ libscilexers_la_SOURCES = \
 	LexSQL.cxx \
 	LexVB.cxx
 
-libscilexers_la_LDFLAGS = -version-info @LT_SCILEXER_CURRENT@:@LT_SCILEXER_REVISION@:@LT_SCILEXER_AGE@
+libscilexers_la_LDFLAGS = -version-info $(LT_SCILEXER_CURRENT):$(LT_SCILEXER_REVISION):$(LT_SCILEXER_AGE)
