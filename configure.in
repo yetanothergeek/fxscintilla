@@ -47,8 +47,8 @@ CHECK_FOX(1, 0)
 
 dnl Generated makefiles
 AC_OUTPUT( \
-	scintilla/include/Makefile \
 	scintilla/src/Makefile \
-	scintilla/fox/Makefile \
 	scintilla/Makefile \
+	include/Makefile \
+	src/Makefile \
 	Makefile)

@@ -59,6 +59,7 @@ cd fxscintilla
 
 if [ "$devel" = "false" ]; then
 		rm -fr test scintilla/gtk scintilla/win32
+		rm -f scintilla.kdevprj
 		rm -f scintilla/scintilla.dsp
 		rm -f scintilla/scintilla.dsw
 		rm -f scintilla/fox/scintilla.dsp

@@ -1,18 +1,18 @@
 #! /bin/bash
 
 # usage:
-#		untar-official <scite_release>
+#		untar-official <scintilla_release>
 # example:
 #		untar-official 140
 # produces
-#		~/scite140
+#		~/scintilla140
 # directory from
-# ~/scite140.zip
+#   ~/scintilla140.zip
 # official archive with end of line conversions using dos2unix.
 
 version=$1
-archive=$HOME/scite$version.zip
-directory=$HOME/scite$version
+archive=$HOME/scintilla$version.zip
+directory=$HOME/scintilla$version
 
 if [ ! -f $archive ]; then
 	echo "The archive $archive doesn't exist."
@@ -35,5 +35,10 @@ find . -type f ! \( \
 		-name '*.jpg' -o \
 		-name '*.bmp' \) \
 	-exec dos2unix -o {} \;
+
+# Moving exported headers to the FXScintilla include directory
+mkdir include
+mv scintilla/include/Scintilla.h include
+mv scintilla/include/SciLexer.h include
 
 popd
