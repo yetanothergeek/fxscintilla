@@ -186,6 +186,10 @@ SOURCE=..\..\..\scintilla\src\LexEScript.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexForth.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexFortran.cxx
 # End Source File
 # Begin Source File
@@ -210,6 +214,10 @@ SOURCE=..\..\..\scintilla\src\LexMatlab.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexMetapost.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexMMIXAL.cxx
 # End Source File
 # Begin Source File
@@ -227,6 +235,10 @@ SOURCE=..\..\..\scintilla\src\LexOthers.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexPascal.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexPB.cxx
 # End Source File
 # Begin Source File
 
@@ -255,6 +267,10 @@ SOURCE=..\..\..\scintilla\src\LexScriptol.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexSQL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexTeX.cxx
 # End Source File
 # Begin Source File
 
