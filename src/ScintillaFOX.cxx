@@ -2,10 +2,10 @@
  *
  *  ScintillaFOX.cxx - FOX toolkit specific subclass of ScintillaBase
  *
- *  Copyright 2001-2002 by Gilles Filippini <gilles.filippini@free.fr>
+ *  Copyright 2001-2004 by Gilles Filippini <gilles.filippini@free.fr>
  *
  *  Adapted from the Scintilla source ScintillaGTK.cxx 
- *  Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+ *  Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
  *
  *  ====================================================================
  *

@@ -2,7 +2,7 @@
  *
  *  FXScintilla.h - Interface for the FOX Scintilla widget
  *
- *  Copyright 2001-2002 by Gilles Filippini <gilles.filippini@free.fr>
+ *  Copyright 2001-2004 by Gilles Filippini <gilles.filippini@free.fr>
  *
  *  ====================================================================
  *

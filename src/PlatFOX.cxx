@@ -2,10 +2,10 @@
  *
  *  PlatFOX.cxx - implementation of platform facilities on the FOX toolkit
  *
- *  Copyright 2001-2003 by Gilles Filippini <gilles.filippini@free.fr>
+ *  Copyright 2001-2004 by Gilles Filippini <gilles.filippini@free.fr>
  *
  *  Adapted from the Scintilla source PlatGTK.cxx 
- *  Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
+ *  Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
  *
  *  ====================================================================
  *
