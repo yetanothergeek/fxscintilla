@@ -64,6 +64,13 @@
 #include "Editor.h"
 #include "SString.h"
 #include "ScintillaBase.h"
+
+#ifdef WIN32
+#ifdef FOXDLL
+#undef FXAPI
+#define FXAPI __declspec(dllexport)
+#endif
+#endif
 #include "FXScintilla.h"
 
 #ifdef _MSC_VER
