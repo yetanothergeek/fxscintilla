@@ -1,3 +1,11 @@
+2004-04-18  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.59
+	
+	* Fixed scroll bugs #8198 and #8505
+	
+	* Started Dev-C++ compatibility
+	
 2004-02-11  Gilles Filippini <pini@free.fr>
 
 	* Fox-1.1 branch: sync'ed with version 1.1.46
