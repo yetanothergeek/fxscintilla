@@ -122,7 +122,7 @@ SOURCE=..\src\Editor.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\win32\ExternalLexer.cxx
+SOURCE=..\src\ExternalLexer.cxx
 # End Source File
 # Begin Source File
 
@@ -158,6 +158,10 @@ SOURCE=..\src\LexBullant.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexCLW.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexConf.cxx
 # End Source File
 # Begin Source File
@@ -178,6 +182,10 @@ SOURCE=..\src\LexEiffel.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexEScript.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexFortran.cxx
 # End Source File
 # Begin Source File
@@ -190,11 +198,27 @@ SOURCE=..\src\LexLisp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexLout.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexLua.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\LexMatlab.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexMMIXAL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexMPT.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexNsis.cxx
 # End Source File
 # Begin Source File
 
@@ -214,6 +238,10 @@ SOURCE=..\src\LexPOV.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexPS.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexPython.cxx
 # End Source File
 # Begin Source File
@@ -222,11 +250,19 @@ SOURCE=..\src\LexRuby.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexScriptol.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexSQL.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=..\src\LexVB.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexYAML.cxx
 # End Source File
 # Begin Source File
 
