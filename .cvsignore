@@ -1,2 +1,7 @@
+Makefile
+libtool
 snapshot
+*.cache
 *.swp
+*.log
+*.status
