@@ -65,10 +65,8 @@ libscintillanolexer_la_SOURCES = \
 	Indicator.cxx \
 	AutoComplete.cxx
 
-noinst_LTLIBRARIES = libscintilla.la libscintillanolexer.la
-
-else
-
-noinst_LTLIBRARIES = libscintilla.la
+libscintillanolexer = libscintillanolexer.la
 
 endif # NOLEXER
+
+noinst_LTLIBRARIES = libscintilla.la $(libscintillanolexer)

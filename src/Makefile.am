@@ -20,7 +20,7 @@ libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 ## NoLexer enabled
 if NOLEXER
 
-lib_LTLIBRARIES = libfxscintilla.la libfxscintillanolexer.la
+libfxscintillanolexer = libfxscintillanolexer.la
 
 libfxscintillanolexer_la_SOURCES = \
 	PlatFOX.cxx \
@@ -31,8 +31,6 @@ libfxscintillanolexer_la_LIBADD = $(top_builddir)/scintilla/src/libscintillanole
 libfxscintillanolexer_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLANOLEXER_CURRENT):$(LT_FXSCINTILLANOLEXER_REVISION):$(LT_FXSCINTILLANOLEXER_AGE)
 
-else
-
-lib_LTLIBRARIES = libfxscintilla.la
-
 endif # NOLEXER
+
+lib_LTLIBRARIES = libfxscintilla.la $(libfxscintillanolexer)

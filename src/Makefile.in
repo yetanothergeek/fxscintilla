@@ -115,8 +115,7 @@ libfxscintilla_la_LDFLAGS = \
 
 libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 
-@NOLEXER_TRUE@lib_LTLIBRARIES = libfxscintilla.la libfxscintillanolexer.la
-@NOLEXER_FALSE@lib_LTLIBRARIES = libfxscintilla.la
+@NOLEXER_TRUE@libfxscintillanolexer = libfxscintillanolexer.la
 
 @NOLEXER_TRUE@libfxscintillanolexer_la_SOURCES = \
 @NOLEXER_TRUE@	PlatFOX.cxx \
@@ -128,6 +127,8 @@ libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 @NOLEXER_TRUE@libfxscintillanolexer_la_LDFLAGS = \
 @NOLEXER_TRUE@	-version-info $(LT_FXSCINTILLANOLEXER_CURRENT):$(LT_FXSCINTILLANOLEXER_REVISION):$(LT_FXSCINTILLANOLEXER_AGE)
 
+
+lib_LTLIBRARIES = libfxscintilla.la $(libfxscintillanolexer)
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =

@@ -159,8 +159,9 @@ libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 @NOLEXER_TRUE@	AutoComplete.cxx
 
 
-@NOLEXER_TRUE@noinst_LTLIBRARIES = libscintilla.la libscintillanolexer.la
-@NOLEXER_FALSE@noinst_LTLIBRARIES = libscintilla.la
+@NOLEXER_TRUE@libscintillanolexer = libscintillanolexer.la
+
+noinst_LTLIBRARIES = libscintilla.la $(libscintillanolexer)
 subdir = scintilla/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
