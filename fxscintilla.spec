@@ -70,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/lib*.a
 
 %changelog
+* Sun Nov 03 2002 Gilles Filippini (pini AT free DOT fr) 1.49-1
+- upgraded to 1.49
+
 * Wed May 29 2002 Laurent Julliard (laurent AT moldus DOT org) 1.46-1
 - upgraded to 1.46.1
 - enabled the generation of the nolexer library (--enable-nolexer)
