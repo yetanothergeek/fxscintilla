@@ -291,9 +291,9 @@ public:
 	SurfaceImpl();
 	virtual ~SurfaceImpl();
 
-	void Init();
-	void Init(SurfaceID sid);
-	void InitPixMap(int width, int height, Surface *surface_);
+	void Init(WindowID wid);
+	void Init(SurfaceID sid, WindowID wid);
+	void InitPixMap(int width, int height, Surface *surface_, WindowID wid);
 
 	void Release();
 	bool Initialised();
@@ -377,19 +377,19 @@ bool SurfaceImpl::Initialised() {
 	return inited;
 }
 
-void SurfaceImpl::Init() {
+void SurfaceImpl::Init(WindowID) {
 	Release();
 	inited = true;
 }
 
-void SurfaceImpl::Init(SurfaceID sid) {
+void SurfaceImpl::Init(SurfaceID sid, WindowID) {
 	Release();
 	drawable = reinterpret_cast<FXDrawable *>(sid);
 	createdDC = true;
 	inited = true;
 }
 
-void SurfaceImpl::InitPixMap(int width, int height, Surface*) {
+void SurfaceImpl::InitPixMap(int width, int height, Surface*, WindowID) {
 	Release();
 	if (height > 0 && width > 0)
 		ppixmap = new FXImage(FXApp::instance(), NULL, 0, width, height);
@@ -696,8 +696,13 @@ void Window::SetPosition(PRectangle rc) {
 
 
 void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
-	id->position(relativeTo.GetID()->getX() + rc.left, relativeTo.GetID()->getY() + rc.top,
-		    rc.Width(), rc.Height());
+	int ox = relativeTo.GetID()->getX() + rc.left;
+	int oy = relativeTo.GetID()->getY() + rc.top;
+	if (ox < 0)
+		ox = 0;
+	if (oy < 0)
+		oy = 0;
+	id->position(ox, oy, rc.Width(), rc.Height());
 }
 
 PRectangle Window::GetClientPosition() {
@@ -749,6 +754,10 @@ void Window::SetCursor(Cursor curs) {
 		break;
 	case cursorWait:
 		cursorID = DEF_SWATCH_CURSOR;
+		break;
+	case cursorHand:
+		// <FIXME/> Should be a hand cursor...
+		cursorID = DEF_CROSSHAIR_CURSOR;
 		break;
 	case cursorReverseArrow:
 		cursorID = DEF_RARROW_CURSOR;
@@ -1210,6 +1219,10 @@ int Platform::DefaultFontSize() {
 
 unsigned int Platform::DoubleClickTime() {
 	return 500; 	// Half a second
+}
+
+bool Platform::MouseButtonBounce() {
+	return true; // <FIXME/> same as gtk?
 }
 
 void Platform::DebugDisplay(const char *s) {

@@ -181,6 +181,12 @@ sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case SCI_GETDIRECTPOINTER:
 		return reinterpret_cast<sptr_t>(this);
 
+#ifdef SCI_LEXER
+	case SCI_LOADLEXERLIBRARY:
+		//LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
+		break;
+#endif
+
 	default:
 		return ScintillaBase::WndProc(iMessage,wParam,lParam);
 	}
@@ -372,6 +378,7 @@ sptr_t ScintillaFOX::DefWndProc(unsigned int, uptr_t, sptr_t)
 
 void ScintillaFOX::CreateCallTipWindow(PRectangle rc)
 {
+	// <FIXME/>
 }
 
 void ScintillaFOX::AddToPopUp(const char * label, int cmd, bool enabled)
@@ -458,7 +465,7 @@ void ScintillaFOX::SyncPaint(PRectangle rc) {
 	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 	Surface *sw = Surface::Allocate();
 	if (sw) {
-		sw->Init(wMain.GetID());
+		sw->Init(wMain.GetID(), wMain.GetID());
 		Paint(sw, rcPaint);
 		sw->Release();
 		delete sw;
@@ -480,7 +487,7 @@ void ScintillaFOX::FullPaint() {
 	if (wMain.GetID()) {
 		Surface *sw = Surface::Allocate();
 		if (sw) {
-			sw->Init(wMain.GetID());
+			sw->Init(wMain.GetID(), wMain.GetID());
 			Paint(sw, rcPaint);
 			sw->Release();
 			delete sw;

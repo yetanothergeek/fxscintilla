@@ -53,6 +53,7 @@ libscintilla_la_SOURCES = \
 	LexOthers.cxx \
 	LexPascal.cxx \
 	LexPerl.cxx \
+	LexPOV.cxx \
 	LexPython.cxx \
 	LexRuby.cxx \
 	LexSQL.cxx \
