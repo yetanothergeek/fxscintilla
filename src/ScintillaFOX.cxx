@@ -788,9 +788,10 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 #ifndef WIN32
 	int key = event->code;
 #else
-	int key = ((event->text[0]) && !ctrl && !alt) ? event->text[0] : event->code;
+	int key = ((event->text[0] >= 32) && !ctrl && !alt) ?
+		event->text[0] : event->code;
 #endif
-  // </FIXME>
+	// </FIXME>
 	if (ctrl && (key < 128))
 		key = toupper(key);
 	else if (!ctrl && (key >= KEY_KP_Multiply && key <= KEY_KP_9))
