@@ -1,0 +1,3 @@
+export CVS_RSH=ssh
+export CVSROOT=pini@subversions.gnu.org:/cvsroot/fxscintilla
+alias cvs='cvs -z3'
