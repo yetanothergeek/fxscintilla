@@ -57,7 +57,7 @@ if [ ! -z $major ]; then
 		if [ ! -z $minor ]; then
 				name="${name}.${minor}"
 		fi
-		name = "${name}.tgz"
+		name= "${name}.tgz"
 else
 		name="../fxscintilla.tgz"
 fi
