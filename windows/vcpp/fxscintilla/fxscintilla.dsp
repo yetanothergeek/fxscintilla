@@ -44,7 +44,7 @@ RSC=rc.exe
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt
 # ADD F90 /compile_only /include:"Release/" /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "d:/fox-1.0.3/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "d:/fox-1.0.36/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /YX /FD /c
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
 # ADD RSC /l 0x40c /d "NDEBUG"
 BSC32=bscmake.exe
@@ -69,7 +69,7 @@ LIB32=link.exe -lib
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "d:/fox-1.0.3/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "d:/fox-1.0.36/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
 # ADD RSC /l 0x40c /d "_DEBUG"
 BSC32=bscmake.exe
@@ -115,6 +115,10 @@ SOURCE=..\..\..\scintilla\src\DocumentAccessor.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\Editor.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\ExternalLexer.cxx
 # End Source File
 # Begin Source File
 
@@ -170,6 +174,10 @@ SOURCE=..\..\..\scintilla\src\LexEiffel.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexEScript.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexFortran.cxx
 # End Source File
 # Begin Source File
@@ -179,6 +187,10 @@ SOURCE=..\..\..\scintilla\src\LexHTML.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexLisp.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexLout.cxx
 # End Source File
 # Begin Source File
 
