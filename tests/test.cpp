@@ -5,40 +5,40 @@
 
 // Initial text
 static const char sInitialText[] = "\
-#! /usr/bin/env ruby
-
-require \"fox\"
-require \"fox/responder\"
-require \"MainWindow\"
-
-include Fox
-
-def main
-  # Make application
-  application = FXApp.new(\"rbCVS\", \"pini\")
-
-  # Current threads implementation causes problems for this example, so disable
-  application.threadsEnabled = false
-  
-  # Open display
-  application.init(ARGV)
-
-  # Set normal font regular
-  font = application.normalFont
-  fd = font.fontDesc
-  fd.weight = FONTWEIGHT_REGULAR
-  font.fontDesc = fd
-
-  # Make window
-  MainWindow.new(application)
-  
-  # Create app  
-  application.create()
-  # Run
-  application.run()
-end
-
-main
+#! /usr/bin/env ruby\n\
+\n\
+require \"fox\"\n\
+require \"fox/responder\"\n\
+require \"MainWindow\"\n\
+\n\
+include Fox\n\
+\n\
+def main\n\
+  # Make application\n\
+  application = FXApp.new(\"rbCVS\", \"pini\")\n\
+\n\
+  # Current threads implementation causes problems for this example, so disable\n\
+  application.threadsEnabled = false\n\
+\n\
+  # Open display\n\
+  application.init(ARGV)\n\
+\n\
+  # Set normal font regular\n\
+  font = application.normalFont\n\
+  fd = font.fontDesc\n\
+  fd.weight = FONTWEIGHT_REGULAR\n\
+  font.fontDesc = fd\n\
+\n\
+  # Make window\n\
+  MainWindow.new(application)\n\
+\n\
+  # Create app\n\
+  application.create()\n\
+  # Run\n\
+  application.run()\n\
+end\n\
+\n\
+main\n\
 ";
 
 // The lexer needs a keywords list
