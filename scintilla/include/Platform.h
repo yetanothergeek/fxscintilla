@@ -60,6 +60,7 @@ class FXDrawable;
 class FXWindow;
 class FXMenuPane;
 class FXList;
+class FXChore;
 # ifndef WIN32
 class FXTimer;
 # else
@@ -76,15 +77,16 @@ typedef FXDrawable * SurfaceID;
 typedef FXWindow * WindowID;
 typedef FXMenuPane * MenuID;
 typedef FXTimer * TickerID;
+typedef FXChore * IdlerID;
 #else
 typedef void *FontID;
 typedef void *SurfaceID;
 typedef void *WindowID;
 typedef void *MenuID;
 typedef void *TickerID;
+typedef void *IdlerID;
 #endif
 typedef void *Function;
-typedef void *IdlerID;
 
 /**
  * A geometric point class.

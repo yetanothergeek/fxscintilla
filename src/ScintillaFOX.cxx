@@ -133,6 +133,7 @@ private:
 	virtual void NotifyChange();
 	virtual void NotifyParent(SCNotification scn);
 	virtual void SetTicking(bool on);
+	virtual bool SetIdle(bool on);
 	virtual void SetMouseCapture(bool on);
 	virtual bool HaveMouseCapture();
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
@@ -374,6 +375,23 @@ void ScintillaFOX::SetTicking(bool on)
 	timer.ticksToWait = caret.period;
 }
 
+bool ScintillaFOX::SetIdle(bool on) {
+	if (on) {
+		// Start idler, if it's not running.
+		if (idler.state == false) {
+			idler.state = true;
+			idler.idlerID = FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
+		}
+	} else {
+		// Stop idler, if it's running
+		if (idler.state == true) {
+			idler.state = false;
+			FXApp::instance()->removeChore(idler.idlerID);
+		}
+	}
+	return true;
+}
+
 void ScintillaFOX::SetMouseCapture(bool on)
 {
 	if (mouseDownCaptures) {
@@ -566,6 +584,7 @@ FXDEFMAP(FXScintilla) FXScintillaMap[]={
 //  FXMAPFUNC(SEL_CLIPBOARD_GAINED,0,FXScintilla::onClipboardGained),
   FXMAPFUNC(SEL_CLIPBOARD_REQUEST,0,FXScintilla::onClipboardRequest),
   FXMAPFUNC(SEL_KEYPRESS,0,FXScintilla::onKeyPress),
+  FXMAPFUNC(SEL_CHORE,FXScintilla::ID_IDLE,FXScintilla::onChoreIdle),
 };
 
 FXIMPLEMENT(FXScintilla,FXScrollArea,FXScintillaMap,ARRAYNUMBER(FXScintillaMap))
@@ -635,6 +654,17 @@ long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
 {
 	_scint->timer.tickerID = FXApp::instance()->addTimeout(_scint->timer.tickSize, this, ID_TICK);
 	_scint->Tick();
+	return 1;
+}
+
+long FXScintilla::onChoreIdle(FXObject *, FXSelector, void *)
+{
+	// Idler will be automatically stoped, if there is nothing
+	// to do while idle.
+	bool ret = _scint->Idle();
+	if (ret == false) {
+		_scint->SetIdle(false);
+	}
 	return 1;
 }
 

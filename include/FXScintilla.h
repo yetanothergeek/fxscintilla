@@ -42,6 +42,7 @@ public:
 	enum {
 		idLast = SCID(100),
 		ID_TICK,
+		ID_IDLE,
 		ID_LAST
 	};
 public:
@@ -52,6 +53,7 @@ public:
 	long onPaint(FXObject *, FXSelector, void *);
 	long onConfigure(FXObject *, FXSelector, void *);
 	long onTimeoutTicking(FXObject *, FXSelector, void *);
+	long onChoreIdle(FXObject *, FXSelector, void *);
 	long onFocusIn(FXObject *, FXSelector, void *);
 	long onFocusOut(FXObject *, FXSelector, void *);
 	long onMotion(FXObject *, FXSelector, void *);

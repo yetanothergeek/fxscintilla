@@ -41,6 +41,7 @@ libscintilla_la_SOURCES = \
 	LexAVE.cxx \
 	LexBaan.cxx \
 	LexBullant.cxx \
+	LexCLW.cxx \
 	LexConf.cxx \
 	LexCPP.cxx \
 	LexCrontab.cxx \
@@ -53,14 +54,20 @@ libscintilla_la_SOURCES = \
 	LexLout.cxx \
 	LexLua.cxx \
 	LexMatlab.cxx \
+	LexMMIXAL.cxx \
+	LexMPT.cxx \
+	LexNsis.cxx \
 	LexOthers.cxx \
 	LexPascal.cxx \
 	LexPerl.cxx \
 	LexPOV.cxx \
+	LexPS.cxx \
 	LexPython.cxx \
 	LexRuby.cxx \
+	LexScriptol.cxx \
 	LexSQL.cxx \
-	LexVB.cxx
+	LexVB.cxx \
+	LexYAML.cxx
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 
