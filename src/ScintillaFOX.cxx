@@ -436,8 +436,8 @@ bool ScintillaFOX::ModifyScrollBars(int nMax, int nPage)
 void ScintillaFOX::SyncPaint(PRectangle rc) {
 	paintState = painting;
 	rcPaint = rc;
-	PRectangle rcText = GetTextRectangle();
-	paintingAllText = rcPaint.Contains(rcText);
+	PRectangle rcClient = GetClientRectangle();
+	paintingAllText = rcPaint.Contains(rcClient);
 	//Platform::DebugPrintf("ScintillaGTK::SyncPaint %0d,%0d %0d,%0d\n",
 	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 	Surface *sw = Surface::Allocate();
@@ -457,7 +457,7 @@ void ScintillaFOX::SyncPaint(PRectangle rc) {
 // Redraw all of text area. This paint will not be abandoned.
 void ScintillaFOX::FullPaint() {
 	paintState = painting;
-	rcPaint = GetTextRectangle();
+	rcPaint = GetClientRectangle();
 	//Platform::DebugPrintf("ScintillaGTK::FullPaint %0d,%0d %0d,%0d\n",
 	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 	paintingAllText = true;
@@ -475,6 +475,12 @@ void ScintillaFOX::FullPaint() {
 long Platform::SendScintilla(
 		WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
 	return static_cast<FXScintilla *>(w)->sendMessage(msg, wParam, lParam);
+}
+
+long Platform::SendScintillaPointer(WindowID w, unsigned int msg,
+																		unsigned long wParam, void *lParam) {
+	return static_cast<FXScintilla *>(w)->
+		sendMessage(msg, wParam, reinterpret_cast<sptr_t>(lParam));
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -658,12 +664,9 @@ long FXScintilla::onRightBtnPress(FXObject * sender, FXSelector sel, void * ptr)
 //		return 1;
 	if (target && target->handle(this, MKUINT(message, SELTYPE(sel)), ptr))
 		return 1;
-	if (_scint->displayPopupMenu) {
-		FXEvent * ev = static_cast<FXEvent *>(ptr);
-		_scint->ContextMenu(Point(ev->root_x, ev->root_y));
-		return 1;
-	}
-	return 0;
+	FXEvent * ev = static_cast<FXEvent *>(ptr);
+	_scint->ContextMenu(Point(ev->root_x, ev->root_y));
+	return 1;
 }
 
 long FXScintilla::onMiddleBtnPress(FXObject * sender, FXSelector sel, void * ptr)

@@ -857,8 +857,20 @@ PRectangle ListBox::GetDesiredRect() {
 	// Before any size allocated pretend its 100 wide so not scrolled
 	PRectangle rc(0, 0, 100, 100);
 	if (id) {
-		rc.right = id->getWidth();
+		// Height
+		int rows = Length();
+		if ((rows == 0) || (rows > desiredVisibleRows))
+			rows = desiredVisibleRows;
+		list->setNumVisible(rows);
 		rc.bottom = id->getHeight();
+		// Width
+		int width = maxItemCharacters;
+		if (width < 12)
+			width = 12;
+		rc.right = width * (aveCharWidth+aveCharWidth/3);
+		if (Length() > rows)
+			rc.right += list->verticalScrollbar()->getWidth();
+
 		// <FIXME/>
 /*		int rows = Length();
 		if ((rows == 0) || (rows > desiredVisibleRows))
@@ -1078,10 +1090,15 @@ bool Platform::IsKeyDown(int) {
 	return false;
 }
 
-/* This method is now implemented in ScintillaFOX.cxx
-long Platform::SendScintilla(
-		WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
+/* These methods are now implemented in ScintillaFOX.cxx
+long Platform::SendScintilla(WindowID w, unsigned int msg,
+														 unsigned long wParam, long lParam) {
 	return static_cast<FXScintilla *>(w)->sendMessage(msg, wParam, lParam);
+}
+long Platform::SendScintillaPointer(WindowID w, unsigned int msg,
+																		unsigned long wParam, void *lParam) {
+	return static_cast<FXScintilla *>(w)->
+		sendMessage(msg, wParam, reinterpret_cast<sptr_t>(lParam));
 }
 */
 

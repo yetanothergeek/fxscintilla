@@ -21,7 +21,10 @@ int Scintilla_LinkLexers();
 // Here should be placed typedefs for uptr_t, an unsigned integer type large enough to
 // hold a pointer and sptr_t, a signed integer large enough to hold a pointer.
 // May need to be changed for 64 bit platforms.
-#ifdef __int3264
+#if _MSC_VER >= 1300
+#include <BaseTsd.h>
+#endif
+#ifdef MAXULONG_PTR
 typedef ULONG_PTR uptr_t;
 typedef LONG_PTR sptr_t;
 #else
@@ -369,6 +372,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_TEXTWIDTH 2276
 #define SCI_SETENDATLASTLINE 2277
 #define SCI_GETENDATLASTLINE 2278
+#define SCI_TEXTHEIGHT 2279
 #define SCI_LINEDOWN 2300
 #define SCI_LINEDOWNEXTEND 2301
 #define SCI_LINEUP 2302
@@ -436,12 +440,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SEARCHANCHOR 2366
 #define SCI_SEARCHNEXT 2367
 #define SCI_SEARCHPREV 2368
-#define CARET_SLOP 0x01
-#define CARET_CENTER 0x02
-#define CARET_STRICT 0x04
-#define CARET_XEVEN 0x08
-#define CARET_XJUMPS 0x10
-#define SCI_SETCARETPOLICY 2369
 #define SCI_LINESONSCREEN 2370
 #define SCI_USEPOPUP 2371
 #define SCI_SELECTIONISRECTANGLE 2372
@@ -475,6 +473,12 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETXOFFSET 2397
 #define SCI_GETXOFFSET 2398
 #define SCI_GRABFOCUS 2400
+#define CARET_SLOP 0x01
+#define CARET_STRICT 0x04
+#define CARET_JUMPS 0x10
+#define CARET_EVEN 0x08
+#define SCI_SETXCARETPOLICY 2402
+#define SCI_SETYCARETPOLICY 2403
 #define SCI_STARTRECORD 3001
 #define SCI_STOPRECORD 3002
 #define SCI_SETLEXER 4001
@@ -515,11 +519,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCK_ADD 310
 #define SCK_SUBTRACT 311
 #define SCK_DIVIDE 312
-#define KeyMod SCMOD_
 #define SCMOD_SHIFT 1
 #define SCMOD_CTRL 2
 #define SCMOD_ALT 4
-#define Lexer SCLEX_
 #define SCN_STYLENEEDED 2000
 #define SCN_CHARADDED 2001
 #define SCN_SAVEPOINTREACHED 2002
@@ -610,6 +612,11 @@ struct SCNotification {
 // To enable these features define INCLUDE_DEPRECATED_FEATURES
 
 #ifdef INCLUDE_DEPRECATED_FEATURES
+
+#define SCI_SETCARETPOLICY 2369
+#define CARET_CENTER 0x02
+#define CARET_XEVEN 0x08
+#define CARET_XJUMPS 0x10
 
 #define SCN_POSCHANGED 2012
 #define SCN_CHECKBRACE 2007

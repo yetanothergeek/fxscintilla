@@ -120,8 +120,8 @@ libscintilla_la_SOURCES = \
 	LexAVE.cxx \
 	LexBaan.cxx \
 	LexBullant.cxx \
-	LexConf.cxx \
 	LexCPP.cxx \
+	LexConf.cxx \
 	LexCrontab.cxx \
 	LexEiffel.cxx \
 	LexHTML.cxx \
@@ -181,7 +181,7 @@ am_libscintilla_la_OBJECTS = libscintilla_la-DocumentAccessor.lo \
 	libscintilla_la-AutoComplete.lo libscintilla_la-KeyWords.lo \
 	libscintilla_la-LexAda.lo libscintilla_la-LexAVE.lo \
 	libscintilla_la-LexBaan.lo libscintilla_la-LexBullant.lo \
-	libscintilla_la-LexConf.lo libscintilla_la-LexCPP.lo \
+	libscintilla_la-LexCPP.lo libscintilla_la-LexConf.lo \
 	libscintilla_la-LexCrontab.lo libscintilla_la-LexEiffel.lo \
 	libscintilla_la-LexHTML.lo libscintilla_la-LexLisp.lo \
 	libscintilla_la-LexLua.lo libscintilla_la-LexMatlab.lo \
@@ -314,8 +314,8 @@ libscintilla_la-LexAda.lo: LexAda.cxx
 libscintilla_la-LexAVE.lo: LexAVE.cxx
 libscintilla_la-LexBaan.lo: LexBaan.cxx
 libscintilla_la-LexBullant.lo: LexBullant.cxx
-libscintilla_la-LexConf.lo: LexConf.cxx
 libscintilla_la-LexCPP.lo: LexCPP.cxx
+libscintilla_la-LexConf.lo: LexConf.cxx
 libscintilla_la-LexCrontab.lo: LexCrontab.cxx
 libscintilla_la-LexEiffel.lo: LexEiffel.cxx
 libscintilla_la-LexHTML.lo: LexHTML.cxx
@@ -812,24 +812,6 @@ libscintilla_la-LexBullant.lo: LexBullant.cxx
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexBullant.lo `test -f LexBullant.cxx || echo '$(srcdir)/'`LexBullant.cxx
 
-libscintilla_la-LexConf.o: LexConf.cxx
-@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.o `test -f LexConf.cxx || echo '$(srcdir)/'`LexConf.cxx
-
-libscintilla_la-LexConf.obj: LexConf.cxx
-@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.obj `cygpath -w LexConf.cxx`
-
-libscintilla_la-LexConf.lo: LexConf.cxx
-@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.lo `test -f LexConf.cxx || echo '$(srcdir)/'`LexConf.cxx
-
 libscintilla_la-LexCPP.o: LexCPP.cxx
 @AMDEP_TRUE@	source='LexCPP.cxx' object='libscintilla_la-LexCPP.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexCPP.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-LexCPP.TPo' @AMDEPBACKSLASH@
@@ -847,6 +829,24 @@ libscintilla_la-LexCPP.lo: LexCPP.cxx
 @AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexCPP.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-LexCPP.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexCPP.lo `test -f LexCPP.cxx || echo '$(srcdir)/'`LexCPP.cxx
+
+libscintilla_la-LexConf.o: LexConf.cxx
+@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.o `test -f LexConf.cxx || echo '$(srcdir)/'`LexConf.cxx
+
+libscintilla_la-LexConf.obj: LexConf.cxx
+@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.obj `cygpath -w LexConf.cxx`
+
+libscintilla_la-LexConf.lo: LexConf.cxx
+@AMDEP_TRUE@	source='LexConf.cxx' object='libscintilla_la-LexConf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-LexConf.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-LexConf.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-LexConf.lo `test -f LexConf.cxx || echo '$(srcdir)/'`LexConf.cxx
 
 libscintilla_la-LexCrontab.o: LexCrontab.cxx
 @AMDEP_TRUE@	source='LexCrontab.cxx' object='libscintilla_la-LexCrontab.o' libtool=no @AMDEPBACKSLASH@

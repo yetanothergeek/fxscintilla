@@ -25,8 +25,8 @@ libscintilla_la_SOURCES = \
 	LexAVE.cxx \
 	LexBaan.cxx \
 	LexBullant.cxx \
-	LexConf.cxx \
 	LexCPP.cxx \
+	LexConf.cxx \
 	LexCrontab.cxx \
 	LexEiffel.cxx \
 	LexHTML.cxx \
