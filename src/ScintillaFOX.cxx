@@ -32,13 +32,19 @@
 #include <ctype.h>
 #include <time.h>
 
-#ifndef WIN32
+#if !defined(WIN32) || defined(__CYGWIN__)
+# ifdef __CYGWIN__
+#  include <windows.h>
+#  ifdef PIC
+#   define FOXDLL
+#  endif
+# endif
 #include <fox/fx.h>
 #include <fox/fxkeys.h>
 #else
 #include <fx.h>
 #include <fxkeys.h>
-#endif	// WIN32
+#endif	// WIN32 || __CYGWIN__
 
 #include "Platform.h"
 

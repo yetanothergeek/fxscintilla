@@ -11,6 +11,50 @@
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
 
+# AM_CONDITIONAL                                              -*- Autoconf -*-
+
+# Copyright 1997, 2000, 2001 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+# serial 5
+
+AC_PREREQ(2.52)
+
+# AM_CONDITIONAL(NAME, SHELL-CONDITION)
+# -------------------------------------
+# Define a conditional.
+AC_DEFUN([AM_CONDITIONAL],
+[ifelse([$1], [TRUE],  [AC_FATAL([$0: invalid condition: $1])],
+        [$1], [FALSE], [AC_FATAL([$0: invalid condition: $1])])dnl
+AC_SUBST([$1_TRUE])
+AC_SUBST([$1_FALSE])
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi
+AC_CONFIG_COMMANDS_PRE(
+[if test -z "${$1_TRUE}" && test -z "${$1_FALSE}"; then
+  AC_MSG_ERROR([conditional "$1" was never defined.
+Usually this means the macro was only invoked conditionally.])
+fi])])
+
 # libtool.m4 - Configure libtool for the host system. -*-Shell-script-*-
 
 # serial 46 AC_PROG_LIBTOOL
@@ -4349,52 +4393,17 @@ AC_MSG_RESULT($_am_result)
 rm -f confinc confmf
 ])
 
-# AM_CONDITIONAL                                              -*- Autoconf -*-
-
-# Copyright 1997, 2000, 2001 Free Software Foundation, Inc.
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2, or (at your option)
-# any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
-
-# serial 5
-
-AC_PREREQ(2.52)
-
-# AM_CONDITIONAL(NAME, SHELL-CONDITION)
-# -------------------------------------
-# Define a conditional.
-AC_DEFUN([AM_CONDITIONAL],
-[ifelse([$1], [TRUE],  [AC_FATAL([$0: invalid condition: $1])],
-        [$1], [FALSE], [AC_FATAL([$0: invalid condition: $1])])dnl
-AC_SUBST([$1_TRUE])
-AC_SUBST([$1_FALSE])
-if $2; then
-  $1_TRUE=
-  $1_FALSE='#'
-else
-  $1_TRUE='#'
-  $1_FALSE=
-fi
-AC_CONFIG_COMMANDS_PRE(
-[if test -z "${$1_TRUE}" && test -z "${$1_FALSE}"; then
-  AC_MSG_ERROR([conditional "$1" was never defined.
-Usually this means the macro was only invoked conditionally.])
-fi])])
-
 AC_DEFUN([CHECK_LIBFOX],
 [
+#
+# Checking for Cygwin
+#
+AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
+case $host_os in
+  *cygwin* ) CYGWIN=yes;;
+         * ) CYGWIN=no;;
+esac
+AM_CONDITIONAL(CYGWIN, test x"$CYGWIN" = xyes)
 #
 # Handle user hints
 #
@@ -4408,14 +4417,21 @@ AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
 #
 FOX_OLD_CPPFLAGS=$CPPFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
+FOX_OLD_LIBS=$LIBS
 AC_LANG_SAVE
 
 #
 # Temporary FLAGS setting
 #
 CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
+LIBS=-lFOX
 AC_LANG_CPLUSPLUS
+
+if test x"$CYGWIN" = xyes; then
+	CPPFLAGS="$CPPFLAGS -DWIN32"
+  LDFLAGS="$LDFLAGS -mwindows"
+fi
 
 #
 # Check Fox headers
@@ -4425,6 +4441,7 @@ AC_CHECK_HEADER(fox/fx.h,, AC_MSG_ERROR(FOX needed))
 #
 # Check FOX lib without pthread
 #
+dnl LDFLAGS="-mwindows $LDFLAGS"
 AC_MSG_CHECKING(for FOX library)
 AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
 AC_MSG_RESULT($have_FOX)
@@ -4454,6 +4471,7 @@ fi
 #
 CPPFLAGS=$FOX_OLD_CPPFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
+LIBS=$FOX_OLD_LIBS
 AC_LANG_RESTORE
 AC_SUBST(FOX_INCLUDE_DIR)
 AC_SUBST(FOX_LIB_DIR)
@@ -4552,7 +4570,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.20 2002/11/06 19:51:42 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.21 2002/12/13 20:41:11 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [

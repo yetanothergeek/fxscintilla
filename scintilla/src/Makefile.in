@@ -36,7 +36,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-@NOLEXER_TRUE@am__append_1 = libscintillanolexer.la
+@CYGWIN_TRUE@am__append_1 = -DWIN32
+@NOLEXER_TRUE@am__append_2 = libscintillanolexer.la
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -55,6 +56,8 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+CYGWIN_FALSE = @CYGWIN_FALSE@
+CYGWIN_TRUE = @CYGWIN_TRUE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -140,9 +143,10 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
-AM_CXXFLAGS = -W -Wall -DFOX
+AM_CXXFLAGS = -W -Wall -DFOX $(am__append_1)
+@CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 
-noinst_LTLIBRARIES = libscintilla.la $(am__append_1)
+noinst_LTLIBRARIES = libscintilla.la $(am__append_2)
 
 libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \

@@ -1,6 +1,15 @@
 AC_DEFUN([CHECK_LIBFOX],
 [
 #
+# Checking for Cygwin
+#
+AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
+case $host_os in
+  *cygwin* ) CYGWIN=yes;;
+         * ) CYGWIN=no;;
+esac
+AM_CONDITIONAL(CYGWIN, test x"$CYGWIN" = xyes)
+#
 # Handle user hints
 #
 AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox 1.0 includes from DIR],
@@ -13,14 +22,21 @@ AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
 #
 FOX_OLD_CPPFLAGS=$CPPFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
+FOX_OLD_LIBS=$LIBS
 AC_LANG_SAVE
 
 #
 # Temporary FLAGS setting
 #
 CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
+LIBS=-lFOX
 AC_LANG_CPLUSPLUS
+
+if test x"$CYGWIN" = xyes; then
+	CPPFLAGS="$CPPFLAGS -DWIN32"
+  LDFLAGS="$LDFLAGS -mwindows"
+fi
 
 #
 # Check Fox headers
@@ -30,6 +46,7 @@ AC_CHECK_HEADER(fox/fx.h,, AC_MSG_ERROR(FOX needed))
 #
 # Check FOX lib without pthread
 #
+dnl LDFLAGS="-mwindows $LDFLAGS"
 AC_MSG_CHECKING(for FOX library)
 AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
 AC_MSG_RESULT($have_FOX)
@@ -59,6 +76,7 @@ fi
 #
 CPPFLAGS=$FOX_OLD_CPPFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
+LIBS=$FOX_OLD_LIBS
 AC_LANG_RESTORE
 AC_SUBST(FOX_INCLUDE_DIR)
 AC_SUBST(FOX_LIB_DIR)

@@ -1,6 +1,12 @@
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
 AM_CXXFLAGS = -W -Wall -DFOX
 
+## Cygwin
+if CYGWIN
+AM_CXXFLAGS += -DWIN32
+AM_LDFLAGS = -mwindows
+endif # Cygwin
+
 noinst_LTLIBRARIES = libscintilla.la
 
 libscintilla_la_SOURCES = \

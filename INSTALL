@@ -1,3 +1,6 @@
+Install FOX
+===========
+
 FXScintilla depends on the FOX GUI toolkit version 1.0.x or 1.1.x:
 
 	http://fox-toolkit.org
@@ -5,8 +8,19 @@ FXScintilla depends on the FOX GUI toolkit version 1.0.x or 1.1.x:
 The instructions below assume you have FOX installed on your box.
 
 
-For Win32 systems
-=================
+Tarballs
+========
+
+Two different FXScintilla tarballs are provided
+- one zipped, for Win32 systems:      line end = CRLF
+- one tar.gz, for Unix like systems:  line end = LF
+
+Please, be careful to build from the appropriate tarball with respect to
+your system. 
+
+
+Install FXScintilla for Win32 systems
+=====================================
 
 You must first have Visual C++ 6.0 installed.
 Everything you need is in the VC++ workspace:
@@ -31,8 +45,8 @@ Include files are in:
 I don't have any other Win32 compiler. Any contribution is welcome.
 
 
-For most UNIX systems (including Linux)
-=======================================
+Install FXScintilla for most UNIX systems (including Linux)
+===========================================================
 
    These are generic installation instructions.
 

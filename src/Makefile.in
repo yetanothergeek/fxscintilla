@@ -36,7 +36,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-@NOLEXER_TRUE@am__append_1 = libfxscintillanolexer.la
+@CYGWIN_TRUE@am__append_1 = -DWIN32
+@NOLEXER_TRUE@am__append_2 = libfxscintillanolexer.la
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -55,6 +56,8 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
+CYGWIN_FALSE = @CYGWIN_FALSE@
+CYGWIN_TRUE = @CYGWIN_TRUE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -146,9 +149,10 @@ INCLUDES = \
 	-I$(FOX_INCLUDE_DIR)
 
 
-AM_CXXFLAGS = -W -Wall -DFOX
+AM_CXXFLAGS = -W -Wall -DFOX $(am__append_1)
+@CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 
-lib_LTLIBRARIES = libfxscintilla.la $(am__append_1)
+lib_LTLIBRARIES = libfxscintilla.la $(am__append_2)
 
 libfxscintilla_la_SOURCES = \
 	PlatFOX.cxx \

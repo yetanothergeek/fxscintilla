@@ -1,4 +1,4 @@
-#ifndef WIN32
+#if !defined(WIN32) || defined(__CYGWIN__)
 #include <fox/fx.h>
 #else
 #include <fx.h>

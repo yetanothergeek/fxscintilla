@@ -1,7 +1,14 @@
 AC_INIT(src/ScintillaFOX.cxx)
 AC_CONFIG_AUX_DIR(config)
 
+dnl Check Cygwin
+AC_CYGWIN
+AM_CONDITIONAL(CYGWIN, test x"$CYGWIN" = xyes)
+
 dnl Using libtool
+if test x"$CYGWIN" = xyes; then
+  AC_DISABLE_SHARED
+fi
 AM_PROG_LIBTOOL
 
 dnl Must have a C++ compiler
