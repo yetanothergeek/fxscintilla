@@ -111,6 +111,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_MARK_BACKGROUND 22
 #define SC_MARK_DOTDOTDOT 23
 #define SC_MARK_ARROWS 24
+#define SC_MARK_PIXMAP 25
 #define SC_MARK_CHARACTER 10000
 #define SC_MARKNUM_FOLDEREND 25
 #define SC_MARKNUM_FOLDEROPENMID 26
@@ -129,6 +130,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_MARKERGET 2046
 #define SCI_MARKERNEXT 2047
 #define SCI_MARKERPREVIOUS 2048
+#define SCI_MARKERDEFINEPIXMAP 2049
 #define SC_MARGIN_SYMBOL 0
 #define SC_MARGIN_NUMBER 1
 #define SCI_SETMARGINTYPEN 2240
@@ -377,6 +379,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETENDATLASTLINE 2277
 #define SCI_GETENDATLASTLINE 2278
 #define SCI_TEXTHEIGHT 2279
+#define SCI_SETVSCROLLBAR 2280
+#define SCI_GETVSCROLLBAR 2281
+#define SCI_APPENDTEXT 2282
 #define SCI_LINEDOWN 2300
 #define SCI_LINEDOWNEXTEND 2301
 #define SCI_LINEUP 2302
@@ -464,7 +469,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETMOUSEDOWNCAPTURES 2384
 #define SCI_GETMOUSEDOWNCAPTURES 2385
 #define SC_CURSORNORMAL -1
-#define SC_CURSORWAIT 3
+#define SC_CURSORWAIT 4
 #define SCI_SETCURSOR 2386
 #define SCI_GETCURSOR 2387
 #define SCI_SETCONTROLCHARSYMBOL 2388
@@ -480,6 +485,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_DELLINERIGHT 2396
 #define SCI_SETXOFFSET 2397
 #define SCI_GETXOFFSET 2398
+#define SCI_CHOOSECARETX 2399
 #define SCI_GRABFOCUS 2400
 #define CARET_SLOP 0x01
 #define CARET_STRICT 0x04

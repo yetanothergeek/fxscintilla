@@ -22,13 +22,15 @@ libscintilla_la_SOURCES = \
   \
 	KeyWords.cxx \
 	LexAda.cxx \
+	LexAsm.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
 	LexBullant.cxx \
-	LexCPP.cxx \
 	LexConf.cxx \
+	LexCPP.cxx \
 	LexCrontab.cxx \
 	LexEiffel.cxx \
+	LexFortran.cxx \
 	LexHTML.cxx \
 	LexLisp.cxx \
 	LexLua.cxx \
