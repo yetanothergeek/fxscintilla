@@ -855,8 +855,6 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 		return 1;
 	int key = ((unsigned int(event->text[0]) >= 32) && !ctrl && !alt) ?
 		event->text[0] : event->code;
-	if ((!event->text[0]) && (event->code >= 32) && (event->code < 256))
-		return 1;
 #endif
 	// </FIXME>
 	if (ctrl && (key < 128))
