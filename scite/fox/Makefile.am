@@ -1,7 +1,7 @@
 scitedir = $(datadir)/scite
 
 INCLUDES = -I../../scintilla/include -I../../scintilla/fox -I../src
-AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER -DSYSCONF_PATH=\"$(scitedir)\"
+AM_CXXFLAGS = @PTHREAD_CFLAGS@ -W -Wall -DFOX -DSCI_LEXER -DSYSCONF_PATH=\"$(scitedir)\"
 
 bin_PROGRAMS = fxscite
 

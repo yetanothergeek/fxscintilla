@@ -1,7 +1,7 @@
 scitedir = $(datadir)/scite
 
 INCLUDES = -I../../scintilla/include
-AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER -DSYSCONF_PATH=\"$(scitedir)\"
+AM_CXXFLAGS = @PTHREAD_CFLAGS@ -W -Wall -DFOX -DSCI_LEXER -DSYSCONF_PATH=\"$(scitedir)\"
 
 noinst_LTLIBRARIES = libscite.la
 

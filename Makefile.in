@@ -80,6 +80,9 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PATCH_LEVEL = @PATCH_LEVEL@
+PTHREAD_CC = @PTHREAD_CC@
+PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
+PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 STRIP = @STRIP@
 VERSION = @VERSION@
@@ -88,7 +91,7 @@ SUBDIRS = scintilla scite .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES = 
-DIST_COMMON =  COPYING INSTALL Makefile.am Makefile.in aclocal.m4 \
+DIST_COMMON =  README COPYING INSTALL Makefile.am Makefile.in aclocal.m4 \
 configure configure.in
 
 
