@@ -1,4 +1,4 @@
-INCLUDES = -I../scintilla/include -I../scintilla/src
+INCLUDES = -I../include -I../scintilla/include -I../scintilla/src
 AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER
 
 lib_LTLIBRARIES = libfxscintilla.la

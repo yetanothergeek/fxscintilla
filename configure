@@ -629,7 +629,7 @@ echo > confdefs.h
 
 # A filename unique to this package, relative to the directory that
 # configure is in, which we can look for to find out if srcdir is correct.
-ac_unique_file=scintilla/fox/ScintillaFOX.cxx
+ac_unique_file=src/ScintillaFOX.cxx
 
 # Find the source files, if location was not specified.
 if test -z "$srcdir"; then
@@ -6094,12 +6094,19 @@ fi
 rm -fr conftest*
 fi
 
+#
+# End
+#
+CPPFLAGS=$FOX_OLD_CPPFLAGS
+LDFLAGS=$FOX_OLD_LDFLAGS
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='${CC-cc} -c $CFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 cross_compiling=$ac_cv_prog_cc_cross
+
+
 
 
 
@@ -6217,10 +6224,11 @@ ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
 trap 'rm -fr `echo "\
-	scintilla/include/Makefile \
 	scintilla/src/Makefile \
-	scintilla/fox/Makefile \
 	scintilla/Makefile \
+	include/Makefile \
+	src/Makefile \
+	tests/Makefile \
 	Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
@@ -6308,6 +6316,8 @@ s%@LT_SCILEXER_AGE@%$LT_SCILEXER_AGE%g
 s%@PTHREAD_CC@%$PTHREAD_CC%g
 s%@PTHREAD_LIBS@%$PTHREAD_LIBS%g
 s%@PTHREAD_CFLAGS@%$PTHREAD_CFLAGS%g
+s%@FOX_INCLUDE_DIR@%$FOX_INCLUDE_DIR%g
+s%@FOX_LIB_DIR@%$FOX_LIB_DIR%g
 
 CEOF
 EOF
@@ -6350,10 +6360,11 @@ EOF
 cat >> $CONFIG_STATUS <<EOF
 
 CONFIG_FILES=\${CONFIG_FILES-"\
-	scintilla/include/Makefile \
 	scintilla/src/Makefile \
-	scintilla/fox/Makefile \
 	scintilla/Makefile \
+	include/Makefile \
+	src/Makefile \
+	tests/Makefile \
 	Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF

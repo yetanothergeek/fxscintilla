@@ -1,4 +1,4 @@
-AC_INIT(scintilla/fox/ScintillaFOX.cxx)
+AC_INIT(src/ScintillaFOX.cxx)
 AC_CONFIG_AUX_DIR(config)
 
 dnl FXScintilla version
@@ -51,4 +51,5 @@ AC_OUTPUT( \
 	scintilla/Makefile \
 	include/Makefile \
 	src/Makefile \
+	tests/Makefile \
 	Makefile)

@@ -66,6 +66,8 @@ DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
 ECHO = @ECHO@
 EXEEXT = @EXEEXT@
+FOX_INCLUDE_DIR = @FOX_INCLUDE_DIR@
+FOX_LIB_DIR = @FOX_LIB_DIR@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -91,7 +93,7 @@ am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
 
-INCLUDES = -I../include
+INCLUDES = -I../../include -I../include
 AM_CXXFLAGS = -W -Wall -DFOX -DSCI_LEXER
 
 noinst_LTLIBRARIES = libscintilla.la

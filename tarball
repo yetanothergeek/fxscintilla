@@ -58,12 +58,7 @@ find fxscintilla/scintilla -type f ! \( \
 cd fxscintilla
 
 if [ "$devel" = "false" ]; then
-		rm -fr test scintilla/gtk scintilla/win32
-		rm -f scintilla.kdevprj
-		rm -f scintilla/scintilla.dsp
-		rm -f scintilla/scintilla.dsw
-		rm -f scintilla/fox/scintilla.dsp
-		rm -f scintilla/fox/scintilla.dsw
+		rm -fr scintilla/gtk scintilla/win32
 fi
 
 cd ..

@@ -1,1 +1,1 @@
-SUBDIRS = include src fox
+SUBDIRS = src

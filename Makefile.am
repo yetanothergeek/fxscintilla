@@ -1,1 +1,1 @@
-SUBDIRS = scintilla include src .
+SUBDIRS = scintilla include src tests .

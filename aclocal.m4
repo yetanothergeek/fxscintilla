@@ -4029,7 +4029,14 @@ AC_TRY_RUN([
 		return (FOX_MAJOR == $1 && FOX_MINOR == $2) ? 0 : -1;
 	}
 	], AC_MSG_RESULT(yes), AC_MSG_RESULT(no); AC_MSG_ERROR(Incompatible FOX version), AC_MSG_WARN(Cross compiling))
+#
+# End
+#
+CPPFLAGS=$FOX_OLD_CPPFLAGS
+LDFLAGS=$FOX_OLD_LDFLAGS
 AC_LANG_RESTORE
+AC_SUBST(FOX_INCLUDE_DIR)
+AC_SUBST(FOX_LIB_DIR)
 ])
 
 dnl @synopsis ACX_PTHREAD([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
@@ -4068,7 +4075,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.5 2002/05/18 09:03:35 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.6 2002/05/27 21:02:30 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [
