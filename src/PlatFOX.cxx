@@ -2,10 +2,10 @@
  *
  *  PlatFOX.cxx - implementation of platform facilities on the FOX toolkit
  *
- *  Copyright 2001-2002 by Gilles Filippini <gilles.filippini@free.fr>
+ *  Copyright 2001-2003 by Gilles Filippini <gilles.filippini@free.fr>
  *
  *  Adapted from the Scintilla source PlatGTK.cxx 
- *  Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+ *  Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
  *
  *  ====================================================================
  *
@@ -311,8 +311,10 @@ public:
 	void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back);
 	void Copy(PRectangle rc, Point from, Surface &surfaceSource);
 
+	void DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
 	void DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
 	void DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore, ColourAllocated back);
+	void DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len, ColourAllocated fore);
 	void MeasureWidths(Font &font_, const char *s, int len, int *positions);
 	int WidthText(Font &font_, const char *s, int len);
 	int WidthChar(Font &font_, char ch);
@@ -539,21 +541,10 @@ void SurfaceImpl::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
 	}
 }
 
-void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
-                       ColourAllocated fore, ColourAllocated back) {
+void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+                       ColourAllocated fore) {
 	if (dc()) {
-		// Have to use :
-		//		FillRectangle
-		//		DrawText
-		// instead of
-		//		DrawImageText
-		// cause the latter causes garbage drawings related to the caret
-
-		// Draw text as a series of segments to avoid limitations in X servers
-		// TODO: make this DBCS and UTF-8 safe by not splitting multibyte characters
-		FillRectangle(rc, back);
 		PenColour(fore);
-		BackColour(back);
 		_dc->setTextFont(font_.GetID());
 
 		const int segmentLength = 1000;
@@ -570,11 +561,24 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 	}
 }
 
+void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+                       ColourAllocated fore, ColourAllocated back) {
+	if (dc()) {
+		FillRectangle(rc, back);
+		DrawTextBase(rc, font_, ybase, s, len, fore);
+	}
+}
+
 // On GTK+, exactly same as DrawText NoClip
 // <FIXME> what about FOX ? </FIXME>
 void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len,
                        ColourAllocated fore, ColourAllocated back) {
 	DrawTextNoClip(rc, font_, ybase, s, len, fore, back);
+}
+
+void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len,
+																			ColourAllocated fore) {
+	DrawTextBase(rc, font_, ybase, s, len, fore);
 }
 
 void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positions) {
@@ -726,12 +730,11 @@ void Window::SetFont(Font &) {
 }
 
 void Window::SetCursor(Cursor curs) {
-	FXDefaultCursor cursorID;
-
 	// We don't set the cursor to same value numerous times under FOX because
 	// it stores the cursor in the window once it's set
 	if (curs == cursorLast)
 		return;
+	FXDefaultCursor cursorID;
 	cursorLast = curs;
 
 	switch (curs) {
@@ -1044,6 +1047,8 @@ void ListBoxFox::RegisterImage(int type, const char *xpm_data)
 {
 	FXXPMIcon * icon = new FXXPMIcon(FXApp::instance(), &xpm_data);
 	icon->create();
+	if (!pixhash)
+		pixhash = new map<int, FXXPMIcon *>;
 	FXXPMIcon * old = (*pixhash)[type];
 	if (old)
 		delete old;

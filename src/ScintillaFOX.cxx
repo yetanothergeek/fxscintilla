@@ -147,6 +147,9 @@ private:
 	virtual void ReconfigureScrollBars();
 	virtual PRectangle GetClientRectangle();
 	virtual int KeyDefault(int key, int modifiers);
+
+	// Popup flag
+	bool getDisplayPopupMenu() const { return displayPopupMenu; }
 };
 
 ScintillaFOX::ScintillaFOX(FXScintilla & fxsc) :
@@ -679,6 +682,8 @@ long FXScintilla::onRightBtnPress(FXObject * sender, FXSelector sel, void * ptr)
 //		return 1;
 	if (target && target->handle(this, MKUINT(message, SELTYPE(sel)), ptr))
 		return 1;
+	if (!_scint->getDisplayPopupMenu())
+		return 0;
 	FXEvent * ev = static_cast<FXEvent *>(ptr);
 	_scint->ContextMenu(Point(ev->root_x, ev->root_y));
 	return 1;
