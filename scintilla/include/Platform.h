@@ -84,6 +84,7 @@ typedef void *MenuID;
 typedef void *TickerID;
 #endif
 typedef void *Function;
+typedef void *IdlerID;
 
 /**
  * A geometric point class.
