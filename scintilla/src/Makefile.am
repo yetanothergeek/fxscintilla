@@ -39,6 +39,7 @@ libscintilla_la_SOURCES = \
 	LexAda.cxx \
 	LexAPDL.cxx \
 	LexAsm.cxx \
+	LexAsn1.cxx \
 	LexAU3.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
@@ -80,6 +81,7 @@ libscintilla_la_SOURCES = \
 	LexTeX.cxx \
 	LexVB.cxx \
 	LexVerilog.cxx \
+	LexVHDL.cxx \
 	LexYAML.cxx
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER

@@ -1047,10 +1047,12 @@ int ListBoxFox::Length() {
 }
 
 void ListBoxFox::Select(int n) {
+	// Case n==-1 handled by FXList
 	list->setCurrentItem(n, true);
 }
 
 int ListBoxFox::GetSelection() {
+	// Returns -1 when no current item
 	return list->getCurrentItem();
 }
 

@@ -130,6 +130,8 @@ public:
 	virtual ~ScintillaFOX();
 	virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 private:
+	int TargetAsUTF8(char *text);
+	int EncodedFromUTF8(char *utf8, char *encoded);
 	// Virtual methods from ScintillaBase
 	virtual void Initialise();
 	virtual void Finalise();
@@ -188,6 +190,18 @@ ScintillaFOX::~ScintillaFOX()
 	Finalise();
 }
 
+int ScintillaFOX::TargetAsUTF8(char *text) {
+	// TODO
+	// Fail
+	return 0;
+}
+
+int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
+	// TODO
+	// Fail
+	return 0;
+}
+
 sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	switch (iMessage) {
 
@@ -206,6 +220,12 @@ sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(wParam));
 		break;
 #endif
+	case SCI_TARGETASUTF8:
+		return TargetAsUTF8(reinterpret_cast<char*>(lParam));
+
+	case SCI_ENCODEDFROMUTF8:
+		return EncodedFromUTF8(reinterpret_cast<char*>(wParam), 
+			reinterpret_cast<char*>(lParam));
 
 	default:
 		return ScintillaBase::WndProc(iMessage,wParam,lParam);
