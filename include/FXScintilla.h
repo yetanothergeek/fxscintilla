@@ -42,6 +42,7 @@ public:
 	enum {
 		idLast = SCID(100),
 		ID_TICK,
+		ID_LAST
 	};
 public:
 	long onScintillaCommand(FXObject *, FXSelector, void*);
