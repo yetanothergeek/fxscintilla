@@ -175,6 +175,10 @@ SOURCE=..\..\..\scintilla\src\ViewStyle.cxx
 
 SOURCE=..\..\..\scintilla\src\WindowAccessor.cxx
 # End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\XPM.cxx
+# End Source File
 # End Group
 # Begin Group "include"
 
