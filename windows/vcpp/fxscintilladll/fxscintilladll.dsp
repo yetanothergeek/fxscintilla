@@ -145,7 +145,15 @@ SOURCE=..\..\..\scintilla\src\LexAda.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexAPDL.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexAsm.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexAU3.cxx
 # End Source File
 # Begin Source File
 
@@ -154,6 +162,10 @@ SOURCE=..\..\..\scintilla\src\LexAVE.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexBaan.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexBash.cxx
 # End Source File
 # Begin Source File
 
@@ -201,7 +213,15 @@ SOURCE=..\..\..\scintilla\src\LexFortran.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexGui4Cli.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexHTML.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexKix.cxx
 # End Source File
 # Begin Source File
 
@@ -230,6 +250,10 @@ SOURCE=..\..\..\scintilla\src\LexMMIXAL.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexMPT.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexMSSQL.cxx
 # End Source File
 # Begin Source File
 
@@ -273,6 +297,10 @@ SOURCE=..\..\..\scintilla\src\LexScriptol.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexSpecman.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexSQL.cxx
 # End Source File
 # Begin Source File
@@ -282,6 +310,10 @@ SOURCE=..\..\..\scintilla\src\LexTeX.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexVB.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexVerilog.cxx
 # End Source File
 # Begin Source File
 

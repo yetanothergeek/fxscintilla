@@ -253,7 +253,7 @@ static int CharacterSetCode(int characterSet) {
 }
 
 void Font::Create(const char *faceName, int characterSet,
-	int size, bool bold, bool italic) {
+	int size, bool bold, bool italic, bool) {
 	Release();
 	id = new FXFont(FXApp::instance(), faceName, size,
 									bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
