@@ -5,9 +5,9 @@
 # example:
 #		tarball release 1_40 3
 # produces
-#		snapshot/fxscintilla-1.40.3.tar.gz
+#		snapshot/1.40.3/fxscintilla-1.40.3.tar.gz
 # and
-#		snapshot/fxscintilla-1.40.3.zip
+#		snapshot/1.40.3/fxscintilla-1.40.3.zip
 
 
 if [ "$1" = "devel" ]; then
@@ -22,14 +22,14 @@ minor=$3
 # Name
 name="fxscintilla-"
 if [ ! -z $major ]; then
-		name="${name}"`echo $major | sed 's/_/./'`
+		version=`echo $major | sed 's/_/./'`
 		if [ ! -z $minor ]; then
-				name="${name}.${minor}"
+				version="${version}.${minor}"
 		fi
 else
-		name="${name}cvs"
+		version="cvs"
 fi
-
+name="${name}${version}"
 # Tag
 if [ ! -z $major ]; then
 		tag="FXSCINTILLA-${major}"
@@ -45,6 +45,9 @@ if [ ! -d snapshot ]; then
 	mkdir snapshot
 fi
 cd snapshot
+if [ ! -d ${version} ]; then
+	mkdir ${version}
+fi
 
 rm -fr fxscintilla
 cvs -z3 -w export -r "${tag}" fxscintilla
@@ -59,12 +62,11 @@ mv fxscintilla $name
 
 binaries='*.png *.ico *.cur *.jpg *.bmp'
 
-rm ${name}.tar.gz ${name}.zip
-tar cvzf ${name}.tar.gz $name
-zip -lr ${name}.zip ${name} -x ${binaries}
-zip -ur ${name}.zip ${name} -i ${binaries}
+tar cvzf ${version}/${name}.tar.gz $name
+zip -lr ${version}/${name}.zip ${name} -x ${binaries}
+zip -ur ${version}/${name}.zip ${name} -i ${binaries}
 
 mv $name fxscintilla
 
-ls -l ${name}.*
+ls -l ${version}
 cd ..
