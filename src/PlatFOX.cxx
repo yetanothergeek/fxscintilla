@@ -351,7 +351,7 @@ FXDCWindow * SurfaceImpl::dc()
 			s_dc_owner->_dc = NULL;
 		}
 		s_dc_owner = this;
-		_dc = new FXDCWindow(drawable);
+		_dc = (drawable) ? new FXDCWindow(drawable) : NULL;
 	}
 	return _dc;
 		
@@ -393,6 +393,8 @@ void SurfaceImpl::InitPixMap(int width, int height, Surface*, WindowID) {
 	Release();
 	if (height > 0 && width > 0)
 		ppixmap = new FXImage(FXApp::instance(), NULL, 0, width, height);
+	else
+		ppixmap = NULL;
 	drawable = ppixmap;
 	if (drawable)
 		drawable->create();
