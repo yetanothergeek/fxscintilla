@@ -819,7 +819,7 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 	// <FIXME> Workaround for event->code doesn't hold the correct
   // KEY_xxx under WIN32
 #ifndef WIN32
-	int key = event->code;
+	int key = (event->code) ? event->code : event->text[0];
 #else
 	int key = ((event->text[0] >= 32) && !ctrl && !alt) ?
 		event->text[0] : event->code;
