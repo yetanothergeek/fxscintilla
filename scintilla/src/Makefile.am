@@ -1,6 +1,8 @@
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
 AM_CXXFLAGS = -W -Wall -DFOX
 
+noinst_LTLIBRARIES = libscintilla.la
+
 libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
@@ -48,6 +50,8 @@ libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 ## NoLexer enabled
 if NOLEXER
 
+noinst_LTLIBRARIES += libscintillanolexer.la
+
 libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
@@ -67,8 +71,4 @@ libscintillanolexer_la_SOURCES = \
 	Indicator.cxx \
 	AutoComplete.cxx
 
-libscintillanolexer = libscintillanolexer.la
-
 endif # NOLEXER
-
-noinst_LTLIBRARIES = libscintilla.la $(libscintillanolexer)

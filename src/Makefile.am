@@ -6,6 +6,8 @@ INCLUDES = \
 
 AM_CXXFLAGS = -W -Wall -DFOX
 
+lib_LTLIBRARIES = libfxscintilla.la
+
 libfxscintilla_la_SOURCES = \
 	PlatFOX.cxx \
 	ScintillaFOX.cxx
@@ -20,7 +22,7 @@ libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 ## NoLexer enabled
 if NOLEXER
 
-libfxscintillanolexer = libfxscintillanolexer.la
+lib_LTLIBRARIES += libfxscintillanolexer.la
 
 libfxscintillanolexer_la_SOURCES = \
 	PlatFOX.cxx \
@@ -33,4 +35,3 @@ libfxscintillanolexer_la_LDFLAGS = \
 
 endif # NOLEXER
 
-lib_LTLIBRARIES = libfxscintilla.la $(libfxscintillanolexer)
