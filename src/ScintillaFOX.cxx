@@ -163,10 +163,10 @@ private:
 
 ScintillaFOX::ScintillaFOX(FXScintilla & fxsc) :
 	_fxsc(fxsc),
-	vsbMax(0),
-	vsbPage(0),
 	tryDrag(false),
-	dragWasDropped(false)
+	dragWasDropped(false),
+	vsbMax(0),
+	vsbPage(0)
 {
 	wMain = &_fxsc;
 	Initialise();
