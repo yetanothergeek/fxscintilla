@@ -42,7 +42,7 @@ are available : Win32 and Unix systems.
 Getting started
 ---------------
 
-here is a rough sample of how to integrate FXScintilla into a FOX app
+Here is a rough sample about how to integrate FXScintilla into a FOX app
 
 //--------------------------------------------------------
 #include <fx.h>
