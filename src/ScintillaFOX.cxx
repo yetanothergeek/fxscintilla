@@ -836,7 +836,7 @@ static int KeyTranslate(int keyIn) {
 			return keyIn;
 	}
 }
-#include <iostream>
+
 long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 {
   // Try handling it in base class first
