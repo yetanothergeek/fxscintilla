@@ -101,7 +101,6 @@ noinst_LTLIBRARIES = libscintillanolexer.la libscintilla.la
 libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
-	KeyWords.cxx \
 	StyleContext.cxx \
 	Document.cxx \
 	CallTip.cxx \
@@ -121,6 +120,7 @@ libscintillanolexer_la_SOURCES = \
 
 libscintilla_la_SOURCES = \
 	$(libscintillanolexer_la_SOURCES) \
+	KeyWords.cxx \
 	LexAda.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
@@ -151,7 +151,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libscintilla_la_LDFLAGS =
 libscintilla_la_LIBADD =
 am_libscintilla_la_OBJECTS = libscintilla_la-DocumentAccessor.lo \
-	libscintilla_la-WindowAccessor.lo libscintilla_la-KeyWords.lo \
+	libscintilla_la-WindowAccessor.lo \
 	libscintilla_la-StyleContext.lo libscintilla_la-Document.lo \
 	libscintilla_la-CallTip.lo libscintilla_la-ScintillaBase.lo \
 	libscintilla_la-ContractionState.lo libscintilla_la-Editor.lo \
@@ -159,24 +159,25 @@ am_libscintilla_la_OBJECTS = libscintilla_la-DocumentAccessor.lo \
 	libscintilla_la-LineMarker.lo libscintilla_la-CellBuffer.lo \
 	libscintilla_la-ViewStyle.lo libscintilla_la-RESearch.lo \
 	libscintilla_la-Style.lo libscintilla_la-Indicator.lo \
-	libscintilla_la-AutoComplete.lo libscintilla_la-LexAda.lo \
-	libscintilla_la-LexAVE.lo libscintilla_la-LexBaan.lo \
-	libscintilla_la-LexBullant.lo libscintilla_la-LexConf.lo \
-	libscintilla_la-LexCPP.lo libscintilla_la-LexCrontab.lo \
-	libscintilla_la-LexEiffel.lo libscintilla_la-LexHTML.lo \
-	libscintilla_la-LexLisp.lo libscintilla_la-LexLua.lo \
-	libscintilla_la-LexMatlab.lo libscintilla_la-LexOthers.lo \
-	libscintilla_la-LexPascal.lo libscintilla_la-LexPerl.lo \
-	libscintilla_la-LexPython.lo libscintilla_la-LexRuby.lo \
-	libscintilla_la-LexSQL.lo libscintilla_la-LexVB.lo
+	libscintilla_la-AutoComplete.lo libscintilla_la-KeyWords.lo \
+	libscintilla_la-LexAda.lo libscintilla_la-LexAVE.lo \
+	libscintilla_la-LexBaan.lo libscintilla_la-LexBullant.lo \
+	libscintilla_la-LexConf.lo libscintilla_la-LexCPP.lo \
+	libscintilla_la-LexCrontab.lo libscintilla_la-LexEiffel.lo \
+	libscintilla_la-LexHTML.lo libscintilla_la-LexLisp.lo \
+	libscintilla_la-LexLua.lo libscintilla_la-LexMatlab.lo \
+	libscintilla_la-LexOthers.lo libscintilla_la-LexPascal.lo \
+	libscintilla_la-LexPerl.lo libscintilla_la-LexPython.lo \
+	libscintilla_la-LexRuby.lo libscintilla_la-LexSQL.lo \
+	libscintilla_la-LexVB.lo
 libscintilla_la_OBJECTS = $(am_libscintilla_la_OBJECTS)
 libscintillanolexer_la_LDFLAGS =
 libscintillanolexer_la_LIBADD =
 am_libscintillanolexer_la_OBJECTS = DocumentAccessor.lo \
-	WindowAccessor.lo KeyWords.lo StyleContext.lo Document.lo \
-	CallTip.lo ScintillaBase.lo ContractionState.lo Editor.lo \
-	PropSet.lo KeyMap.lo LineMarker.lo CellBuffer.lo ViewStyle.lo \
-	RESearch.lo Style.lo Indicator.lo AutoComplete.lo
+	WindowAccessor.lo StyleContext.lo Document.lo CallTip.lo \
+	ScintillaBase.lo ContractionState.lo Editor.lo PropSet.lo \
+	KeyMap.lo LineMarker.lo CellBuffer.lo ViewStyle.lo RESearch.lo \
+	Style.lo Indicator.lo AutoComplete.lo
 libscintillanolexer_la_OBJECTS = $(am_libscintillanolexer_la_OBJECTS)
 
 DEFS = @DEFS@
@@ -191,10 +192,10 @@ depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 @AMDEP_TRUE@	$(DEPDIR)/Document.Plo \
 @AMDEP_TRUE@	$(DEPDIR)/DocumentAccessor.Plo $(DEPDIR)/Editor.Plo \
 @AMDEP_TRUE@	$(DEPDIR)/Indicator.Plo $(DEPDIR)/KeyMap.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/KeyWords.Plo $(DEPDIR)/LineMarker.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/PropSet.Plo $(DEPDIR)/RESearch.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/ScintillaBase.Plo $(DEPDIR)/Style.Plo \
-@AMDEP_TRUE@	$(DEPDIR)/StyleContext.Plo $(DEPDIR)/ViewStyle.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/LineMarker.Plo $(DEPDIR)/PropSet.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/RESearch.Plo $(DEPDIR)/ScintillaBase.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/Style.Plo $(DEPDIR)/StyleContext.Plo \
+@AMDEP_TRUE@	$(DEPDIR)/ViewStyle.Plo \
 @AMDEP_TRUE@	$(DEPDIR)/WindowAccessor.Plo \
 @AMDEP_TRUE@	$(DEPDIR)/libscintilla_la-AutoComplete.Plo \
 @AMDEP_TRUE@	$(DEPDIR)/libscintilla_la-CallTip.Plo \
@@ -272,7 +273,6 @@ clean-noinstLTLIBRARIES:
 	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
 libscintilla_la-DocumentAccessor.lo: DocumentAccessor.cxx
 libscintilla_la-WindowAccessor.lo: WindowAccessor.cxx
-libscintilla_la-KeyWords.lo: KeyWords.cxx
 libscintilla_la-StyleContext.lo: StyleContext.cxx
 libscintilla_la-Document.lo: Document.cxx
 libscintilla_la-CallTip.lo: CallTip.cxx
@@ -288,6 +288,7 @@ libscintilla_la-RESearch.lo: RESearch.cxx
 libscintilla_la-Style.lo: Style.cxx
 libscintilla_la-Indicator.lo: Indicator.cxx
 libscintilla_la-AutoComplete.lo: AutoComplete.cxx
+libscintilla_la-KeyWords.lo: KeyWords.cxx
 libscintilla_la-LexAda.lo: LexAda.cxx
 libscintilla_la-LexAVE.lo: LexAVE.cxx
 libscintilla_la-LexBaan.lo: LexBaan.cxx
@@ -327,7 +328,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/Editor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/Indicator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/KeyMap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/KeyWords.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/LineMarker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/PropSet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/RESearch.Plo@am__quote@
@@ -430,24 +430,6 @@ libscintilla_la-WindowAccessor.lo: WindowAccessor.cxx
 @AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-WindowAccessor.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-WindowAccessor.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-WindowAccessor.lo `test -f WindowAccessor.cxx || echo '$(srcdir)/'`WindowAccessor.cxx
-
-libscintilla_la-KeyWords.o: KeyWords.cxx
-@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.o `test -f KeyWords.cxx || echo '$(srcdir)/'`KeyWords.cxx
-
-libscintilla_la-KeyWords.obj: KeyWords.cxx
-@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.obj `cygpath -w KeyWords.cxx`
-
-libscintilla_la-KeyWords.lo: KeyWords.cxx
-@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.lo `test -f KeyWords.cxx || echo '$(srcdir)/'`KeyWords.cxx
 
 libscintilla_la-StyleContext.o: StyleContext.cxx
 @AMDEP_TRUE@	source='StyleContext.cxx' object='libscintilla_la-StyleContext.o' libtool=no @AMDEPBACKSLASH@
@@ -718,6 +700,24 @@ libscintilla_la-AutoComplete.lo: AutoComplete.cxx
 @AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-AutoComplete.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-AutoComplete.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-AutoComplete.lo `test -f AutoComplete.cxx || echo '$(srcdir)/'`AutoComplete.cxx
+
+libscintilla_la-KeyWords.o: KeyWords.cxx
+@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.o `test -f KeyWords.cxx || echo '$(srcdir)/'`KeyWords.cxx
+
+libscintilla_la-KeyWords.obj: KeyWords.cxx
+@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Po' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.obj `cygpath -w KeyWords.cxx`
+
+libscintilla_la-KeyWords.lo: KeyWords.cxx
+@AMDEP_TRUE@	source='KeyWords.cxx' object='libscintilla_la-KeyWords.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@	depfile='$(DEPDIR)/libscintilla_la-KeyWords.Plo' tmpdepfile='$(DEPDIR)/libscintilla_la-KeyWords.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@	$(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+	$(LIBTOOL) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libscintilla_la_CXXFLAGS) $(CXXFLAGS) -c -o libscintilla_la-KeyWords.lo `test -f KeyWords.cxx || echo '$(srcdir)/'`KeyWords.cxx
 
 libscintilla_la-LexAda.o: LexAda.cxx
 @AMDEP_TRUE@	source='LexAda.cxx' object='libscintilla_la-LexAda.o' libtool=no @AMDEPBACKSLASH@

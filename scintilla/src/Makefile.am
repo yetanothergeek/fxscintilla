@@ -6,7 +6,6 @@ noinst_LTLIBRARIES = libscintillanolexer.la libscintilla.la
 libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
-	KeyWords.cxx \
 	StyleContext.cxx \
 	Document.cxx \
 	CallTip.cxx \
@@ -25,6 +24,7 @@ libscintillanolexer_la_SOURCES = \
 
 libscintilla_la_SOURCES = \
 	$(libscintillanolexer_la_SOURCES) \
+	KeyWords.cxx \
 	LexAda.cxx \
 	LexAVE.cxx \
 	LexBaan.cxx \
