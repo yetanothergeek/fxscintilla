@@ -1,5 +1,5 @@
 %define name    fxscintilla
-%define version 1.49.0
+%define version 1.49.1
 %define release 1
 
 Summary: FXScintilla - Scintilla Editor Widget for FOX
