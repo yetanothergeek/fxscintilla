@@ -1,0 +1,57 @@
+FXScintilla is a port to the FOX GUI toolkit of the Scintilla widget.
+It also provides a FOX port of the demonstrating SciTE editor (FXSciTE).
+
+*** Linux version ***
+
+You must first have FOX 1.0.x and GCC (2.8 or better) installed.
+Other C++ compilers may work but may require tweaking the make file.
+
+Then use
+  ./configure
+  make
+  make install
+as usual. Please read INSTALL for detailed instructions.
+
+*** Windows version ***
+
+Only FXScintilla is currently available under Windows.
+You must first have FOX 1.0.x and Visual C++ 6.0 installed.
+Other C++ compilers may work but may require tweaking the make file.
+
+To build FXScintilla, use the makefile scintilla\fox\scintilla.mak with nmake
+(you may have to first edit the makefile to change the value of FOX_TOP)
+	cd scintilla\fox
+	nmake /f scintilla.mak
+That should build the static lib scintilla/bin/scintilla-static.lib
+
+
+*** Usage ***
+
+here is a rough sample of how to integrate FXScintilla into a FOX app
+
+//=======================================================
+#include <fx.h>
+#include <Scintilla.h>
+#include <FXScintilla.h>
+
+int main(int argc, char ** argv)
+{
+	FXApp application("test");
+	application.init(argc, argv);
+	FXMainWindow win(&application, "Test");
+
+	// Instanciating an FXScintilla widget
+	FXScintilla scint(&win, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
+
+  // The Scintilla programming interface is through messages
+	// à la Windows (see scintilla/doc/ScintillaDoc.html)
+	scint.sendMessage(SCI_STYLESETFONT, STYLE_DEFAULT, (long)"lucida");
+	scint.sendMessage(SCI_STYLESETSIZE, STYLE_DEFAULT, (long)10);
+	scint.sendMessage(SCI_STYLECLEARALL, 0, 0);
+
+	application.create();
+	win.show(PLACEMENT_SCREEN);
+	application.run();
+	return 0;
+}
+//=======================================================
