@@ -3,3 +3,4 @@
 Makefile
 *.lo
 libfxscintilla.la
+version.h
