@@ -76,6 +76,20 @@ bool EqualCaseInsensitive(const char *a, const char *b) {
 // implementations of the SString members here as well, so
 // that I can quickly see what effect this has.
 
+SString::SString(int i) : sizeGrowth(sizeGrowthDefault) {
+	char number[32];
+	sprintf(number, "%0d", i);
+	s = StringAllocate(number);
+	sSize = sLen = (s) ? strlen(s) : 0;
+}
+
+SString::SString(double d, int precision) : sizeGrowth(sizeGrowthDefault) {
+	char number[32];
+	sprintf(number, "%.*f", precision, d);
+	s = StringAllocate(number);
+	sSize = sLen = (s) ? strlen(s) : 0;
+}
+
 bool SString::grow(lenpos_t lenNew) {
 	while (sizeGrowth * 6 < lenNew) {
 		sizeGrowth *= 2;
@@ -183,7 +197,7 @@ SString &SString::append(const char *sOther, lenpos_t sLenOther, char sep) {
 	}
 	lenpos_t lenNew = sLen + sLenOther + lenSep;
 	// Conservative about growing the buffer: don't do it, unless really needed
-	if ((lenNew + 1 < sSize) || (grow(lenNew))) {
+	if ((lenNew < sSize) || (grow(lenNew))) {
 		if (lenSep) {
 			s[sLen] = sep;
 			sLen++;
@@ -196,7 +210,7 @@ SString &SString::append(const char *sOther, lenpos_t sLenOther, char sep) {
 }
 
 SString &SString::insert(lenpos_t pos, const char *sOther, lenpos_t sLenOther) {
-	if (!sOther) {
+	if (!sOther || pos > sLen) {
 		return *this;
 	}
 	if (sLenOther == measure_length) {
@@ -204,7 +218,7 @@ SString &SString::insert(lenpos_t pos, const char *sOther, lenpos_t sLenOther) {
 	}
 	lenpos_t lenNew = sLen + sLenOther;
 	// Conservative about growing the buffer: don't do it, unless really needed
-	if ((lenNew + 1 < sSize) || grow(lenNew)) {
+	if ((lenNew < sSize) || grow(lenNew)) {
 		lenpos_t moveChars = sLen - pos + 1;
 		for (lenpos_t i = moveChars; i > 0; i--) {
 			s[pos + sLenOther + i - 1] = s[pos + i - 1];
@@ -215,12 +229,16 @@ SString &SString::insert(lenpos_t pos, const char *sOther, lenpos_t sLenOther) {
 	return *this;
 }
 
-/** Remove @a len characters from the @a pos position, included.
+/**
+ * Remove @a len characters from the @a pos position, included.
  * Characters at pos + len and beyond replace characters at pos.
  * If @a len is 0, or greater than the length of the string
  * starting at @a pos, the string is just truncated at @a pos.
  */
 void SString::remove(lenpos_t pos, lenpos_t len) {
+	if (pos >= sLen) {
+		return;
+	}
 	if (len < 1 || pos + len >= sLen) {
 		s[pos] = '\0';
 		sLen = pos;
@@ -230,6 +248,22 @@ void SString::remove(lenpos_t pos, lenpos_t len) {
 		}
 		sLen -= len;
 	}
+}
+
+bool SString::startswith(const char *prefix) {
+	lenpos_t lenPrefix = strlen(prefix);
+	if (lenPrefix > sLen) {
+		return false;
+	}
+	return strncmp(s, prefix, lenPrefix) == 0;
+}
+
+bool SString::endswith(const char *suffix) {
+	lenpos_t lenSuffix = strlen(suffix);
+	if (lenSuffix > sLen) {
+		return false;
+	}
+	return strncmp(s + sLen - lenSuffix, suffix, lenSuffix) == 0;
 }
 
 int SString::search(const char *sFind, lenpos_t start) const {
@@ -270,16 +304,15 @@ int SString::substitute(const char *sFind, const char *sReplace) {
 	return c;
 }
 
-/**
- * Duplicate a C string.
- * Allocate memory of the given size, or big enough to fit the string if length isn't given;
- * then copy the given string in the allocated memory.
- * @return the pointer to the new string
- */
-char *SString::StringAllocate(
-	const char *s,			///< The string to duplicate
-	lenpos_t len)			///< The length of memory to allocate. Optional.
-{
+char *SContainer::StringAllocate(lenpos_t len) {
+	if (len != measure_length) {
+		return new char[len + 1];
+	} else {
+		return 0;
+	}
+}
+
+char *SContainer::StringAllocate(const char *s, lenpos_t len) {
 	if (s == 0) {
 		return 0;
 	}
@@ -295,8 +328,6 @@ char *SString::StringAllocate(
 }
 
 // End SString functions
-
-
 
 PropSet::PropSet() {
 	superPS = 0;
@@ -823,8 +854,8 @@ const char *WordList::GetNearestWord(const char *wordStart, int searchLen /*= -1
 						// Found another word
 						first = pivot;
 						end = pivot - 1;
-					} 
-					else if (cond > 0) 
+					}
+					else if (cond > 0)
 						start = pivot + 1;
 					else if (cond <= 0)
 						break;
@@ -860,8 +891,8 @@ const char *WordList::GetNearestWord(const char *wordStart, int searchLen /*= -1
 						// Found another word
 						first = pivot;
 						end = pivot - 1;
-					} 
-					else if (cond > 0) 
+					}
+					else if (cond > 0)
 						start = pivot + 1;
 					else if (cond <= 0)
 						break;
@@ -922,8 +953,9 @@ char *WordList::GetNearestWords(
     const char *wordStart,
     int searchLen /*= -1*/,
     bool ignoreCase /*= false*/,
-    char otherSeparator /*= '\0'*/) {
-	int wordlen; // length of the word part (before the '(' brace) of the api array element
+    char otherSeparator /*= '\0'*/,
+    bool exactLen /*=false*/) {
+	unsigned int wordlen; // length of the word part (before the '(' brace) of the api array element
 	SString wordsNear;
 	wordsNear.setsizegrowth(1000);
 	int start = 0; // lower bound of the api array block to search
@@ -953,6 +985,8 @@ char *WordList::GetNearestWords(
 					(0 == CompareNCaseInsensitive(wordStart,
 						wordsNoCase[pivot], searchLen))) {
 					wordlen = LengthWord(wordsNoCase[pivot], otherSeparator) + 1;
+					if (exactLen && wordlen != LengthWord(wordStart, otherSeparator) + 1)
+						break;
 					wordsNear.append(wordsNoCase[pivot], wordlen, ' ');
 					++pivot;
 				}
@@ -979,6 +1013,8 @@ char *WordList::GetNearestWords(
 					(0 == strncmp(wordStart,
 						words[pivot], searchLen))) {
 					wordlen = LengthWord(words[pivot], otherSeparator) + 1;
+					if (exactLen && wordlen != LengthWord(wordStart, otherSeparator) + 1)
+						break;
 					wordsNear.append(words[pivot], wordlen, ' ');
 					++pivot;
 				}

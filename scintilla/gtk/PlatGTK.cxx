@@ -645,7 +645,8 @@ Font::Font() : id(0) {}
 
 Font::~Font() {}
 
-void Font::Create(const char *faceName, int characterSet, int size, bool bold, bool italic) {
+void Font::Create(const char *faceName, int characterSet, int size,
+	bool bold, bool italic, bool) {
 	Release();
 	id = FontCached::FindOrCreate(faceName, characterSet, size, bold, italic);
 }
@@ -1169,13 +1170,18 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
 		bool draw8bit = true;
 		if (et != singleByte) {
 			GdkWChar wctext[maxLengthTextRun];
+			if (len >= maxLengthTextRun)
+				len = maxLengthTextRun-1;
 			int wclen;
 			if (et == UTF8) {
 				wclen = UCS2FromUTF8(s, len,
 					reinterpret_cast<wchar_t *>(wctext), maxLengthTextRun - 1);
 			} else {	// dbcs, so convert using current locale
+				char sMeasure[maxLengthTextRun];
+				memcpy(sMeasure, s, len);
+				sMeasure[len] = '\0';
 				wclen = gdk_mbstowcs(
-					wctext, s, maxLengthTextRun - 1);
+					wctext, sMeasure, maxLengthTextRun - 1);
 			}
 			if (wclen > 0) {
 				draw8bit = false;
@@ -1186,11 +1192,11 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
 					gdk_draw_text_wc(drawable, PFont(font_)->pfont, gc,
 							 x, ybase, wcp, lenDraw);
 					wclen -= lenDraw;
-					wcp += lenDraw;
 					if (wclen > 0) {	// Avoid next calculation if possible as may be expensive
 						x += gdk_text_width_wc(PFont(font_)->pfont,
 								       wcp, lenDraw);
 					}
+					wcp += lenDraw;
 				}
 			}
 		}
@@ -1200,10 +1206,10 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
 				gdk_draw_text(drawable, PFont(font_)->pfont, gc,
 				              x, ybase, s, lenDraw);
 				len -= lenDraw;
-				s += lenDraw;
 				if (len > 0) {	// Avoid next calculation if possible as may be expensive
 					x += gdk_text_width(PFont(font_)->pfont, s, lenDraw);
 				}
+				s += lenDraw;
 			}
 		}
 	}
@@ -1326,13 +1332,18 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
 		bool measure8bit = true;
 		if (et != singleByte) {
 			GdkWChar wctext[maxLengthTextRun];
+			if (len >= maxLengthTextRun)
+				len = maxLengthTextRun-1;
 			int wclen;
 			if (et == UTF8) {
 				wclen = UCS2FromUTF8(s, len,
 					reinterpret_cast<wchar_t *>(wctext), maxLengthTextRun - 1);
 			} else {	// dbcsMode, so convert using current locale
+				char sDraw[maxLengthTextRun];
+				memcpy(sDraw, s, len);
+				sDraw[len] = '\0';
 				wclen = gdk_mbstowcs(
-					wctext, s, maxLengthTextRun - 1);
+					wctext, sDraw, maxLengthTextRun - 1);
 			}
 			if (wclen > 0) {
 				measure8bit = false;
@@ -1342,11 +1353,13 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
 				for (int iU = 0; iU < wclen; iU++) {
 					int width = gdk_char_width_wc(gf, wctext[iU]);
 					totalWidth += width;
-					size_t lenChar;
+					int lenChar;
 					if (et == UTF8) {
 						lenChar = UTF8Len(s[i]);
 					} else {
 						lenChar = mblen(s+i, MB_CUR_MAX);
+						if (lenChar < 0)
+							lenChar = 1;
 					}
 					while (lenChar--) {
 						positions[i++] = totalWidth;
@@ -1608,6 +1621,19 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 	oy += rc.top;
 	if (oy < 0)
 		oy = 0;
+
+	/* do some corrections to fit into screen */
+	int sizex = rc.right - rc.left;
+	int sizey = rc.bottom - rc.top;
+	int screenWidth = gdk_screen_width();
+	int screenHeight = gdk_screen_height();
+	if (sizex > screenWidth)
+		ox = 0; /* the best we can do */
+	else if (ox + sizex > screenWidth)
+		ox = screenWidth - sizex;
+	if (oy + sizey > screenHeight)
+		oy = screenHeight - sizey;
+
 	gtk_widget_set_uposition(PWidget(id), ox, oy);
 #if 0
 
@@ -1618,7 +1644,7 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 	alloc.height = rc.bottom - rc.top;
 	gtk_widget_size_allocate(id, &alloc);
 #endif
-	gtk_widget_set_usize(PWidget(id), rc.right - rc.left, rc.bottom - rc.top);
+	gtk_widget_set_usize(PWidget(id), sizex, sizey);
 }
 
 PRectangle Window::GetClientPosition() {
@@ -1858,9 +1884,6 @@ void ListBoxX::Create(Window &, int, int, bool) {
 	gtk_tree_view_append_column(GTK_TREE_VIEW(list), column);
 	gtk_container_add(GTK_CONTAINER(PWidget(scroller)), PWidget(list));
 	gtk_widget_show(PWidget(list));
-
-	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store),
-										  TEXT_COLUMN, GTK_SORT_ASCENDING);
 
 	gtk_signal_connect(GTK_OBJECT(PWidget(list)), "button_press_event",
 	                   GTK_SIGNAL_FUNC(ButtonPress), this);

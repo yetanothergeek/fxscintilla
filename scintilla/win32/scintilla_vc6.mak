@@ -112,9 +112,12 @@ SOBJS=\
 #**LEXOBJS=\\\n\(\t$(DIR_O)\\\*.obj \\\n\)
 LEXOBJS=\
 	$(DIR_O)\LexAda.obj \
+	$(DIR_O)\LexAPDL.obj \
 	$(DIR_O)\LexAsm.obj \
+	$(DIR_O)\LexAU3.obj \
 	$(DIR_O)\LexAVE.obj \
 	$(DIR_O)\LexBaan.obj \
+	$(DIR_O)\LexBash.obj \
 	$(DIR_O)\LexBullant.obj \
 	$(DIR_O)\LexCLW.obj \
 	$(DIR_O)\LexConf.obj \
@@ -126,7 +129,9 @@ LEXOBJS=\
 	$(DIR_O)\LexEScript.obj \
 	$(DIR_O)\LexForth.obj \
 	$(DIR_O)\LexFortran.obj \
+	$(DIR_O)\LexGui4Cli.obj \
 	$(DIR_O)\LexHTML.obj \
+	$(DIR_O)\LexKix.obj \
 	$(DIR_O)\LexLisp.obj \
 	$(DIR_O)\LexLout.obj \
 	$(DIR_O)\LexLua.obj \
@@ -145,6 +150,7 @@ LEXOBJS=\
 	$(DIR_O)\LexPython.obj \
 	$(DIR_O)\LexRuby.obj \
 	$(DIR_O)\LexScriptol.obj \
+	$(DIR_O)\LexSpecman.obj \
 	$(DIR_O)\LexSQL.obj \
 	$(DIR_O)\LexTeX.obj \
 	$(DIR_O)\LexVB.obj \
@@ -261,11 +267,17 @@ $(DIR_O)\KeyWords.obj: ../src/KeyWords.cxx ../include/Platform.h \
 
 $(DIR_O)\LexAda.obj: ..\src\LexAda.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexAPDL.obj: ..\src\LexAPDL.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexAsm.obj: ..\src\LexAsm.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexAU3.obj: ..\src\LexAU3.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexAVE.obj: ..\src\LexAVE.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexBaan.obj: ..\src\LexBaan.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexBash.obj: ..\src\LexBash.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexBullant.obj: ..\src\LexBullant.cxx $(LEX_HEADERS)
 
@@ -289,7 +301,11 @@ $(DIR_O)\LexForth.obj: ..\src\LexForth.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexFortran.obj: ..\src\LexFortran.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexGui4Cli.obj: ..\src\LexGui4Cli.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexKix.obj: ..\src\LexKix.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexLisp.obj: ..\src\LexLisp.cxx $(LEX_HEADERS)
 
@@ -326,6 +342,8 @@ $(DIR_O)\LexPython.obj: ..\src\LexPython.cxx $(LEX_HEADERS)
 $(DIR_O)\LexRuby.obj: ..\src\LexRuby.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexScriptol.obj: ..\src\LexScriptol.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexSpecman.obj: ..\src\LexSpecman.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexSQL.obj: ..\src\LexSQL.cxx $(LEX_HEADERS)
 

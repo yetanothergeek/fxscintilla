@@ -142,7 +142,15 @@ SOURCE=..\src\LexAda.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexAPDL.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexAsm.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexAU3.cxx
 # End Source File
 # Begin Source File
 
@@ -151,6 +159,10 @@ SOURCE=..\src\LexAVE.cxx
 # Begin Source File
 
 SOURCE=..\src\LexBaan.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexBash.cxx
 # End Source File
 # Begin Source File
 
@@ -198,7 +210,15 @@ SOURCE=..\src\LexFortran.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\LexGui4Cli.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\LexHTML.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexKix.cxx
 # End Source File
 # Begin Source File
 
@@ -271,6 +291,10 @@ SOURCE=..\src\LexRuby.cxx
 # Begin Source File
 
 SOURCE=..\src\LexScriptol.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\LexSpecman.cxx
 # End Source File
 # Begin Source File
 
