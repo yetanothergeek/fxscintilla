@@ -49,9 +49,12 @@
 
 #if PLAT_FOX
 
+# if HAVE_FOX_1_0
+#  define horizontalScrollBar horizontalScrollbar
+#  define verticalScrollBar verticalScrollbar
+# endif
+
 # if HAVE_FOX_1_2
-#  define horizontalScrollbar horizontalScrollBar
-#  define verticalScrollbar verticalScrollBar
 namespace FX {
 # endif
 

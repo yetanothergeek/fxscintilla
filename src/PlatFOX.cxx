@@ -71,9 +71,8 @@ extern "C" {
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
-#if HAVE_FOX_1_2
-#define getRoot getRootWindow
-#define setTextFont setFont
+#if HAVE_FOX_1_0
+#define getRootWindow getRoot
 #endif
 
 #include <map>
@@ -553,7 +552,11 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
                        ColourAllocated fore) {
 	if (dc()) {
 		PenColour(fore);
+#if HAVE_FOX_1_2
+		_dc->setFont(font_.GetID());
+#else
 		_dc->setTextFont(font_.GetID());
+#endif
 
 		const int segmentLength = 1000;
 		int x = rc.left;
@@ -714,8 +717,8 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 	/* do some corrections to fit into screen */
 	int sizex = rc.right - rc.left;
 	int sizey = rc.bottom - rc.top;
-	int screenWidth = FXApp::instance()->getRoot()->getDefaultWidth();;
-	int screenHeight = FXApp::instance()->getRoot()->getDefaultHeight();;
+	int screenWidth = FXApp::instance()->getRootWindow()->getDefaultWidth();;
+	int screenHeight = FXApp::instance()->getRootWindow()->getDefaultHeight();;
 	if (sizex > screenWidth)
 		ox = 0; /* the best we can do */
 	else if (ox + sizex > screenWidth)
@@ -885,7 +888,7 @@ PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
 	FXPopup(parent), listBox(lb)
 {
 	list = new FXList(this,
-#if !HAVE_FOX_1_2
+#if HAVE_FOX_1_0
 		0,
 #endif
 		this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
@@ -968,7 +971,7 @@ PRectangle ListBoxFox::GetDesiredRect() {
 			width = 12;
 		rc.right = width * (aveCharWidth+aveCharWidth/3);
 		if (Length() > rows)
-			rc.right += list->verticalScrollbar()->getWidth();
+			rc.right += list->verticalScrollBar()->getWidth();
 
 		// <FIXME/>
 /*		int rows = Length();
@@ -1132,8 +1135,8 @@ void Menu::Destroy() {
 }
 
 void Menu::Show(Point pt, Window &) {
-	int screenHeight = FXApp::instance()->getRoot()->getDefaultHeight();
-	int screenWidth = FXApp::instance()->getRoot()->getDefaultWidth();
+	int screenHeight = FXApp::instance()->getRootWindow()->getDefaultHeight();
+	int screenWidth = FXApp::instance()->getRootWindow()->getDefaultWidth();
 	id->create();
 	if ((pt.x + id->getWidth()) > screenWidth) {
 		pt.x = screenWidth - id->getWidth();

@@ -9,5 +9,23 @@
 #   fxscintilla-1.49.zip
 # on the FXScintilla project's download page.
 
-cd snapshot
-rsync --rsh=ssh -r $1 pini@savannah.nongnu.org:/upload/fxscintilla/FXScintilla.pkg
+# cd snapshot
+# rsync --rsh=ssh -r $1 pini@savannah.nongnu.org:/upload/fxscintilla/FXScintilla.pkg
+
+cd snapshot/$1
+
+#gpg -b fxscintilla-$1.tar.gz
+#gpg -b fxscintilla-$1.zip
+
+ftp -n <<EOF
+ open savannah.gnu.org
+ user anonymous ${USER}@
+ cd /incoming/savannah/fxscintilla
+ binary
+ passive
+ put fxscintilla-$1.tar.gz
+ put fxscintilla-$1.tar.gz.sig
+ put fxscintilla-$1.zip
+ put fxscintilla-$1.zip.sig
+EOF
+

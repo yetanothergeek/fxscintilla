@@ -95,11 +95,10 @@
 #pragma warning(disable: 4127)
 #endif
 
-#if HAVE_FOX_1_2
-# define SELID FXSELID
-# define SELTYPE FXSELTYPE
-# define addTimeout(delay,tgt,msg) addTimeout(tgt,msg,delay)
-#else
+#if HAVE_FOX_1_0
+# define FXSELID SELID
+# define FXSELTYPE SELTYPE
+# define addTimeout(tgt,msg,delay) addTimeout(delay,tgt,msg)
 # define startAutoScroll(ev,insideonly) startAutoScroll(ev->win_x, ev->win_y, insideonly)
 #endif
 
@@ -381,7 +380,7 @@ void ScintillaFOX::SetTicking(bool on)
 	if (timer.ticking != on) {
 		timer.ticking = on;
 		if (timer.ticking) {
-			timer.tickerID = FXApp::instance()->addTimeout(timer.tickSize, &_fxsc, _fxsc.ID_TICK);
+			timer.tickerID = FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
 		} else {
 			FXApp::instance()->removeTimeout(static_cast<FXTimer *>(timer.tickerID));
 		}
@@ -458,10 +457,10 @@ PRectangle ScintillaFOX::GetClientRectangle() {
 	// Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
 	// to prevent infinite loop
 	PRectangle rc(0, 0, _fxsc.FXScrollArea::getViewportWidth(), _fxsc.FXScrollArea::getViewportHeight());
-	if (_fxsc.horizontalScrollbar()->shown())
-		rc.bottom -= _fxsc.horizontalScrollbar()->getDefaultHeight();
-	if (_fxsc.verticalScrollbar()->shown())
-		rc.right -= _fxsc.verticalScrollbar()->getDefaultWidth();
+	if (_fxsc.horizontalScrollBar()->shown())
+		rc.bottom -= _fxsc.horizontalScrollBar()->getDefaultHeight();
+	if (_fxsc.verticalScrollBar()->shown())
+		rc.right -= _fxsc.verticalScrollBar()->getDefaultWidth();
 	return rc;
 }
 
@@ -483,29 +482,30 @@ bool ScintillaFOX::ModifyScrollBars(int nMax, int nPage)
 	// There won't be a vertical scrollbar if
 	//   !nMax || (nMax < nPage)
 	bool noVScrollNew = !nMax || (nMax < nPage);
-
 	if ((nMax != vsbMax) || (nPage != vsbPage)) {
 		vsbMax = nMax;
 		vsbPage = nPage;
 		// Layout if vertical scrollbar should appear or change
-		if (noVScroll && !noVScrollNew || !noVScroll) {
+		if (noVScroll != noVScrollNew || !noVScroll) {
 			_fxsc.layout();
+			if (noVScrollNew)
+				ChangeSize();	// Force scrollbar recalc
 			modified = true;
 		}
 	}
 	// Vertical scrollbar
 	int line = vs.lineHeight;
-	if (_fxsc.verticalScrollbar()->getLine() != line) {
-		_fxsc.verticalScrollbar()->setLine(line);
+	if (_fxsc.verticalScrollBar()->getLine() != line) {
+		_fxsc.verticalScrollBar()->setLine(line);
 		modified = true;
 	}
 	// Horizontal scrollbar
 	PRectangle rcText = GetTextRectangle();
 	unsigned int pageWidth = rcText.Width();
-	if ((_fxsc.horizontalScrollbar()->getPage() != int(pageWidth)) ||
-			(_fxsc.horizontalScrollbar()->getLine() != 10)) {
-		_fxsc.horizontalScrollbar()->setPage(pageWidth);
-		_fxsc.horizontalScrollbar()->setLine(10);
+	if ((_fxsc.horizontalScrollBar()->getPage() != int(pageWidth)) ||
+			(_fxsc.horizontalScrollBar()->getLine() != 10)) {
+		_fxsc.horizontalScrollBar()->setPage(pageWidth);
+		_fxsc.horizontalScrollBar()->setLine(10);
 		modified = true;
 	}
 	return modified;
@@ -638,21 +638,21 @@ FXbool FXScintilla::canFocus() const
 
 long FXScintilla::onScintillaCommand(FXObject *, FXSelector sel, void *)
 {
-	_scint->Command(SELID(sel)-SCID(0));
+	_scint->Command(FXSELID(sel)-SCID(0));
 	return 1;
 }
 
 long FXScintilla::onCommand(FXObject *, FXSelector sel, void * ptr)
 {
 	if (target)
-		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
+		return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
 	return 0;
 }
 
 long FXScintilla::onChanged(FXObject *, FXSelector sel, void * ptr)
 {
 	if (target)
-		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
+		return target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr);
 	return 0;
 }
 
@@ -666,7 +666,7 @@ long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
 
 long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
 {
-	_scint->timer.tickerID = FXApp::instance()->addTimeout(_scint->timer.tickSize, this, ID_TICK);
+	_scint->timer.tickerID = FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
 	_scint->Tick();
 	return 1;
 }
@@ -758,7 +758,7 @@ long FXScintilla::onRightBtnPress(FXObject *, FXSelector sel, void * ptr)
 {
 //	if (FXScrollArea::onRightBtnPress(sender, sel, ptr))
 //		return 1;
-	if (target && target->handle(this, MKUINT(message, SELTYPE(sel)), ptr))
+	if (target && target->handle(this, MKUINT(message, FXSELTYPE(sel)), ptr))
 		return 1;
 	if (!_scint->getDisplayPopupMenu())
 		return 0;

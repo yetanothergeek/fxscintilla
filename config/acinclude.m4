@@ -80,31 +80,31 @@ esac
 #
 # Handle user hints
 #
-AC_ARG_WITH(fox-1-2, [  --with-fox-1-2   use Fox 1.2],
-        WITH_FOX_1_2=$withval, FOX_INCLUDE_DIR=/usr/local/include)
+AC_ARG_WITH(fox-1-0, [  --with-fox-1-0          force Fox 1.0 usage],
+        WITH_FOX_1_0=$withval,)
 AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox includes from DIR],
         FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
 AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox libs from DIR],
         FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
 
-if test x"$WITH_FOX_1_2" != xyes; then
-	CHECK_LIBFOX__()
+if test x"$WITH_FOX_1_0" != xyes; then
+	CHECK_LIBFOX__(-1.2)
 	if test x"$have_FOX" = xyes; then
-		AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
+		AC_DEFINE(HAVE_FOX_1_2,1,[Define FOX version 1.2.])
 	fi
 fi
-AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX" = xyes)
-have_FOX_1_0=$have_FOX
+AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX" = xyes)
+have_FOX_1_2=$have_FOX
 
-if test x"$WITH_FOX_1_2" != xno; then
+if test x"$WITH_FOX_1_0" != xno; then
 	if test x"$have_FOX" != xyes; then
-		CHECK_LIBFOX__(-1.2)
+		CHECK_LIBFOX__()
 		if test x"$have_FOX" = xyes; then
-			AC_DEFINE(HAVE_FOX_1_2,1,[Define FOX version 1.2.])
+			AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
 		fi
 	fi
 fi
-AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes)
+AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX_1_2" != xyes -a x"$have_FOX" = xyes)
 
 #
 # Abort if no FOX lib
