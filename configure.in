@@ -47,7 +47,7 @@ AC_MSG_RESULT([$enable_nolexer])
 AM_CONDITIONAL(NOLEXER, test x"$enable_nolexer" = xyes)
 
 dnl Check FOX library
-CHECK_LIBFOX(" ")
+CHECK_LIBFOX(:)
 CHECK_LIBFOX_VERSION(1, 0)
 if test x"$check_libfox_version_ok" = xno; then
 	CHECK_LIBFOX_VERSION(1, 1,, AC_MSG_ERROR(Incompatible FOX version))

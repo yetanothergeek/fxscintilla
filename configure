@@ -6130,7 +6130,7 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 # Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
 if test x"$have_FOX" = xyes; then
-        " "
+        :
         :
 else
         
