@@ -20,15 +20,6 @@ AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
 
-dnl - Checking for pthread
-dnl - Maybe we should consider other platforms as well. Feel free to
-dnl - submit changes.
-case "${host}" in
-*-*-freebsd*)
-  ACX_PTHREAD
-  ;;
-esac
-
 dnl - Libtool versioning scheme
 dnl   current:revision:age
 dnl   . start with 0:0:0

@@ -5642,6 +5642,47 @@ PATCH_LEVEL=2
 
 
 
+LT_FXSCINTILLA_CURRENT=0
+LT_FXSCINTILLA_REVISION=0
+LT_FXSCINTILLA_AGE=0
+
+
+
+
+LT_SCILEXER_CURRENT=0
+LT_SCILEXER_REVISION=0
+LT_SCILEXER_AGE=0
+
+
+
+
+# 1 = FOX MAJOR VERSION
+# 0 = FOX_MINOR_VERSION
+
+#
+# Handle user hints
+#
+
+# Check whether --with-foxinclude or --without-foxinclude was given.
+if test "${with_foxinclude+set}" = set; then
+  withval="$with_foxinclude"
+  FOX_INCLUDE_DIR=$withval
+else
+  FOX_INCLUDE_DIR=/usr/local/include
+fi
+
+# Check whether --with-foxlib or --without-foxlib was given.
+if test "${with_foxlib+set}" = set; then
+  withval="$with_foxlib"
+  FOX_LIB_DIR=$withval
+else
+  FOX_LIB_DIR=/usr/local/lib
+fi
+
+
+#
+# -pthread trick for FreeBSD
+#
 case "${host}" in
 *-*-freebsd*)
   
@@ -5661,9 +5702,9 @@ if test x"$PTHREAD_LIBS$PTHREAD_CFLAGS" != x; then
         save_LIBS="$LIBS"
         LIBS="$PTHREAD_LIBS $LIBS"
         echo $ac_n "checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD_CFLAGS""... $ac_c" 1>&6
-echo "configure:5665: checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD_CFLAGS" >&5
+echo "configure:5706: checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD_CFLAGS" >&5
         cat > conftest.$ac_ext <<EOF
-#line 5667 "configure"
+#line 5708 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -5674,7 +5715,7 @@ int main() {
 pthread_join()
 ; return 0; }
 EOF
-if { (eval echo configure:5678: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5719: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   acx_pthread_ok=yes
 else
@@ -5741,18 +5782,18 @@ for flag in $acx_pthread_flags; do
         case $flag in
                 none)
                 echo $ac_n "checking whether pthreads work without any flags""... $ac_c" 1>&6
-echo "configure:5745: checking whether pthreads work without any flags" >&5
+echo "configure:5786: checking whether pthreads work without any flags" >&5
                 ;;
 
                 -*)
                 echo $ac_n "checking whether pthreads work with $flag""... $ac_c" 1>&6
-echo "configure:5750: checking whether pthreads work with $flag" >&5
+echo "configure:5791: checking whether pthreads work with $flag" >&5
                 PTHREAD_CFLAGS="$flag"
                 ;;
 
                 *)
                 echo $ac_n "checking for the pthreads library -l$flag""... $ac_c" 1>&6
-echo "configure:5756: checking for the pthreads library -l$flag" >&5
+echo "configure:5797: checking for the pthreads library -l$flag" >&5
                 PTHREAD_LIBS="-l$flag"
                 ;;
         esac
@@ -5772,7 +5813,7 @@ echo "configure:5756: checking for the pthreads library -l$flag" >&5
         # functions on Solaris that doesn't have a non-functional libc stub.
         # We try pthread_create on general principles.
         cat > conftest.$ac_ext <<EOF
-#line 5776 "configure"
+#line 5817 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 int main() {
@@ -5781,7 +5822,7 @@ pthread_t th; pthread_join(th, 0);
                      pthread_create(0,0,0,0); pthread_cleanup_pop(0); 
 ; return 0; }
 EOF
-if { (eval echo configure:5785: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5826: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   acx_pthread_ok=yes
 else
@@ -5813,16 +5854,16 @@ if test "x$acx_pthread_ok" = xyes; then
         # Detect AIX lossage: threads are created detached by default
         # and the JOINABLE attribute has a nonstandard name (UNDETACHED).
         echo $ac_n "checking for joinable pthread attribute""... $ac_c" 1>&6
-echo "configure:5817: checking for joinable pthread attribute" >&5
+echo "configure:5858: checking for joinable pthread attribute" >&5
         cat > conftest.$ac_ext <<EOF
-#line 5819 "configure"
+#line 5860 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 int main() {
 int attr=PTHREAD_CREATE_JOINABLE;
 ; return 0; }
 EOF
-if { (eval echo configure:5826: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5867: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ok=PTHREAD_CREATE_JOINABLE
 else
@@ -5834,14 +5875,14 @@ fi
 rm -f conftest*
         if test x"$ok" = xunknown; then
                 cat > conftest.$ac_ext <<EOF
-#line 5838 "configure"
+#line 5879 "configure"
 #include "confdefs.h"
 #include <pthread.h>
 int main() {
 int attr=PTHREAD_CREATE_UNDETACHED;
 ; return 0; }
 EOF
-if { (eval echo configure:5845: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:5886: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   ok=PTHREAD_CREATE_UNDETACHED
 else
@@ -5864,7 +5905,7 @@ EOF
         fi
 
         echo $ac_n "checking if more special flags are required for pthreads""... $ac_c" 1>&6
-echo "configure:5868: checking if more special flags are required for pthreads" >&5
+echo "configure:5909: checking if more special flags are required for pthreads" >&5
         flag=no
         case "${host_cpu}-${host_os}" in
                 *-aix* | *-freebsd*)     flag="-D_THREAD_SAFE";;
@@ -5882,7 +5923,7 @@ echo "configure:5868: checking if more special flags are required for pthreads" 
         # Extract the first word of "cc_r", so it can be a program name with args.
 set dummy cc_r; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:5886: checking for $ac_word" >&5
+echo "configure:5927: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_PTHREAD_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5933,50 +5974,12 @@ fi
   ;;
 esac
 
-LT_FXSCINTILLA_CURRENT=0
-LT_FXSCINTILLA_REVISION=0
-LT_FXSCINTILLA_AGE=0
-
-
-
-
-LT_SCILEXER_CURRENT=0
-LT_SCILEXER_REVISION=0
-LT_SCILEXER_AGE=0
-
-
-
-
-# 1 = FOX MAJOR VERSION
-# 0 = FOX_MINOR_VERSION
-
-#
-# Handle user hints
-#
-
-# Check whether --with-foxinclude or --without-foxinclude was given.
-if test "${with_foxinclude+set}" = set; then
-  withval="$with_foxinclude"
-  FOX_INCLUDE_DIR=$withval
-else
-  FOX_INCLUDE_DIR=/usr/local/include
-fi
-
-# Check whether --with-foxlib or --without-foxlib was given.
-if test "${with_foxlib+set}" = set; then
-  withval="$with_foxlib"
-  FOX_LIB_DIR=$withval
-else
-  FOX_LIB_DIR=/usr/local/lib
-fi
-
-
 #
 # Check Fox headers and library
 #
 FOX_OLD_CPPFLAGS=$CPPFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
 
 ac_ext=c
@@ -5988,17 +5991,17 @@ cross_compiling=$ac_cv_prog_cc_cross
 
 ac_safe=`echo "fox/fx.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for fox/fx.h""... $ac_c" 1>&6
-echo "configure:5992: checking for fox/fx.h" >&5
+echo "configure:5995: checking for fox/fx.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 5997 "configure"
+#line 6000 "configure"
 #include "confdefs.h"
 #include <fox/fx.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:6002: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:6005: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -6021,7 +6024,7 @@ else
 fi
 
 echo $ac_n "checking for fxfindfox in -lFOX""... $ac_c" 1>&6
-echo "configure:6025: checking for fxfindfox in -lFOX" >&5
+echo "configure:6028: checking for fxfindfox in -lFOX" >&5
 ac_lib_var=`echo FOX'_'fxfindfox | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -6029,7 +6032,7 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lFOX  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 6033 "configure"
+#line 6036 "configure"
 #include "confdefs.h"
 /* Override any gcc2 internal prototype to avoid an error.  */
 /* We use char because int might match the return type of a gcc2
@@ -6040,7 +6043,7 @@ int main() {
 fxfindfox()
 ; return 0; }
 EOF
-if { (eval echo configure:6044: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:6047: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -6065,12 +6068,12 @@ fi
 # Check Fox version
 #
 echo $ac_n "checking FOX version 1.0.x""... $ac_c" 1>&6
-echo "configure:6069: checking FOX version 1.0.x" >&5
+echo "configure:6072: checking FOX version 1.0.x" >&5
 if test "$cross_compiling" = yes; then
   echo "configure: warning: Cross compiling" 1>&2
 else
   cat > conftest.$ac_ext <<EOF
-#line 6074 "configure"
+#line 6077 "configure"
 #include "confdefs.h"
 
 	#include <fox/fxver.h>
@@ -6079,7 +6082,7 @@ else
 	}
 	
 EOF
-if { (eval echo configure:6083: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:6086: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   echo "$ac_t""yes" 1>&6
 else
@@ -6300,15 +6303,15 @@ s%@CXXDEPMODE@%$CXXDEPMODE%g
 s%@MAJOR_VERSION@%$MAJOR_VERSION%g
 s%@MINOR_VERSION@%$MINOR_VERSION%g
 s%@PATCH_LEVEL@%$PATCH_LEVEL%g
-s%@PTHREAD_CC@%$PTHREAD_CC%g
-s%@PTHREAD_LIBS@%$PTHREAD_LIBS%g
-s%@PTHREAD_CFLAGS@%$PTHREAD_CFLAGS%g
 s%@LT_FXSCINTILLA_CURRENT@%$LT_FXSCINTILLA_CURRENT%g
 s%@LT_FXSCINTILLA_REVISION@%$LT_FXSCINTILLA_REVISION%g
 s%@LT_FXSCINTILLA_AGE@%$LT_FXSCINTILLA_AGE%g
 s%@LT_SCILEXER_CURRENT@%$LT_SCILEXER_CURRENT%g
 s%@LT_SCILEXER_REVISION@%$LT_SCILEXER_REVISION%g
 s%@LT_SCILEXER_AGE@%$LT_SCILEXER_AGE%g
+s%@PTHREAD_CC@%$PTHREAD_CC%g
+s%@PTHREAD_LIBS@%$PTHREAD_LIBS%g
+s%@PTHREAD_CFLAGS@%$PTHREAD_CFLAGS%g
 
 CEOF
 EOF

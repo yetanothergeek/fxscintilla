@@ -12,11 +12,20 @@ AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
         FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
 
 #
+# -pthread trick for FreeBSD
+#
+case "${host}" in
+*-*-freebsd*)
+  ACX_PTHREAD
+  ;;
+esac
+
+#
 # Check Fox headers and library
 #
 FOX_OLD_CPPFLAGS=$CPPFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
 AC_LANG_SAVE
 AC_LANG_C

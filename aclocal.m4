@@ -3986,6 +3986,52 @@ AC_DEFUN([AM_PROG_NM],        [AC_PROG_NM])
 # This is just to silence aclocal about the macro not being used
 ifelse([AC_DISABLE_FAST_INSTALL])
 
+AC_DEFUN([CHECK_FOX],
+# $1 = FOX MAJOR VERSION
+# $2 = FOX_MINOR_VERSION
+
+#
+# Handle user hints
+#
+[
+AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox 1.0 includes from DIR],
+        FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
+AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
+        FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
+
+#
+# -pthread trick for FreeBSD
+#
+case "${host}" in
+*-*-freebsd*)
+  ACX_PTHREAD
+  ;;
+esac
+
+#
+# Check Fox headers and library
+#
+FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_LDFLAGS=$LDFLAGS
+CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS -I${FOX_INCLUDE_DIR}"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
+AC_LANG_SAVE
+AC_LANG_C
+AC_CHECK_HEADER(fox/fx.h,, AC_MSG_ERROR(FOX needed))
+AC_CHECK_LIB(FOX, fxfindfox, LIBS=${LIBS}, AC_MSG_ERROR(FOX needed))
+#
+# Check Fox version
+#
+AC_MSG_CHECKING(FOX version $1.$2.x)
+AC_TRY_RUN([
+	#include <fox/fxver.h>
+	int main(int argc, char** argv) {
+		return (FOX_MAJOR == $1 && FOX_MINOR == $2) ? 0 : -1;
+	}
+	], AC_MSG_RESULT(yes), AC_MSG_RESULT(no); AC_MSG_ERROR(Incompatible FOX version), AC_MSG_WARN(Cross compiling))
+AC_LANG_RESTORE
+])
+
 dnl @synopsis ACX_PTHREAD([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
 dnl
 dnl This macro figures out how to build C programs using POSIX
@@ -4022,7 +4068,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.3 2002/05/09 09:58:54 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.4 2002/05/13 20:05:43 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [
@@ -4210,41 +4256,4 @@ else
 fi
 
 ])dnl ACX_PTHREAD
-
-AC_DEFUN([CHECK_FOX],
-# $1 = FOX MAJOR VERSION
-# $2 = FOX_MINOR_VERSION
-
-#
-# Handle user hints
-#
-[
-AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox 1.0 includes from DIR],
-        FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
-AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
-        FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
-
-#
-# Check Fox headers and library
-#
-FOX_OLD_CPPFLAGS=$CPPFLAGS
-FOX_OLD_LDFLAGS=$LDFLAGS
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
-AC_LANG_SAVE
-AC_LANG_C
-AC_CHECK_HEADER(fox/fx.h,, AC_MSG_ERROR(FOX needed))
-AC_CHECK_LIB(FOX, fxfindfox, LIBS=${LIBS}, AC_MSG_ERROR(FOX needed))
-#
-# Check Fox version
-#
-AC_MSG_CHECKING(FOX version $1.$2.x)
-AC_TRY_RUN([
-	#include <fox/fxver.h>
-	int main(int argc, char** argv) {
-		return (FOX_MAJOR == $1 && FOX_MINOR == $2) ? 0 : -1;
-	}
-	], AC_MSG_RESULT(yes), AC_MSG_RESULT(no); AC_MSG_ERROR(Incompatible FOX version), AC_MSG_WARN(Cross compiling))
-AC_LANG_RESTORE
-])
 
