@@ -355,6 +355,9 @@ FXDCWindow * SurfaceImpl::dc()
 		}
 		s_dc_owner = this;
 		_dc = (drawable) ? new FXDCWindow(drawable) : NULL;
+		// Ask for lines that do not paint the last pixel so is like Win32
+		if (_dc)
+			_dc->setLineCap(CAP_NOT_LAST);
 	}
 	return _dc;
 		

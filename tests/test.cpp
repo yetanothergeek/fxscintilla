@@ -25,9 +25,6 @@ def main\n\
   # Make application\n\
   application = FXApp.new(\"rbCVS\", \"pini\")\n\
 \n\
-  # Current threads implementation causes problems for this example, so disable\n\
-  application.threadsEnabled = false\n\
-\n\
   # Open display\n\
   application.init(ARGV)\n\
 \n\

@@ -220,7 +220,7 @@ void ScintillaFOX::ClaimSelection()
 	if (currentPos != anchor) {
     _fxsc.acquireSelection(&FXWindow::stringType,1);
 		primarySelection = true;
-		primary.Set(0, 0, 0);
+		primary.Free();
 	}
 	else {
     _fxsc.releaseSelection();
@@ -231,7 +231,7 @@ void ScintillaFOX::UnclaimSelection()
 {
 	//Platform::DebugPrintf("UnclaimPrimarySelection\n");
 	if (!_fxsc.hasSelection()) {
-		primary.Set(0, 0, 0);
+		primary.Free();
 		primarySelection = false;
 		FullPaint();
 	}
@@ -343,7 +343,7 @@ void ScintillaFOX::SetHorizontalScrollPos()
 
 void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
 	if (_fxsc.acquireClipboard(&FXWindow::stringType, 1)) {
-		copyText.Copy(selectedText.s, selectedText.len, 0);
+		copyText.Copy(selectedText);
 	}
 }
 
@@ -905,7 +905,7 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXScrollArea::onClipboardLost(sender,sel,ptr);
 	//Platform::DebugPrintf("Clipboard lost\n");
-	_scint->copyText.Set(0, 0, 0);
+	_scint->copyText.Free();
 
   return 1;
 }
