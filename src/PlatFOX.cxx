@@ -814,7 +814,6 @@ public:
 	virtual int GetSelection();
 	virtual int Find(const char *prefix);
 	virtual void GetValue(int n, char *value, int len);
-	virtual void Sort();
 	virtual void RegisterImage(int type, const char *xpm_data);
 	virtual void ClearRegisteredImages();
 	virtual void SetDoubleClickAction(CallBackAction action, void *data) {
@@ -1015,6 +1014,7 @@ void ListBoxFox::Append(char *s, int type) {
         	maxItemCharacters = len;
 	if (list->getNumItems() <= desiredVisibleRows)
 		list->setNumVisible(list->getNumItems());
+	list->sortItems();
 }
 
 int ListBoxFox::Length() {
@@ -1051,10 +1051,6 @@ void ListBoxFox::GetValue(int n, char *value, int len) {
 	} else {
 		value[0] = '\0';
 	}
-}
-
-void ListBoxFox::Sort() {
-	list->sortItems();
 }
 
 void ListBoxFox::RegisterImage(int type, const char *xpm_data)

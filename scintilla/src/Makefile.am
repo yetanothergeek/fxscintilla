@@ -48,17 +48,20 @@ libscintilla_la_SOURCES = \
 	LexCSS.cxx \
 	LexEiffel.cxx \
 	LexEScript.cxx \
+	LexForth.cxx \
 	LexFortran.cxx \
 	LexHTML.cxx \
 	LexLisp.cxx \
 	LexLout.cxx \
 	LexLua.cxx \
 	LexMatlab.cxx \
+	LexMetapost.cxx \
 	LexMMIXAL.cxx \
 	LexMPT.cxx \
 	LexNsis.cxx \
 	LexOthers.cxx \
 	LexPascal.cxx \
+	LexPB.cxx \
 	LexPerl.cxx \
 	LexPOV.cxx \
 	LexPS.cxx \
@@ -66,6 +69,7 @@ libscintilla_la_SOURCES = \
 	LexRuby.cxx \
 	LexScriptol.cxx \
 	LexSQL.cxx \
+	LexTeX.cxx \
 	LexVB.cxx \
 	LexYAML.cxx
 
