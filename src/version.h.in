@@ -1,0 +1,4 @@
+FXString FXScintilla::version()
+{
+	return "@MAJOR_VERSION@.@MINOR_VERSION@.@PATCH_LEVEL@";
+}

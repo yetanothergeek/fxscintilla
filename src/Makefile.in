@@ -199,7 +199,7 @@ libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = version.h
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libfxscintilla_la_DEPENDENCIES = \
@@ -234,7 +234,7 @@ CXXLINK = $(LIBTOOL) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(libfxscintilla_la_SOURCES) \
 	$(am__libfxscintillanolexer_la_SOURCES_DIST)
-DIST_COMMON = Makefile.am Makefile.in
+DIST_COMMON = Makefile.am Makefile.in version.h.in
 SOURCES = $(libfxscintilla_la_SOURCES) $(libfxscintillanolexer_la_SOURCES)
 
 all: all-am
@@ -246,6 +246,8 @@ $(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	  $(AUTOMAKE) --foreign  src/Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)
+version.h: $(top_builddir)/config.status version.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 libLTLIBRARIES_INSTALL = $(INSTALL)
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
