@@ -38,7 +38,7 @@
 
     <h1>Scintilla Documentation</h1>
 
-    <p>Last edited 29/February/2004 NH</p>
+    <p>Last edited 29/May/2004 NH</p>
 
     <p>There is <a class="jump" href="Design.html">an overview of the internal design of
     Scintilla</a>.<br />
@@ -52,6 +52,10 @@
      on GTK+</a>.<br />
      <a class="jump" href="Lexer.txt">A detailed description of how to write a lexer, including a
     discussion of folding</a>.<br />
+     <a class="jump" href="http://sphere.sourceforge.net/flik/docs/scintilla-container_lexer.html">
+     How to implement a lexer in the container</a>.<br />
+     <a class="jump" href="http://sphere.sourceforge.net/flik/docs/scintilla-folding.html">
+     How to implement folding</a>.<br />
      The <a class="jump" href="SciCoding.html">coding style</a> used in Scintilla and SciTE is
     worth following if you want to contribute code to Scintilla but is not compulsory.</p>
 
@@ -2393,7 +2397,7 @@ struct TextToFind {
 
     <h2 id="TabsAndIndentationGuides">Tabs and Indentation Guides</h2>
 
-    <p>Indentation (the white space at the start of a line) if often used by programmers to clarify
+    <p>Indentation (the white space at the start of a line) is often used by programmers to clarify
     program structure and in some languages, for example Python, it may be part of the language
     syntax. Tabs are normally used in editors to insert a tab character or to pad text with spaces
     up to the next tab.</p>
@@ -3698,7 +3702,9 @@ sptr_t CallScintilla(unsigned int iMessage, uptr_t wParam, sptr_t lParam){
     <p>It is up to your code to set the connection between user actions and folding and unfolding.
     The best way to see how this is done is to search the SciTE source code for the messages used
     in this section of the documentation and see how they are used. You will also need to use
-    markers and a folding margin to complete your folding implementation.</p>
+    markers and a folding margin to complete your folding implementation.
+    The <code>"fold"</code> property should be set to <code>"1"</code> with 
+    <code>SCI_SETPROPERTY("fold", "1")</code> to enable folding. </p>
     <code><a class="message" href="#SCI_VISIBLEFROMDOCLINE">SCI_VISIBLEFROMDOCLINE(int
     docLine)</a><br />
      <a class="message" href="#SCI_DOCLINEFROMVISIBLE">SCI_DOCLINEFROMVISIBLE(int

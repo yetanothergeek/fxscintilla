@@ -71,7 +71,7 @@ void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		Free();
 		chars = new char[maxLineLength_ + 1];
-		styles = new char[maxLineLength_ + 1];
+		styles = new unsigned char[maxLineLength_ + 1];
 		indicators = new char[maxLineLength_ + 1];
 		// Extra position allocated as sometimes the Windows
 		// GetTextExtentExPoint API writes an extra element.
@@ -646,8 +646,7 @@ Point Editor::LocationFromPosition(int pos) {
 				pt.x = ll->positions[posInLine] - ll->positions[ll->LineStart(subLine)];
 				if (actualWrapVisualStartIndent != 0) {
 					int lineStart = ll->LineStart(subLine);
-					bool continuedWrapLine = lineStart != 0;
-					if (continuedWrapLine)
+					if (lineStart != 0)	// Wrapped
 						pt.x += actualWrapVisualStartIndent * vs.aveCharWidth;
 				}
 			}
@@ -704,8 +703,7 @@ int Editor::PositionFromLocation(Point pt) {
 			int subLineStart = ll->positions[lineStart];
 
 			if (actualWrapVisualStartIndent != 0) {
-				bool continuedWrapLine = lineStart != 0;
-				if (continuedWrapLine)
+				if (lineStart != 0)	// Wrapped
 					pt.x -= actualWrapVisualStartIndent * vs.aveCharWidth;
 			}
 			for (int i = lineStart; i < lineEnd; i++) {
@@ -754,8 +752,7 @@ int Editor::PositionFromLocationClose(Point pt) {
 			int subLineStart = ll->positions[lineStart];
 
 			if (actualWrapVisualStartIndent != 0) {
-				bool continuedWrapLine = lineStart != 0;
-				if (continuedWrapLine)
+				if (lineStart != 0)	// Wrapped
 					pt.x -= actualWrapVisualStartIndent * vs.aveCharWidth;
 			}
 			for (int i = lineStart; i < lineEnd; i++) {
@@ -792,8 +789,7 @@ int Editor::PositionFromLineX(int lineDoc, int x) {
 		int subLineStart = ll->positions[lineStart];
 
 		if (actualWrapVisualStartIndent != 0) {
-			bool continuedWrapLine = lineStart != 0;
-			if (continuedWrapLine)
+			if (lineStart != 0)	// Wrapped
 				x -= actualWrapVisualStartIndent * vs.aveCharWidth;
 		}
 		for (int i = lineStart; i < lineEnd; i++) {
@@ -2862,8 +2858,7 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 
 						if (actualWrapVisualStartIndent != 0) {
 							int lineStart = ll->LineStart(subLine);
-							bool continuedWrapLine = lineStart != 0;
-							if (continuedWrapLine)
+							if (lineStart != 0)	// Wrapped
 								xposCaret += actualWrapVisualStartIndent * vs.aveCharWidth;
 						}
 						int widthOverstrikeCaret;
@@ -4636,7 +4631,8 @@ char *Editor::CopyRange(int start, int end) {
 }
 
 void Editor::CopySelectionFromRange(SelectionText *ss, int start, int end) {
-	ss->Set(CopyRange(start, end), end - start + 1, pdoc->dbcsCodePage, false);
+	ss->Set(CopyRange(start, end), end - start + 1,
+		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false);
 }
 
 void Editor::CopySelectionRange(SelectionText *ss) {
@@ -4678,7 +4674,8 @@ void Editor::CopySelectionRange(SelectionText *ss) {
 				text[size] = '\0';
 			}
 		}
- 		ss->Set(text, size + 1, pdoc->dbcsCodePage, selType == selRectangle);
+ 		ss->Set(text, size + 1, pdoc->dbcsCodePage,
+			vs.styles[STYLE_DEFAULT].characterSet, selType == selRectangle);
 	}
 }
 
@@ -4686,13 +4683,15 @@ void Editor::CopyRangeToClipboard(int start, int end) {
 	start = pdoc->ClampPositionIntoDocument(start);
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
-	selectedText.Set(CopyRange(start, end), end - start + 1, pdoc->dbcsCodePage);
+	selectedText.Set(CopyRange(start, end), end - start + 1,
+		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false);
 	CopyToClipboard(selectedText);
 }
 
 void Editor::CopyText(int length, const char *text) {
 	SelectionText selectedText;
-	selectedText.Copy(text, length, pdoc->dbcsCodePage);
+	selectedText.Copy(text, length,
+		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false);
 	CopyToClipboard(selectedText);
 }
 
@@ -5166,7 +5165,7 @@ void Editor::ButtonUp(Point pt, unsigned int curTime, bool ctrl) {
 					} else {
 						SetEmptySelection(newPos);
 					}
-					drag.Set(0, 0, 0);
+					drag.Free();
 				}
 				selectionType = selChar;
 			}
@@ -5943,7 +5942,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETWORDCHARS: {
-			pdoc->SetDefaultCharClasses();
+			pdoc->SetDefaultCharClasses(false);
 			if (lParam == 0)
 				return 0;
 			pdoc->SetCharClasses(reinterpret_cast<unsigned char *>(lParam), Document::ccWord);
@@ -5958,7 +5957,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETCHARSDEFAULT:
-		pdoc->SetDefaultCharClasses();
+		pdoc->SetDefaultCharClasses(true);
 		break;
 
 	case SCI_GETLENGTH:
