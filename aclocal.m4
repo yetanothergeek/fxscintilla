@@ -4480,7 +4480,7 @@ AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
 #
 # FLAGS backup
 #
-FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_CXXFLAGS=$CXXFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
 FOX_OLD_LIBS=$LIBS
 AC_LANG_SAVE
@@ -4488,7 +4488,7 @@ AC_LANG_SAVE
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+CXXFLAGS="$CXXFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
 LIBS=-lFOX
 AC_LANG_CPLUSPLUS
@@ -4496,7 +4496,7 @@ AC_LANG_CPLUSPLUS
 if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
   LDFLAGS="$LDFLAGS -mwindows"
 	if test x"$HAVE_CYGWIN" = xyes; then
-		CPPFLAGS="$CPPFLAGS -DWIN32"
+		CXXFLAGS="$CXXFLAGS -DWIN32"
 	fi
 fi
 
@@ -4519,7 +4519,7 @@ AC_MSG_RESULT($have_FOX)
 #
 if test x"$have_FOX" = xno; then
   ACX_PTHREAD
-	CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
+	CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
   AC_MSG_CHECKING(for FOX library with pthread)
   AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
   AC_MSG_RESULT($have_FOX)
@@ -4536,7 +4536,7 @@ fi
 #
 # End
 #
-CPPFLAGS=$FOX_OLD_CPPFLAGS
+CXXFLAGS=$FOX_OLD_CXXFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 LIBS=$FOX_OLD_LIBS
 AC_LANG_RESTORE
@@ -4562,16 +4562,16 @@ dnl $4 = ACTION-IF-NOT-OK
 #
 # FLAGS backup
 #
-FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_CXXFLAGS=$CXXFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
 AC_LANG_SAVE
 
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
-AC_LANG_C
+AC_LANG_CPLUSPLUS
 
 #
 # Check Fox version
@@ -4587,7 +4587,7 @@ AC_TRY_RUN([
 #
 # Restore FLAGS
 #
-CPPFLAGS=$FOX_OLD_CPPFLAGS
+CXXFLAGS=$FOX_OLD_CXXFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 AC_LANG_RESTORE
 
@@ -4637,7 +4637,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.33 2003/04/19 12:54:51 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.34 2003/05/01 22:21:16 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [

@@ -8520,7 +8520,7 @@ fi;
 #
 # FLAGS backup
 #
-FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_CXXFLAGS=$CXXFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
 FOX_OLD_LIBS=$LIBS
 
@@ -8529,7 +8529,7 @@ FOX_OLD_LIBS=$LIBS
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+CXXFLAGS="$CXXFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
 LIBS=-lFOX
 ac_ext=cc
@@ -8542,7 +8542,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
   LDFLAGS="$LDFLAGS -mwindows"
 	if test x"$HAVE_CYGWIN" = xyes; then
-		CPPFLAGS="$CPPFLAGS -DWIN32"
+		CXXFLAGS="$CXXFLAGS -DWIN32"
 	fi
 fi
 
@@ -9120,7 +9120,7 @@ else
 fi
 
 
-	CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
+	CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
   echo "$as_me:$LINENO: checking for FOX library with pthread" >&5
 echo $ECHO_N "checking for FOX library with pthread... $ECHO_C" >&6
   cat >conftest.$ac_ext <<_ACEOF
@@ -9183,7 +9183,7 @@ fi
 #
 # End
 #
-CPPFLAGS=$FOX_OLD_CPPFLAGS
+CXXFLAGS=$FOX_OLD_CXXFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 LIBS=$FOX_OLD_LIBS
 ac_ext=c
@@ -9208,7 +9208,7 @@ fi
 #
 # FLAGS backup
 #
-FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_CXXFLAGS=$CXXFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
 
 
@@ -9216,13 +9216,13 @@ FOX_OLD_LDFLAGS=$LDFLAGS
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 #
@@ -9276,7 +9276,7 @@ fi
 #
 # Restore FLAGS
 #
-CPPFLAGS=$FOX_OLD_CPPFLAGS
+CXXFLAGS=$FOX_OLD_CXXFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -9303,7 +9303,7 @@ if test x"$check_libfox_version_ok" = xno; then
 #
 # FLAGS backup
 #
-FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_CXXFLAGS=$CXXFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
 
 
@@ -9311,13 +9311,13 @@ FOX_OLD_LDFLAGS=$LDFLAGS
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
 LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 #
@@ -9371,7 +9371,7 @@ fi
 #
 # Restore FLAGS
 #
-CPPFLAGS=$FOX_OLD_CPPFLAGS
+CXXFLAGS=$FOX_OLD_CXXFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
