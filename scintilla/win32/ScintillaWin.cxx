@@ -384,7 +384,7 @@ LRESULT ScintillaWin::WndPaint(uptr_t wParam) {
 		pps = &ps;
 		::BeginPaint(MainHWND(), pps);
 	}
-	AutoSurface surfaceWindow(pps->hdc, CodePage());
+	AutoSurface surfaceWindow(pps->hdc, this);
 	if (surfaceWindow) {
 		rcPaint = PRectangle(pps->rcPaint.left, pps->rcPaint.top, pps->rcPaint.right, pps->rcPaint.bottom);
 		PRectangle rcClient = GetClientRectangle();
@@ -615,6 +615,8 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 					DisplayCursor(Window::cursorReverseArrow);
 				} else if (PointInSelection(Point(pt.x, pt.y))) {
 					DisplayCursor(Window::cursorArrow);
+				} else if (PointIsHotspot(Point(pt.x, pt.y))) {
+					DisplayCursor(Window::cursorHand);
 				} else {
 					DisplayCursor(Window::cursorText);
 				}
@@ -666,8 +668,15 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case WM_GETDLGCODE:
 		return DLGC_HASSETSEL | DLGC_WANTALLKEYS;
 
-	case WM_KILLFOCUS:
-		SetFocusState(false);
+	case WM_KILLFOCUS: {
+			HWND wOther = reinterpret_cast<HWND>(wParam);
+			HWND wThis = reinterpret_cast<HWND>(wMain.GetID());
+			HWND wCT = reinterpret_cast<HWND>(ct.wCallTip.GetID());
+			if (!wParam ||
+				!(::IsChild(wThis,wOther) || (wOther == wCT))) {
+				SetFocusState(false);
+			}
+		}
 		//RealizeWindowPalette(true);
 		break;
 
@@ -745,6 +754,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
         // These are not handled in Scintilla and its faster to dispatch them here.
         // Also moves time out to here so profile doesn't count lots of empty message calls.
+
 	case WM_MOVE:
 	case WM_MOUSEACTIVATE:
 	case WM_NCHITTEST:
@@ -829,6 +839,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case SCI_GRABFOCUS:
 		::SetFocus(MainHWND());
 		break;
+
+#ifdef SCI_LEXER
+	case SCI_LOADLEXERLIBRARY:
+		//LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(lParam));
+		break;
+#endif
 
 	default:
 		return ScintillaBase::WndProc(iMessage, wParam, lParam);
@@ -1068,12 +1084,14 @@ void ScintillaWin::Paste() {
 
 void ScintillaWin::CreateCallTipWindow(PRectangle) {
 #ifdef TOTAL_CONTROL
-	ct.wCallTip = ::CreateWindow(callClassName, "ACallTip",
-				     WS_VISIBLE | WS_CHILD, 100, 100, 150, 20,
-				     MainHWND(), reinterpret_cast<HMENU>(idCallTip),
-				     GetWindowInstance(MainHWND()),
-				     &ct);
-	ct.wDraw = ct.wCallTip;
+	if (!ct.wCallTip.Created()) {
+		ct.wCallTip = ::CreateWindow(callClassName, "ACallTip",
+					     WS_POPUP, 100, 100, 150, 20,
+					     MainHWND(), 0,
+					     GetWindowInstance(MainHWND()),
+					     this);
+		ct.wDraw = ct.wCallTip;
+	}
 #endif
 }
 
@@ -1425,7 +1443,7 @@ void ScintillaWin::ImeStartComposition() {
 			int sizeZoomed = vs.styles[styleHere].size + vs.zoomLevel;
 			if (sizeZoomed <= 2)	// Hangs if sizeZoomed <= 1
 				sizeZoomed = 2;
-			AutoSurface surface(CodePage());
+			AutoSurface surface(this);
 			int deviceHeight = sizeZoomed;
 			if (surface) {
 				deviceHeight = (sizeZoomed * surface->LogPixelsY()) / 72;
@@ -1586,7 +1604,7 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 void ScintillaWin::RealizeWindowPalette(bool inBackGround) {
 	RefreshStyleData();
 	HDC hdc = ::GetDC(MainHWND());
-	AutoSurface surfaceWindow(hdc, CodePage());
+	AutoSurface surfaceWindow(hdc, this);
 	if (surfaceWindow) {
 		int changes = surfaceWindow->SetPalette(&palette, inBackGround);
 		if (changes > 0)
@@ -1605,7 +1623,7 @@ void ScintillaWin::FullPaint() {
 	rcPaint = GetClientRectangle();
 	paintingAllText = true;
 	HDC hdc = ::GetDC(MainHWND());
-	AutoSurface surfaceWindow(hdc, CodePage());
+	AutoSurface surfaceWindow(hdc, this);
 	if (surfaceWindow) {
 		Paint(surfaceWindow, rcPaint);
 		surfaceWindow->Release();
@@ -1910,9 +1928,9 @@ sptr_t PASCAL ScintillaWin::CTWndProc(
     HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam) {
 
 	// Find C++ object associated with window.
-	CallTip *ctp = reinterpret_cast<CallTip *>(PointerFromWindow(hWnd));
+	ScintillaWin *sciThis = reinterpret_cast<ScintillaWin *>(PointerFromWindow(hWnd));
 	// ctp will be zero if WM_CREATE not seen yet
-	if (ctp == 0) {
+	if (sciThis == 0) {
 		if (iMessage == WM_CREATE) {
 			// Associate CallTip object with window
 			CREATESTRUCT *pCreate = reinterpret_cast<CREATESTRUCT *>(lParam);
@@ -1928,13 +1946,35 @@ sptr_t PASCAL ScintillaWin::CTWndProc(
 		} else if (iMessage == WM_PAINT) {
 			PAINTSTRUCT ps;
 			::BeginPaint(hWnd, &ps);
-			AutoSurface surfaceWindow(ps.hdc, ctp->codePage);
+			Surface *surfaceWindow = Surface::Allocate();
 			if (surfaceWindow) {
-				ctp->PaintCT(surfaceWindow);
+				surfaceWindow->Init(ps.hdc, hWnd);
+				surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == sciThis->ct.codePage);
+				surfaceWindow->SetDBCSMode(sciThis->ct.codePage);
+				sciThis->ct.PaintCT(surfaceWindow);
 				surfaceWindow->Release();
+				delete surfaceWindow;
 			}
 			::EndPaint(hWnd, &ps);
 			return 0;
+		} else if ((iMessage == WM_NCLBUTTONDOWN) || (iMessage == WM_NCLBUTTONDBLCLK)) {
+			POINT pt;
+			pt.x = static_cast<short>(LOWORD(lParam));
+			pt.y = static_cast<short>(HIWORD(lParam));
+			ScreenToClient(hWnd, &pt);
+			sciThis->ct.MouseClick(Point(pt.x, pt.y));
+			sciThis->CallTipClick();
+			return 0;
+		} else if (iMessage == WM_LBUTTONDOWN) {
+			// This does not fire due to the hit test code
+			sciThis->ct.MouseClick(Point::FromLong(lParam));
+			sciThis->CallTipClick();
+			return 0;
+		} else if (iMessage == WM_SETCURSOR) {
+			::SetCursor(::LoadCursor(NULL,IDC_ARROW));
+			return 0;
+		} else if (iMessage == WM_NCHITTEST) {
+			return HTCAPTION;
 		} else {
 			return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 		}

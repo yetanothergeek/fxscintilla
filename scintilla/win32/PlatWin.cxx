@@ -23,6 +23,10 @@
 #include "UniConversion.h"
 #include "XPM.h"
 
+#ifndef IDC_HAND
+#define IDC_HAND MAKEINTRESOURCE(32649)
+#endif
+
 // Take care of 32/64 bit pointers
 #ifdef GetWindowLongPtr
 static void *PointerFromWindow(HWND hWnd) {
@@ -282,6 +286,8 @@ class SurfaceImpl : public Surface {
 	HBITMAP bitmapOld;
 	HPALETTE paletteOld;
 	int maxWidthMeasure;
+	int maxLenText;
+
 	void BrushColor(ColourAllocated back);
 	void SetFont(Font &font_);
 
@@ -292,9 +298,9 @@ public:
 	SurfaceImpl();
 	virtual ~SurfaceImpl();
 
-	void Init();
-	void Init(SurfaceID sid);
-	void InitPixMap(int width, int height, Surface *surface_);
+	void Init(WindowID wid);
+	void Init(SurfaceID sid, WindowID wid);
+	void InitPixMap(int width, int height, Surface *surface_, WindowID wid);
 
 	void Release();
 	bool Initialised();
@@ -342,6 +348,9 @@ SurfaceImpl::SurfaceImpl() :
 	paletteOld(0) {
 	// Windows 9x has only a 16 bit coordinate system so break after 30000 pixels
 	maxWidthMeasure = IsNT() ? 1000000 : 30000;
+	// There appears to be a 16 bit string length limit in GDI on NT and a limit of
+	// 8192 characters on Windows 95.
+	maxLenText = IsNT() ? 65535 : 8192;
 }
 
 SurfaceImpl::~SurfaceImpl() {
@@ -390,20 +399,20 @@ bool SurfaceImpl::Initialised() {
 	return hdc != 0;
 }
 
-void SurfaceImpl::Init() {
+void SurfaceImpl::Init(WindowID) {
 	Release();
 	hdc = ::CreateCompatibleDC(NULL);
 	hdcOwned = true;
 	::SetTextAlign(reinterpret_cast<HDC>(hdc), TA_BASELINE);
 }
 
-void SurfaceImpl::Init(SurfaceID sid) {
+void SurfaceImpl::Init(SurfaceID sid, WindowID) {
 	Release();
 	hdc = reinterpret_cast<HDC>(sid);
 	::SetTextAlign(reinterpret_cast<HDC>(hdc), TA_BASELINE);
 }
 
-void SurfaceImpl::InitPixMap(int width, int height, Surface *surface_) {
+void SurfaceImpl::InitPixMap(int width, int height, Surface *surface_, WindowID) {
 	Release();
 	hdc = ::CreateCompatibleDC(static_cast<SurfaceImpl *>(surface_)->hdc);
 	hdcOwned = true;
@@ -529,10 +538,8 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 		tbuf[tlen] = L'\0';
 		::ExtTextOutW(hdc, rc.left, ybase, ETO_OPAQUE, &rcw, tbuf, tlen, NULL);
 	} else {
-		// There appears to be a 16 bit string length limit in GDI
-		if (len > 65535)
-			len = 65535;
-		::ExtTextOut(hdc, rc.left, ybase, ETO_OPAQUE, &rcw, s, len, NULL);
+		::ExtTextOut(hdc, rc.left, ybase, ETO_OPAQUE, &rcw, s,
+			Platform::Minimum(len, maxLenText), NULL);
 	}
 }
 
@@ -548,31 +555,33 @@ void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const c
 		tbuf[tlen] = L'\0';
 		::ExtTextOutW(hdc, rc.left, ybase, ETO_OPAQUE | ETO_CLIPPED, &rcw, tbuf, tlen, NULL);
 	} else {
-		// There appears to be a 16 bit string length limit in GDI
-		if (len > 65535)
-			len = 65535;
-		::ExtTextOut(hdc, rc.left, ybase, ETO_OPAQUE | ETO_CLIPPED, &rcw, s, len, NULL);
+		::ExtTextOut(hdc, rc.left, ybase, ETO_OPAQUE | ETO_CLIPPED, &rcw, s,
+			Platform::Minimum(len, maxLenText), NULL);
 	}
 }
 
 void SurfaceImpl::DrawTextTransparent(PRectangle rc, Font &font_, int ybase, const char *s, int len,
 	ColourAllocated fore) {
-	SetFont(font_);
-	::SetTextColor(hdc, fore.AsLong());
-	::SetBkMode(hdc, TRANSPARENT);
-	RECT rcw = RectFromPRectangle(rc);
-	if (unicodeMode) {
-		wchar_t tbuf[MAX_US_LEN];
-		int tlen = UCS2FromUTF8(s, len, tbuf, sizeof(tbuf)/sizeof(wchar_t)-1);
-		tbuf[tlen] = L'\0';
-		::ExtTextOutW(hdc, rc.left, ybase, 0, &rcw, tbuf, tlen, NULL);
-	} else {
-		// There appears to be a 16 bit string length limit in GDI
-		if (len > 65535)
-			len = 65535;
-		::ExtTextOut(hdc, rc.left, ybase, 0, &rcw, s, len, NULL);
+	// Avoid drawing spaces in transparent mode
+	for (int i=0;i<len;i++) {
+		if (s[i] != ' ') {
+			SetFont(font_);
+			::SetTextColor(hdc, fore.AsLong());
+			::SetBkMode(hdc, TRANSPARENT);
+			RECT rcw = RectFromPRectangle(rc);
+			if (unicodeMode) {
+				wchar_t tbuf[MAX_US_LEN];
+				int tlen = UCS2FromUTF8(s, len, tbuf, sizeof(tbuf)/sizeof(wchar_t)-1);
+				tbuf[tlen] = L'\0';
+				::ExtTextOutW(hdc, rc.left, ybase, 0, &rcw, tbuf, tlen, NULL);
+			} else {
+				::ExtTextOut(hdc, rc.left, ybase, 0, &rcw, s,
+					Platform::Minimum(len,maxLenText), NULL);
+			}
+			::SetBkMode(hdc, OPAQUE);
+			return;
+		}
 	}
-	::SetBkMode(hdc, OPAQUE);
 }
 
 int SurfaceImpl::WidthText(Font &font_, const char *s, int len) {
@@ -584,7 +593,7 @@ int SurfaceImpl::WidthText(Font &font_, const char *s, int len) {
 		tbuf[tlen] = L'\0';
 		::GetTextExtentPoint32W(hdc, tbuf, tlen, &sz);
 	} else {
-		::GetTextExtentPoint32(hdc, s, len, &sz);
+		::GetTextExtentPoint32(hdc, s, Platform::Minimum(len, maxLenText), &sz);
 	}
 	return sz.cx;
 }
@@ -632,7 +641,8 @@ void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positi
 			positions[i++] = lastPos;
 		}
 	} else {
-		if (!::GetTextExtentExPoint(hdc, s, len, maxWidthMeasure, &fit, positions, &sz)) {
+		if (!::GetTextExtentExPoint(hdc, s, Platform::Minimum(len, maxLenText),
+			maxWidthMeasure, &fit, positions, &sz)) {
 			// Eeek - a NULL DC or other foolishness could cause this.
 			// The least we can do is set the positions to zero!
 			memset(positions, 0, len * sizeof(*positions));
@@ -751,22 +761,35 @@ PRectangle Window::GetPosition() {
 
 void Window::SetPosition(PRectangle rc) {
 	::SetWindowPos(reinterpret_cast<HWND>(id),
-		0, rc.left, rc.top, rc.Width(), rc.Height(), SWP_NOZORDER);
+		0, rc.left, rc.top, rc.Width(), rc.Height(), SWP_NOZORDER|SWP_NOACTIVATE);
 }
 
-void Window::SetPositionRelative(PRectangle rc, Window) {
+void Window::SetPositionRelative(PRectangle rc, Window w) {
+	LONG style = ::GetWindowLong(reinterpret_cast<HWND>(id), GWL_STYLE);
+	if (style & WS_POPUP) {
+		RECT rcOther;
+		::GetWindowRect(reinterpret_cast<HWND>(w.GetID()), &rcOther);
+		rc.Move(rcOther.left, rcOther.top);
+		if (rc.left < 0) {
+			rc.Move(-rc.left,0);
+		}
+		if (rc.top < 0) {
+			rc.Move(0,-rc.top);
+		}
+	}
 	SetPosition(rc);
 }
 
 PRectangle Window::GetClientPosition() {
-	RECT rc;
-	::GetClientRect(reinterpret_cast<HWND>(id), &rc);
+	RECT rc={0,0,0,0};
+	if (id)
+		::GetClientRect(reinterpret_cast<HWND>(id), &rc);
 	return  PRectangle(rc.left, rc.top, rc.right, rc.bottom);
 }
 
 void Window::Show(bool show) {
 	if (show)
-		::ShowWindow(reinterpret_cast<HWND>(id), SW_SHOWNORMAL);
+		::ShowWindow(reinterpret_cast<HWND>(id), SW_SHOWNOACTIVATE);
 	else
 		::ShowWindow(reinterpret_cast<HWND>(id), SW_HIDE);
 }
@@ -805,6 +828,9 @@ void Window::SetCursor(Cursor curs) {
 		break;
 	case cursorVert:
 		::SetCursor(::LoadCursor(NULL,IDC_SIZENS));
+		break;
+	case cursorHand:
+		::SetCursor(::LoadCursor(NULL,IDC_HAND));
 		break;
 	case cursorReverseArrow: {
 			if (!hinstPlatformRes)
@@ -1064,7 +1090,7 @@ void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
 		}
 		int pixId = ltt.Get(pDrawItem->itemID);
 		XPM *pxpm = xset.Get(pixId);
-        if (pDrawItem->itemState & ODS_SELECTED) {
+		if (pDrawItem->itemState & ODS_SELECTED) {
 			::SetBkColor(pDrawItem->hDC, ::GetSysColor(COLOR_HIGHLIGHT));
 			::SetTextColor(pDrawItem->hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
 		} else {
@@ -1080,7 +1106,8 @@ void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
 				ETO_OPAQUE, &(pDrawItem->rcItem), tbuf, tlen, NULL);
 		} else {
 			::ExtTextOut(pDrawItem->hDC, pDrawItem->rcItem.left+widthPix+1, pDrawItem->rcItem.top,
-				ETO_OPAQUE, &(pDrawItem->rcItem), text, len, NULL);
+				ETO_OPAQUE, &(pDrawItem->rcItem), text,
+				len, NULL);
 		}
 		if (pxpm) {
 			Surface *surfaceItem = Surface::Allocate();
@@ -1279,6 +1306,10 @@ int Platform::DefaultFontSize() {
 
 unsigned int Platform::DoubleClickTime() {
 	return ::GetDoubleClickTime();
+}
+
+bool Platform::MouseButtonBounce() {
+	return false;
 }
 
 void Platform::DebugDisplay(const char *s) {
