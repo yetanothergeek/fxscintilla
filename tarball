@@ -24,9 +24,9 @@ cd snapshot
 rm -fr scintilla
 
 if [ ! -z $major ]; then
-		cvs -w export -r "scintilla-${major}fox${minor}" scintilla
+		cvs -w export -r "FXSCINTILLA-${major}_${minor}" fxscintilla
 else
-		cvs -w export -r HEAD scintilla
+		cvs -w export -r HEAD fxscintilla
 fi
 
 find scintilla -type f ! \( \
@@ -38,7 +38,7 @@ find scintilla -type f ! \( \
 		-name '*.bmp' \) \
 	-exec unix2dos -o {} \;
 
-cd scintilla
+cd fxscintilla
 
 if [ "$devel" = "false" ]; then
 		rm -fr scintilla/gtk scintilla/win32
@@ -50,9 +50,9 @@ if [ "$devel" = "false" ]; then
 fi
 
 if [ ! -z $major ]; then
-		name="../scite"`echo $major | sed 's/_//'`"fox${minor}.tgz"
+		name="../fxscintilla-"`echo $major | sed 's/_/./'`".${minor}.tgz"
 else
-		name="../scite.tgz"
+		name="../fxscintilla.tgz"
 fi
 rm -f $name
 
