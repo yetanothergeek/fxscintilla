@@ -7,10 +7,15 @@ INCLUDES = \
 AM_CXXFLAGS = -W -Wall -DFOX
 
 ## Cygwin
-if CYGWIN
+if HAVE_CYGWIN
 AM_CXXFLAGS += -DWIN32
 AM_LDFLAGS = -mwindows
 endif # Cygwin
+
+## MinGW32
+if HAVE_MINGW32
+AM_LDFLAGS = -mwindows
+endif # MinGW32
 
 lib_LTLIBRARIES = libfxscintilla.la
 

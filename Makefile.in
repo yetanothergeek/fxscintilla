@@ -54,8 +54,6 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-CYGWIN_FALSE = @CYGWIN_FALSE@
-CYGWIN_TRUE = @CYGWIN_TRUE@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO = @ECHO@
@@ -66,6 +64,10 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FOX_INCLUDE_DIR = @FOX_INCLUDE_DIR@
 FOX_LIB_DIR = @FOX_LIB_DIR@
+HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
+HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
+HAVE_MINGW32_FALSE = @HAVE_MINGW32_FALSE@
+HAVE_MINGW32_TRUE = @HAVE_MINGW32_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -156,7 +158,8 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 DIST_COMMON = README COPYING INSTALL Makefile.am Makefile.in aclocal.m4 \
 	config/acinclude.m4 config/config.guess config/config.sub \
 	config/depcomp config/install-sh config/ltmain.sh \
-	config/missing config/mkinstalldirs configure configure.in
+	config/missing config/mkinstalldirs configure configure.in \
+	install-sh missing mkinstalldirs
 DIST_SUBDIRS = $(SUBDIRS)
 all: all-recursive
 

@@ -31,22 +31,22 @@
 #include <stdlib.h>
 
 
-#if !defined(WIN32) || defined(__CYGWIN__)
-# ifdef __CYGWIN__
+#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+# if defined(__CYGWIN__) || defined(__MINGW32__)
 #  include <windows.h>
 #  ifdef PIC
 #   define FOXDLL
 #  endif
 # endif
-#include <sys/time.h>
-#include <fox/fx.h>
-#include <fox/fxkeys.h>
+# include <sys/time.h>
+# include <fox/fx.h>
+# include <fox/fxkeys.h>
 #else
-#include <time.h>
-#include <windows.h>
-#include <fx.h>
-#include <fxkeys.h>
-#endif	// WIN32 || __CYGWIN__
+# include <time.h>
+# include <windows.h>
+# include <fx.h>
+# include <fxkeys.h>
+#endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 
 #include "Platform.h"
 

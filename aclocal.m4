@@ -4396,14 +4396,14 @@ rm -f confinc confmf
 AC_DEFUN([CHECK_LIBFOX],
 [
 #
-# Checking for Cygwin
+# Checking for Cygwin and MinGW32
 #
 AC_REQUIRE([AC_CANONICAL_HOST])[]dnl
 case $host_os in
-  *cygwin* ) CYGWIN=yes;;
-         * ) CYGWIN=no;;
+  *cygwin* ) HAVE_CYGWIN=yes;;
+  *mingw32* ) HAVE_MINGW32=yes;;
+         * ) ;;
 esac
-AM_CONDITIONAL(CYGWIN, test x"$CYGWIN" = xyes)
 #
 # Handle user hints
 #
@@ -4428,9 +4428,11 @@ LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
 LIBS=-lFOX
 AC_LANG_CPLUSPLUS
 
-if test x"$CYGWIN" = xyes; then
-	CPPFLAGS="$CPPFLAGS -DWIN32"
+if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
   LDFLAGS="$LDFLAGS -mwindows"
+	if test x"$HAVE_CYGWIN" = xyes; then
+		CPPFLAGS="$CPPFLAGS -DWIN32"
+	fi
 fi
 
 #
@@ -4570,7 +4572,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.28 2003/02/24 13:16:44 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.29 2003/03/02 10:22:57 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [

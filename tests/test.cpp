@@ -1,8 +1,8 @@
-#if !defined(WIN32) || defined(__CYGWIN__)
-#include <fox/fx.h>
+#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+# include <fox/fx.h>
 #else
-#include <fx.h>
-#endif // WIN32
+# include <fx.h>
+#endif // !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 #include <Scintilla.h>
 #include <SciLexer.h>
 #include <FXScintilla.h>

@@ -1,12 +1,19 @@
 AC_INIT(src/ScintillaFOX.cxx)
 AC_CONFIG_AUX_DIR(config)
 
-dnl Check Cygwin
-AC_CYGWIN
-AM_CONDITIONAL(CYGWIN, test x"$CYGWIN" = xyes)
+dnl Check Cygwin and MinGW32
+AC_CANONICAL_HOST
+case $host_os in
+	*cygwin* )  HAVE_CYGWIN=yes;;
+	*mingw32* ) HAVE_MINGW32=yes;;
+	* ) ;;
+esac
+
+AM_CONDITIONAL(HAVE_CYGWIN, test x"$HAVE_CYGWIN" = xyes)
+AM_CONDITIONAL(HAVE_MINGW32, test x"$HAVE_MINGW32" = xyes)
 
 dnl Using libtool
-if test x"$CYGWIN" = xyes; then
+if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
   AC_DISABLE_SHARED
 fi
 AM_PROG_LIBTOOL
