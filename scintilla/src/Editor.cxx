@@ -12,7 +12,9 @@
 
 #include "Platform.h"
 
+#ifndef PLAT_QT
 #define INCLUDE_DEPRECATED_FEATURES
+#endif
 #include "Scintilla.h"
 
 #include "ContractionState.h"
@@ -327,6 +329,7 @@ Editor::Editor() {
 	xCaretMargin = 50;
 	horizontalScrollBarVisible = true;
 	scrollWidth = 2000;
+	verticalScrollBarVisible = true;
 	endAtLastLine = true;
 
 	pixmapLine = Surface::Allocate();
@@ -1555,15 +1558,15 @@ void Editor::LayoutLine(int line, Surface *surface, ViewStyle &vstyle, LineLayou
 				char chDoc = pdoc->CharAt(charInDoc);
 				styleByte = pdoc->StyleAt(charInDoc);
 				if (vstyle.viewEOL || ((chDoc != '\r') && (chDoc != '\n'))) {
-					allSame = allSame && 
+					allSame = allSame &&
 						(ll->styles[numCharsInLine] == static_cast<char>(styleByte & styleMask));
-					allSame = allSame && 
+					allSame = allSame &&
 						(ll->indicators[numCharsInLine] == static_cast<char>(styleByte & ~styleMask));
 					if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseUpper)
-						allSame = allSame && 
+						allSame = allSame &&
 							(ll->chars[numCharsInLine] == static_cast<char>(toupper(chDoc)));
 					else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseLower)
-						allSame = allSame && 
+						allSame = allSame &&
 							(ll->chars[numCharsInLine] == static_cast<char>(tolower(chDoc)));
 					else
 						allSame = allSame &&
@@ -2377,8 +2380,8 @@ long Editor::FormatRange(bool draw, RangeToFormat *pfr) {
 	if (linePrintLast > linePrintMax)
 		linePrintLast = linePrintMax;
 	//Platform::DebugPrintf("Formatting lines=[%0d,%0d,%0d] top=%0d bottom=%0d line=%0d %0d\n",
-	//	linePrintStart, linePrintLast, linePrintMax, pfr->rc.top, pfr->rc.bottom, vsPrint.lineHeight,
-	//	surfaceMeasure->Height(vsPrint.styles[STYLE_LINENUMBER].font));
+	//      linePrintStart, linePrintLast, linePrintMax, pfr->rc.top, pfr->rc.bottom, vsPrint.lineHeight,
+	//      surfaceMeasure->Height(vsPrint.styles[STYLE_LINENUMBER].font));
 	int endPosPrint = pdoc->Length();
 	if (linePrintLast < pdoc->LinesTotal())
 		endPosPrint = pdoc->LineStart(linePrintLast + 1);
@@ -2388,22 +2391,46 @@ long Editor::FormatRange(bool draw, RangeToFormat *pfr) {
 
 	int xStart = vsPrint.fixedColumnWidth + pfr->rc.left + lineNumberWidth;
 	int ypos = pfr->rc.top;
-	int line = linePrintStart;
 
-	if (draw) {	// Otherwise just measuring
+	int lineDoc = linePrintStart;
 
-		while (line <= linePrintLast && ypos < pfr->rc.bottom) {
+	int nPrintPos = pdoc->LineStart(lineDoc);
+	int visibleLine = 0;
 
-			// When printing, the hdc and hdcTarget may be the same, so
-			// changing the state of surfaceMeasure may change the underlying
-			// state of surface. Therefore, any cached state is discarded before
-			// using each surface.
-			surfaceMeasure->FlushCachedState();
+	while (lineDoc <= linePrintLast && ypos < pfr->rc.bottom) {
 
-			// Copy this line and its styles from the document into local arrays
-			// and determine the x position at which each character starts.
-			LineLayout ll(8000);
-			LayoutLine(line, surfaceMeasure, vsPrint, &ll);
+		// When printing, the hdc and hdcTarget may be the same, so
+		// changing the state of surfaceMeasure may change the underlying
+		// state of surface. Therefore, any cached state is discarded before
+		// using each surface.
+		surfaceMeasure->FlushCachedState();
+
+		// Copy this line and its styles from the document into local arrays
+		// and determine the x position at which each character starts.
+		LineLayout ll(8000);
+		LayoutLine(lineDoc, surfaceMeasure, vsPrint, &ll, pfr->rc.Width() - lineNumberWidth);
+
+		// When document line is wrapped over multiple display lines, find where
+		// to start printing from to ensure a particular position is on the first
+		// line of the page.
+		if (visibleLine == 0) {
+			for (int iwl = 0; iwl < ll.lines - 1; iwl++) {
+				if (ll.LineStart(iwl) <= nPrintPos && ll.LineStart(iwl + 1) >= nPrintPos)
+					nPrintPos = ll.LineStart(iwl);
+			}
+
+			if (ll.lines > 1 && nPrintPos >= ll.LineStart(ll.lines - 1)) {
+				nPrintPos = ll.LineStart(ll.lines - 1);
+			}
+		}
+
+		if (ypos + vsPrint.lineHeight * ll.lines > pfr->rc.bottom) {
+			ypos = pfr->rc.bottom;
+			continue;
+		}
+
+
+		if (draw && nPrintPos >= pfr->chrg.cpMin) {
 			ll.selStart = -1;
 			ll.selEnd = -1;
 			ll.containsCaret = false;
@@ -2411,31 +2438,39 @@ long Editor::FormatRange(bool draw, RangeToFormat *pfr) {
 			PRectangle rcLine;
 			rcLine.left = pfr->rc.left + lineNumberWidth;
 			rcLine.top = ypos;
-			rcLine.right = pfr->rc.right;
+			rcLine.right = pfr->rc.right - 1;
 			rcLine.bottom = ypos + vsPrint.lineHeight;
 
 			if (lineNumberWidth) {
 				char number[100];
-				sprintf(number, "%d" lineNumberPrintSpace, line + 1);
+				sprintf(number, "%d" lineNumberPrintSpace, lineDoc + 1);
 				PRectangle rcNumber = rcLine;
 				rcNumber.right = rcNumber.left + lineNumberWidth;
 				// Right justify
-				rcNumber.left -=
-				    surface->WidthText(vsPrint.styles[STYLE_LINENUMBER].font, number, strlen(number));
+				rcNumber.left -= surfaceMeasure->WidthText(
+					vsPrint.styles[STYLE_LINENUMBER].font, number, strlen(number));
+				surface->FlushCachedState();
 				surface->DrawTextNoClip(rcNumber, vsPrint.styles[STYLE_LINENUMBER].font,
-				                  ypos + vsPrint.maxAscent, number, strlen(number),
-				                  vsPrint.styles[STYLE_LINENUMBER].fore.allocated,
-				                  vsPrint.styles[STYLE_LINENUMBER].back.allocated);
+				                        ypos + vsPrint.maxAscent, number, strlen(number),
+				                        vsPrint.styles[STYLE_LINENUMBER].fore.allocated,
+				                        vsPrint.styles[STYLE_LINENUMBER].back.allocated);
 			}
 
 			// Draw the line
 			surface->FlushCachedState();
-			DrawLine(surface, vsPrint, line, line, xStart, rcLine, &ll);
-
-			ypos += vsPrint.lineHeight;
-			line++;
+			for (int iwl = 0; iwl < ll.lines; iwl++) {
+				DrawLine(surface, vsPrint, lineDoc, visibleLine, xStart, rcLine, &ll, iwl);
+				++visibleLine;
+				ypos += vsPrint.lineHeight;
+				rcLine.top = ypos;
+				rcLine.bottom = ypos + vsPrint.lineHeight;
+			}
 		}
+
+		nPrintPos += ll.numCharsInLine;
+		++lineDoc;
 	}
+	endPosPrint = pdoc->LineStart(lineDoc);
 
 	return endPosPrint;
 }
@@ -2753,9 +2788,11 @@ void Editor::NotifySavePoint(bool isSavePoint) {
 }
 
 void Editor::NotifyModifyAttempt() {
+#ifdef INCLUDE_DEPRECATED_FEATURES
 	SCNotification scn;
 	scn.nmhdr.code = SCN_MODIFYATTEMPTRO;
 	NotifyParent(scn);
+#endif
 }
 
 void Editor::NotifyDoubleClick(Point, bool) {
@@ -3004,6 +3041,7 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, unsigned long wParam, long
 	case SCI_REPLACESEL:
 	case SCI_ADDTEXT:
 	case SCI_INSERTTEXT:
+	case SCI_APPENDTEXT:
 	case SCI_CLEARALL:
 	case SCI_SELECTALL:
 	case SCI_GOTOLINE:
@@ -4659,6 +4697,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETXOFFSET:
 		return xOffset;
 
+	case SCI_CHOOSECARETX:
+		SetLastXChosen();
+		break;
+
 	case SCI_SCROLLCARET:
 		EnsureCaretVisible();
 		break;
@@ -4762,6 +4804,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			SetEmptySelection(newCurrent);
 			return 0;
 		}
+
+	case SCI_APPENDTEXT:
+		pdoc->InsertString(pdoc->Length(), CharPtrFromSPtr(lParam), wParam);
+		return 0;
 
 	case SCI_CLEARALL:
 		ClearAll();
@@ -5085,6 +5131,17 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETHSCROLLBAR:
 		return horizontalScrollBarVisible;
 
+	case SCI_SETVSCROLLBAR:
+		if (verticalScrollBarVisible != (wParam != 0)) {
+			verticalScrollBarVisible = wParam != 0;
+			SetScrollBars();
+			ReconfigureScrollBars();
+		}
+		break;
+
+	case SCI_GETVSCROLLBAR:
+		return verticalScrollBarVisible;
+
 	case SCI_SETINDENTATIONGUIDES:
 		vs.viewIndentationGuides = wParam != 0;
 		Redraw();
@@ -5174,7 +5231,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 		return -1;
 
-	case SCI_SETMARGINTYPEN:
+	case SCI_MARKERDEFINEPIXMAP:
+		if (wParam <= MARKER_MAX) {
+			vs.markers[wParam].SetXPM(CharPtrFromSPtr(lParam));
+		};
+		InvalidateStyleData();
+		RedrawSelMargin();
+		break;
+
+		case SCI_SETMARGINTYPEN:
 		if (ValidMargin(wParam)) {
 			vs.ms[wParam].symbol = (lParam == SC_MARGIN_SYMBOL);
 			InvalidateStyleRedraw();
@@ -5412,10 +5477,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_SEARCHPREV:
 		return SearchText(iMessage, wParam, lParam);
 
+#ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_SETCARETPOLICY:	// Deprecated
 		caretXPolicy = caretYPolicy = wParam;
 		caretXSlop = caretYSlop = lParam;
 		break;
+#endif
 
 	case SCI_SETXCARETPOLICY:
 		caretXPolicy = wParam;

@@ -260,6 +260,7 @@ val SC_MARK_CIRCLEMINUSCONNECTED=21
 val SC_MARK_BACKGROUND=22
 val SC_MARK_DOTDOTDOT=23
 val SC_MARK_ARROWS=24
+val SC_MARK_PIXMAP=25
 
 val SC_MARK_CHARACTER=10000
 
@@ -301,6 +302,9 @@ fun int MarkerNext=2047(int lineStart, int markerMask)
 
 # Find the previous line before lineStart that includes a marker in mask.
 fun int MarkerPrevious=2048(int lineStart, int markerMask)
+
+# Define a marker from a pixmap.
+fun void MarkerDefinePixmap=2049(int markerNumber, string pixmap)
 
 enu MarginType=SC_MARGIN_
 val SC_MARGIN_SYMBOL=0
@@ -688,7 +692,7 @@ fun position FindText=2150(int flags, findtext ft)
 # On Windows, will draw the document into a display context such as a printer.
 fun void FormatRange=2151(bool draw, formatrange fr)
 
-# Retrieve the line at the top of the display.
+# Retrieve the display line at the top of the display.
 get int GetFirstVisibleLine=2152(,)
 
 # Retrieve the contents of a line.
@@ -988,6 +992,17 @@ get int GetEndAtLastLine=2278(,)
 # Retrieve the height of a particular line of text in pixels.
 fun int TextHeight=2279(int line,)
 
+# Show or hide the vertical scroll bar.
+set void SetVScrollBar=2280(bool show,)
+
+# Is the vertical scroll bar visible?
+get bool GetVScrollBar=2281(,)
+
+# Append a string to the end of the document without changing the selection.
+fun void AppendText=2282(int length, string text)
+
+## New messages go here
+
 ## Start of key messages
 # Move caret down one line.
 fun void LineDown=2300(,)
@@ -1130,14 +1145,14 @@ fun void DeleteBackNotLine=2344(,)
 # Move caret to first position on display line.
 fun void HomeDisplay=2345(,)
 
-# Move caret to first position on display line extending selection to 
+# Move caret to first position on display line extending selection to
 # new caret position.
 fun void HomeDisplayExtend=2346(,)
 
 # Move caret to last position on display line.
 fun void LineEndDisplay=2347(,)
 
-# Move caret to last position on display line extending selection to new 
+# Move caret to last position on display line extending selection to new
 # caret position.
 fun void LineEndDisplayExtend=2348(,)
 
@@ -1251,7 +1266,7 @@ get bool GetMouseDownCaptures=2385(,)
 
 enu CursorShape=SC_CURSOR
 val SC_CURSORNORMAL=-1
-val SC_CURSORWAIT=3
+val SC_CURSORWAIT=4
 # Sets the cursor to one of the SC_CURSOR* values.
 set void SetCursor=2386(int cursorType,)
 # Get cursor type.
@@ -1290,6 +1305,9 @@ fun void DelLineRight=2396(,)
 # Get and Set the xOffset (ie, horizonal scroll position).
 set void SetXOffset=2397(int newOffset,)
 get int GetXOffset=2398(,)
+
+# Set the last x chosen value to be the caret x position
+fun void ChooseCaretX=2399(,)
 
 # Set the focus to this Scintilla widget.
 # GTK+ Specific.
@@ -1442,6 +1460,10 @@ val SCLEX_PHP=30
 val SCLEX_BAAN=31
 val SCLEX_MATLAB=32
 val SCLEX_SCRIPTOL=33
+val SCLEX_ASM=34
+val SCLEX_CPPNOCASE=35
+val SCLEX_FORTRAN=36
+val SCLEX_F77=37
 
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a
 # value assigned in sequence from SCLEX_AUTOMATIC+1.
@@ -1708,6 +1730,7 @@ val SCE_ERR_DIFF_CHANGED=10
 val SCE_ERR_DIFF_ADDITION=11
 val SCE_ERR_DIFF_DELETION=12
 val SCE_ERR_DIFF_MESSAGE=13
+val SCE_ERR_PHP=14
 # Lexical states for SCLEX_BATCH
 lex Batch=SCLEX_BATCH SCE_BAT_
 val SCE_BAT_DEFAULT=0
@@ -1764,14 +1787,17 @@ val SCE_AVE_OPERATOR=10
 # Lexical states for SCLEX_ADA
 lex Ada=SCLEX_ADA SCE_ADA_
 val SCE_ADA_DEFAULT=0
-val SCE_ADA_COMMENT=1
-val SCE_ADA_NUMBER=2
-val SCE_ADA_WORD=3
-val SCE_ADA_STRING=4
+val SCE_ADA_WORD=1
+val SCE_ADA_IDENTIFIER=2
+val SCE_ADA_NUMBER=3
+val SCE_ADA_DELIMITER=4
 val SCE_ADA_CHARACTER=5
-val SCE_ADA_OPERATOR=6
-val SCE_ADA_IDENTIFIER=7
+val SCE_ADA_CHARACTEREOL=6
+val SCE_ADA_STRING=7
 val SCE_ADA_STRINGEOL=8
+val SCE_ADA_LABEL=9
+val SCE_ADA_COMMENTLINE=10
+val SCE_ADA_ILLEGAL=11
 # Lexical states for SCLEX_BAAN
 lex Baan=SCLEX_BAAN SCE_BAAN_
 val SCE_BAAN_DEFAULT=0
@@ -1852,6 +1878,37 @@ val SCE_SCRIPTOL_WORD2=16
 val SCE_SCRIPTOL_COMMENTDOCKEYWORD=17
 val SCE_SCRIPTOL_COMMENTDOCKEYWORDERROR=18
 val SCE_SCRIPTOL_COMMENTBASIC=19
+# Lexical states for SCLEX_ASM
+lex Asm=SCLEX_ASM SCE_ASM_
+val SCE_ASM_DEFAULT=0
+val SCE_ASM_COMMENT=1
+val SCE_ASM_NUMBER=2
+val SCE_ASM_STRING=3
+val SCE_ASM_OPERATOR=4
+val SCE_ASM_IDENTIFIER=5
+val SCE_ASM_CPUINSTRUCTION=6
+val SCE_ASM_MATHINSTRUCTION=7
+val SCE_ASM_REGISTER=8
+val SCE_ASM_DIRECTIVE=9
+val SCE_ASM_DIRECTIVEOPERAND=10
+# Lexical states for SCLEX_FORTRAN
+lex Fortran=SCLEX_FORTRAN SCE_F_
+lex F77=SCLEX_F77 SCE_F_
+val SCE_F_DEFAULT=0
+val SCE_F_COMMENT=1
+val SCE_F_NUMBER=2
+val SCE_F_STRING1=3
+val SCE_F_STRING2=4
+val SCE_F_STRINGEOL=5
+val SCE_F_OPERATOR=6
+val SCE_F_IDENTIFIER=7
+val SCE_F_WORD=8
+val SCE_F_WORD2=9
+val SCE_F_WORD3=10
+val SCE_F_PREPROCESSOR=11
+val SCE_F_OPERATOR2=12
+val SCE_F_LABEL=13
+val SCE_F_CONTINUATION=14
 
 # Events
 

@@ -85,7 +85,8 @@ CXXFLAGS=$(CXXFLAGS) $(INCLUDEDIRS)
 ALL:	$(COMPONENT) $(LEXCOMPONENT) $(DIR_O)\ScintillaWinS.obj $(DIR_O)\WindowAccessor.obj
 
 clean:
-	-del /q $(DIR_O)\*.obj $(DIR_O)\*.pdb $(COMPONENT) $(LEXCOMPONENT) $(DIR_O)\*.res $(DIR_BIN)\*.map
+	-del /q $(DIR_O)\*.obj $(DIR_O)\*.pdb $(COMPONENT) $(LEXCOMPONENT) \
+	$(DIR_O)\*.res $(DIR_BIN)\*.map $(DIR_BIN)\*.exp $(DIR_BIN)\*.pdb $(DIR_BIN)\*.lib
 
 SOBJS=\
 	$(DIR_O)\AutoComplete.obj \
@@ -110,6 +111,7 @@ SOBJS=\
 #**LEXOBJS=\\\n\(\t$(DIR_O)\\\*.obj \\\n\)
 LEXOBJS=\
 	$(DIR_O)\LexAda.obj \
+	$(DIR_O)\LexAsm.obj \
 	$(DIR_O)\LexAVE.obj \
 	$(DIR_O)\LexBaan.obj \
 	$(DIR_O)\LexBullant.obj \
@@ -117,6 +119,7 @@ LEXOBJS=\
 	$(DIR_O)\LexCPP.obj \
 	$(DIR_O)\LexCrontab.obj \
 	$(DIR_O)\LexEiffel.obj \
+	$(DIR_O)\LexFortran.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexLisp.obj \
 	$(DIR_O)\LexLua.obj \
@@ -238,6 +241,8 @@ $(DIR_O)\KeyWords.obj: ../src/KeyWords.cxx ../include/Platform.h \
 
 $(DIR_O)\LexAda.obj: ..\src\LexAda.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexAsm.obj: ..\src\LexAsm.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexAVE.obj: ..\src\LexAVE.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexBaan.obj: ..\src\LexBaan.cxx $(LEX_HEADERS)
@@ -251,6 +256,8 @@ $(DIR_O)\LexCPP.obj: ..\src\LexCPP.cxx $(LEX_HEADERS)
 $(DIR_O)\LexCrontab.obj: ..\src\LexCrontab.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexEiffel.obj: ..\src\LexEiffel.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexFortran.obj: ..\src\LexFortran.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
 
