@@ -30,6 +30,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// for some weird reason ltdl.h doesn't compile correctly when not included
+// first
+#if HAVE_FOX_1_0
+# if !defined(WIN32) || defined(__CYGWIN__)
+extern "C" {
+#  include "../ltdl/ltdl.h"
+}
+# endif
+#endif
+
+
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if defined(__CYGWIN__)
 #  include <windows.h>
@@ -1245,10 +1256,6 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 // For Fox 1.0, I'd like to use libltdl for both Unix and Win32 but I haven't
 // succeded yet using it under Win32
 #elif !defined(WIN32) || defined(__CYGWIN__)
-extern "C" {
-# include "../ltdl/ltdl.h"
-}
-
 
 class DynamicLibraryImpl : public DynamicLibrary {
 protected:
