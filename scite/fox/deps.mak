@@ -7,9 +7,9 @@ SciTEFOX.o: SciTEFOX.cxx ../../scintilla/include/Platform.h \
  ../src/SciTE.h ../../scintilla/include/PropSet.h \
  ../../scintilla/include/SString.h ../../scintilla/include/Accessor.h \
  ../../scintilla/include/KeyWords.h \
- ../../scintilla/include/Scintilla.h \
- ../../scintilla/include/ScintillaWidget.h ../src/Extender.h \
- ../src/SciTEBase.h DirectorExtension.h pixmapsGNOME.h SciIcon.h
+ ../../scintilla/include/Scintilla.h ../src/Extender.h \
+ ../src/SciTEBase.h DirectorExtension.h pixmapsGNOME.h SciIcon.h \
+ ../../scintilla/fox/FXScintilla.h
 Exporters.o: ../src/Exporters.cxx ../../scintilla/include/Platform.h \
  ../src/SciTE.h ../../scintilla/include/PropSet.h \
  ../../scintilla/include/SString.h ../../scintilla/include/Accessor.h \

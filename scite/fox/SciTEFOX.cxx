@@ -317,12 +317,6 @@ protected:
 	virtual void GetDefaultDirectory(char *directory, size_t size);
 	virtual bool GetSciteDefaultHome(char *path, unsigned int lenPath);
 	virtual bool GetSciteUserHome(char *path, unsigned int lenPath);
-	virtual bool GetDefaultPropertiesFileName(char *pathDefaultProps,
-	        char *pathDefaultDir, unsigned int lenPath);
-	virtual bool GetUserPropertiesFileName(char *pathUserProps,
-	                                       char *pathUserDir, unsigned int lenPath);
-	virtual bool GetAbbrevPropertiesFileName(char *pathAbbrevProps,
-	        char *pathDefaultDir, unsigned int lenPath);
 
 	virtual void SetStatusBarText(const char *s);
 	virtual void ShowToolBar();
@@ -696,32 +690,6 @@ bool SciTEFOX::GetSciteDefaultHome(char *path, unsigned int lenPath) {
 	return false;
 }
 
-bool SciTEFOX::GetDefaultPropertiesFileName(char *pathDefaultProps,
-        char *pathDefaultDir, unsigned int lenPath) {
-	if (!GetSciteDefaultHome(pathDefaultDir, lenPath))
-		return false;
-	if (strlen(pathDefaultProps) + 1 + strlen(propGlobalFileName) < lenPath) {
-		strncpy(pathDefaultProps, pathDefaultDir, lenPath);
-		strncat(pathDefaultProps, pathSepString, lenPath);
-		strncat(pathDefaultProps, propGlobalFileName, lenPath);
-		return true;
-	}
-	return false;
-}
-
-bool SciTEFOX::GetAbbrevPropertiesFileName(char *pathAbbrevProps,
-        char *pathDefaultDir, unsigned int lenPath) {
-	if (!GetSciteDefaultHome(pathDefaultDir, lenPath))
-		return false;
-	if (strlen(pathAbbrevProps) + 1 + strlen(propAbbrevFileName) < lenPath) {
-		strncpy(pathAbbrevProps, pathDefaultDir, lenPath);
-		strncat(pathAbbrevProps, pathSepString, lenPath);
-		strncat(pathAbbrevProps, propAbbrevFileName, lenPath);
-		return true;
-	}
-	return false;
-}
-
 bool SciTEFOX::GetSciteUserHome(char *path, unsigned int lenPath) {
 	char *where = getenv("SciTE_HOME");
 	if (!where) {
@@ -729,19 +697,6 @@ bool SciTEFOX::GetSciteUserHome(char *path, unsigned int lenPath) {
 	}
 	if (where) {
 		strncpy(path, where, lenPath);
-		return true;
-	}
-	return false;
-}
-
-bool SciTEFOX::GetUserPropertiesFileName(char *pathUserProps,
-        char *pathUserDir, unsigned int lenPath) {
-	if (!GetSciteUserHome(pathUserDir, lenPath))
-		return false;
-	if (strlen(pathUserProps) + 1 + strlen(propUserFileName) < lenPath) {
-		strncpy(pathUserProps, pathUserDir, lenPath);
-		strncat(pathUserProps, pathSepString, lenPath);
-		strncat(pathUserProps, propUserFileName, lenPath);
 		return true;
 	}
 	return false;
@@ -1783,6 +1738,7 @@ void SciTEFOX::CreateMenu() {
 	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("Vertical &Split").c_str(), NULL, this, ID(IDM_SPLITVERTICAL), MENUSTATE_CHECKED);
 	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("&Wrap").c_str(), NULL, this, ID(IDM_WRAP), MENUSTATE_CHECKED);
 	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("Wrap Out&put").c_str(), NULL, this, ID(IDM_WRAPOUTPUT), MENUSTATE_CHECKED);
+	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("&Read-Only").c_str(), NULL, this, ID(IDM_READONLY), MENUSTATE_CHECKED);
 	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("Clear &Output\tShift-F5").c_str(), NULL, this, ID(IDM_CLEAROUTPUT));
 	new FXMenuCommand(optionsMenu, TranslatedMenuLabel("&Switch Pane\tCtl-F6").c_str(), NULL, this, ID(IDM_SWITCHPANE));
 	new FXMenuSeparator(optionsMenu);

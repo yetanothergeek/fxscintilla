@@ -7,7 +7,7 @@ ScintillaFOX.o: ScintillaFOX.cxx ../include/Platform.h \
  ../src/SVector.h ../src/CellBuffer.h ../src/CallTip.h ../src/KeyMap.h \
  ../src/Indicator.h ../src/LineMarker.h ../src/Style.h \
  ../src/AutoComplete.h ../src/ViewStyle.h ../src/Document.h \
- ../src/Editor.h ../src/ScintillaBase.h
+ ../src/Editor.h ../src/ScintillaBase.h FXScintilla.h
 AutoComplete.o: ../src/AutoComplete.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../src/AutoComplete.h
 CallTip.o: ../src/CallTip.cxx ../include/Platform.h \
@@ -41,6 +41,10 @@ LexAVE.o: ../src/LexAVE.cxx ../include/Platform.h ../include/PropSet.h \
 LexAda.o: ../src/LexAda.cxx ../include/Platform.h ../include/PropSet.h \
  ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
  ../include/Scintilla.h ../include/SciLexer.h
+LexBaan.o: ../src/LexBaan.cxx ../include/Platform.h \
+ ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
+ ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
+ ../include/SciLexer.h
 LexBullant.o: ../src/LexBullant.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
@@ -55,7 +59,8 @@ LexCrontab.o: ../src/LexCrontab.cxx ../include/Platform.h \
  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
 LexEiffel.o: ../src/LexEiffel.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
- ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
+ ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
+ ../include/SciLexer.h
 LexHTML.o: ../src/LexHTML.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
  ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
@@ -64,8 +69,12 @@ LexLisp.o: ../src/LexLisp.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
 LexLua.o: ../src/LexLua.cxx ../include/Platform.h ../include/PropSet.h \
- ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
- ../include/Scintilla.h ../include/SciLexer.h
+ ../include/SString.h ../include/Accessor.h ../src/StyleContext.h \
+ ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
+LexMatlab.o: ../src/LexMatlab.cxx ../include/Platform.h \
+ ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
+ ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
+ ../include/SciLexer.h
 LexOthers.o: ../src/LexOthers.cxx ../include/Platform.h \
  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h

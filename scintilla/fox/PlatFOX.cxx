@@ -445,7 +445,9 @@ void SurfaceImpl::RectangleDraw(PRectangle rc, ColourAllocated fore, ColourAlloc
 }
 
 void SurfaceImpl::FillRectangle(PRectangle rc, ColourAllocated back) {
-	if (dc()) {
+	// Protect against out of range
+	// if (dc()) {
+	if (dc() && (rc.left < 32000)) {
 		// GTK+ rectangles include their lower and right edges
 		rc.bottom--;
 		rc.right--;
