@@ -16,25 +16,38 @@ fi
 major=$2
 minor=$3
 
+# Name
+name="fxscintilla-"
+if [ ! -z $major ]; then
+		name="${name}"`echo $major | sed 's/_/./'`
+		if [ ! -z $minor ]; then
+				name="${name}.${minor}"
+		fi
+else
+		name="${name}cvs"
+fi
+
+# Tag
+if [ ! -z $major ]; then
+		tag="FXSCINTILLA-${major}"
+		if [ ! -z $minor ]; then
+				tag="${tag}_${minor}"
+		fi
+else
+		tag="HEAD"
+fi
+
+
 if [ ! -d snapshot ]; then
 	mkdir snapshot
 fi
 cd snapshot
 
 rm -fr fxscintilla
+cvs -w export -r "${tag}" fxscintilla
 
-if [ ! -z $major ]; then
-		tag="FXSCINTILLA-${major}"
-		if [ ! -z $minor ]; then
-				tag="${tag}_${minor}"
-		fi
-		cvs -w export -r "${tag}" fxscintilla
-else
-		cvs -w export -r HEAD fxscintilla
-fi
-
-find fxscintilla -type f ! \( \
-		-name makefile -o \
+find fxscintilla/scintilla -type f ! \( \
+		-name 'Makefile.*' -o \
 		-name '*.png' -o \
 		-name '*.ico' -o \
 		-name '*.cur' -o \
@@ -45,29 +58,17 @@ find fxscintilla -type f ! \( \
 cd fxscintilla
 
 if [ "$devel" = "false" ]; then
-		rm -fr scintilla/gtk scintilla/win32
+		rm -fr test scintilla/gtk scintilla/win32
 		rm -f scintilla/scintilla.dsp
 		rm -f scintilla/scintilla.dsw
 		rm -f scintilla/fox/scintilla.dsp
 		rm -f scintilla/fox/scintilla.dsw
 fi
 
-if [ ! -z $major ]; then
-		name="../fxscintilla-"`echo $major | sed 's/_/./'`
-		if [ ! -z $minor ]; then
-				name="${name}.${minor}"
-		fi
-		name="${name}.tgz"
-else
-		name="../fxscintilla.tgz"
-fi
-rm -f $name
+cd ..
+mv fxscintilla $name
+tar cvzf ${name}.tgz $name
+mv $name fxscintilla
 
-if [ "$devel" = "false" ]; then
-		tar cvzf $name scintilla
-else
-		tar cvzf $name .
-fi
-
-ls -l $name
-cd ../..
+ls -l ${name}.tgz
+cd ..
