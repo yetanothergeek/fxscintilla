@@ -172,6 +172,9 @@ void ScintillaFOX::ClaimSelection()
 		primarySelection = true;
 		primary.Set(0, 0);
 	}
+	else {
+    _fxsc.releaseSelection();
+	}
 }
 
 void ScintillaFOX::UnclaimSelection()
@@ -282,6 +285,9 @@ void ScintillaFOX::Copy()
 			CopySelectionRange(&copyText);
     }
 	}
+	else {
+    _fxsc.releaseClipboard();
+	}
 }
 
 void ScintillaFOX::Paste()
@@ -291,16 +297,14 @@ void ScintillaFOX::Paste()
 
 void ScintillaFOX::NotifyChange()
 {
-	if (_fxsc.getTarget())
-		_fxsc.getTarget()->handle(&_fxsc, MKUINT(_fxsc.getSelector(), SEL_CHANGED), NULL);
+	_fxsc.handle(&_fxsc, MKUINT(0, SEL_CHANGED), NULL);
 }
 
 void ScintillaFOX::NotifyParent(SCNotification scn)
 {
 	scn.nmhdr.hwndFrom = wMain.GetID();
 	scn.nmhdr.idFrom = GetCtrlID();
-	if (_fxsc.getTarget())
-		_fxsc.getTarget()->handle(&_fxsc, MKUINT(_fxsc.getSelector(), SEL_COMMAND), &scn);
+	_fxsc.handle(&_fxsc, MKUINT(0, SEL_COMMAND), &scn);
 }
 
 void ScintillaFOX::SetTicking(bool on)
@@ -472,6 +476,7 @@ long Platform::SendScintilla(
 
 FXDEFMAP(FXScintilla) FXScintillaMap[]={
   FXMAPFUNCS(SEL_COMMAND, FXScrollArea::ID_LAST, FXScintilla::idLast, FXScintilla::onScintillaCommand),
+  FXMAPFUNC(SEL_COMMAND, 0, FXScintilla::onCommand),
   FXMAPFUNC(SEL_PAINT, 0, FXScintilla::onPaint),
   FXMAPFUNC(SEL_CONFIGURE,0,FXScintilla::onConfigure),
   FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK,FXScintilla::onTimeoutTicking),
@@ -537,6 +542,20 @@ long FXScintilla::onScintillaCommand(FXObject * obj, FXSelector sel, void * ptr)
 {
 	_scint->Command(SELID(sel)-SCID(0));
 	return 1;
+}
+
+long FXScintilla::onCommand(FXObject * obj, FXSelector sel, void * ptr)
+{
+	if (target)
+		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
+	return 0;
+}
+
+long FXScintilla::onChanged(FXObject * obj, FXSelector sel, void * ptr)
+{
+	if (target)
+		return target->handle(this, MKUINT(message, SELTYPE(sel)), ptr);
+	return 0;
 }
 
 long FXScintilla::onPaint(FXObject * obj, FXSelector sel, void * ptr)
@@ -773,7 +792,6 @@ long FXScintilla::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   return 1;
 }
 
-
 // Somebody wants our clipboard
 long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
@@ -999,10 +1017,11 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 long FXScintilla::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
   FXbool hadselection=hasSelection();
   FXScrollArea::onSelectionLost(sender,sel,ptr);
-  if (hadselection)
+  if (hadselection) {
 		_scint->UnclaimSelection();
+	}
   return 1;
-  }
+}
 
 
 // Somebody wants our selection
