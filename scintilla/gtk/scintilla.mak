@@ -132,17 +132,20 @@ LEXOBJS=\
 	$(DIR_O)\LexCSS.obj \
 	$(DIR_O)\LexEiffel.obj \
 	$(DIR_O)\LexEScript.obj \
+	$(DIR_O)\LexForth.obj \
 	$(DIR_O)\LexFortran.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexLisp.obj \
 	$(DIR_O)\LexLout.obj \
 	$(DIR_O)\LexLua.obj \
 	$(DIR_O)\LexMatlab.obj \
+	$(DIR_O)\LexMetapost.obj \
 	$(DIR_O)\LexMMIXAL.obj \
 	$(DIR_O)\LexMPT.obj \
 	$(DIR_O)\LexNsis.obj \
 	$(DIR_O)\LexOthers.obj \
 	$(DIR_O)\LexPascal.obj \
+	$(DIR_O)\LexPB.obj \
 	$(DIR_O)\LexPerl.obj \
 	$(DIR_O)\LexPOV.obj \
 	$(DIR_O)\LexPS.obj \
@@ -150,6 +153,7 @@ LEXOBJS=\
 	$(DIR_O)\LexRuby.obj \
 	$(DIR_O)\LexScriptol.obj \
 	$(DIR_O)\LexSQL.obj \
+	$(DIR_O)\LexTeX.obj \
 	$(DIR_O)\LexVB.obj \
 	$(DIR_O)\LexYAML.obj \
 
@@ -288,6 +292,8 @@ $(DIR_O)\LexEiffel.obj: ..\src\LexEiffel.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexEScript.obj: ..\src\LexEScript.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexForth.obj: ..\src\LexForth.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexFortran.obj: ..\src\LexFortran.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
@@ -300,6 +306,8 @@ $(DIR_O)\LexLua.obj: ..\src\LexLua.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexMatlab.obj: ..\src\LexMatlab.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexMetapost.obj: ..\src\LexMetapost.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexMMIXAL.obj: ..\src\LexMMIXAL.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexMPT.obj: ..\src\LexMPT.cxx $(LEX_HEADERS)
@@ -309,6 +317,8 @@ $(DIR_O)\LexNsis.obj: ..\src\LexNsis.cxx $(LEX_HEADERS)
 $(DIR_O)\LexOthers.obj: ..\src\LexOthers.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexPascal.obj: ..\src\LexPascal.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexPB.obj: ..\src\LexPB.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexPerl.obj: ..\src\LexPerl.cxx $(LEX_HEADERS)
 
@@ -323,6 +333,8 @@ $(DIR_O)\LexRuby.obj: ..\src\LexRuby.cxx $(LEX_HEADERS)
 $(DIR_O)\LexScriptol.obj: ..\src\LexScriptol.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexSQL.obj: ..\src\LexSQL.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexTeX.obj: ..\src\LexTeX.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexVB.obj: ..\src\LexVB.cxx $(LEX_HEADERS)
 

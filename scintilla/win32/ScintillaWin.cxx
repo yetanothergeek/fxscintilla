@@ -60,25 +60,6 @@
 #define UNICODE_NOCHAR                  0xFFFF
 #endif
 
-// These undefinitions are required to work around differences between different versions
-// of the mingw headers, some of which define these twice, in both winuser.h and imm.h.
-#ifdef __MINGW_H
-#if __MINGW32_MAJOR_VERSION == 1
-#undef WM_IME_STARTCOMPOSITION
-#undef WM_IME_ENDCOMPOSITION
-#undef WM_IME_COMPOSITION
-#undef WM_IME_KEYLAST
-#undef WM_IME_SETCONTEXT
-#undef WM_IME_NOTIFY
-#undef WM_IME_CONTROL
-#undef WM_IME_COMPOSITIONFULL
-#undef WM_IME_SELECT
-#undef WM_IME_CHAR
-#undef WM_IME_KEYDOWN
-#undef WM_IME_KEYUP
-#endif
-#endif
-
 #ifndef WM_IME_STARTCOMPOSITION
 #include <imm.h>
 #endif
@@ -350,6 +331,14 @@ static int InputCodePage() {
 	return atoi(sCodePage);
 }
 
+#ifndef VK_OEM_2
+static const VK_OEM_2=0xbf;
+static const VK_OEM_3=0xc0;
+static const VK_OEM_4=0xdb;
+static const VK_OEM_5=0xdc;
+static const VK_OEM_6=0xdd;
+#endif
+
 /** Map the key codes to their equivalent SCK_ form. */
 static int KeyTranslate(int keyIn) {
 //PLATFORM_ASSERT(!keyIn);
@@ -371,6 +360,11 @@ static int KeyTranslate(int keyIn) {
 		case VK_ADD:		return SCK_ADD;
 		case VK_SUBTRACT:	return SCK_SUBTRACT;
 		case VK_DIVIDE:		return SCK_DIVIDE;
+		case VK_OEM_2:		return '/';
+		case VK_OEM_3:		return '`';
+		case VK_OEM_4:		return '[';
+		case VK_OEM_5:		return '\\';
+		case VK_OEM_6:		return ']';
 		default:			return keyIn;
 	}
 }
