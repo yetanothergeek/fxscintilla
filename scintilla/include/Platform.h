@@ -54,7 +54,7 @@
 #  define verticalScrollBar verticalScrollbar
 # endif
 
-# if HAVE_FOX_1_2
+# if HAVE_FOX_1_2 || HAVE_FOX_1_4
 namespace FX {
 # endif
 
@@ -70,7 +70,7 @@ class FXTimer;
 struct FXTimer;
 # endif	// WIN32
 
-# if HAVE_FOX_1_2 
+# if HAVE_FOX_1_2 || HAVE_FOX_1_4
 };
 using namespace FX;
 # endif

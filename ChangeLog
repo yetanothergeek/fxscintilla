@@ -1,4 +1,9 @@
+2005-02-16  Gilles Filippini <pini@free.fr>
+
+	* Added Fox 1.4 support
+
 2004-11-20  Gilles Filippini <pini@free.fr>
+
 	* Updated to Scintilla 1.62
 
 	* Scrollbar bug fixed

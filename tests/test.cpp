@@ -1,6 +1,8 @@
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if HAVE_FOX_1_2
 #  include <fox-1.2/fx.h>
+# elif HAVE_FOX_1_4
+#  include <fox-1.4/fx.h>
 # else
 #  include <fox/fx.h>
 # endif

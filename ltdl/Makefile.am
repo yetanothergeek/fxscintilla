@@ -1,6 +1,6 @@
 AM_CFLAGS = -W -Wall
 
-## No need for ltdl with Fox 1.1
+## No need for ltdl with Fox >= 1.2
 if HAVE_FOX_1_0
 
 ## Cygwin

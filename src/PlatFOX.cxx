@@ -49,7 +49,10 @@ extern "C" {
 #  endif
 # endif
 # include <sys/time.h>
-# if HAVE_FOX_1_2
+# if HAVE_FOX_1_4
+#  include <fox-1.4/fx.h>
+#  include <fox-1.4/fxkeys.h>
+# elif HAVE_FOX_1_2
 #  include <fox-1.2/fx.h>
 #  include <fox-1.2/fxkeys.h>
 # else
@@ -552,10 +555,10 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
                        ColourAllocated fore) {
 	if (dc()) {
 		PenColour(fore);
-#if HAVE_FOX_1_2
-		_dc->setFont(font_.GetID());
-#else
+#if HAVE_FOX_1_0
 		_dc->setTextFont(font_.GetID());
+#else
+		_dc->setFont(font_.GetID());
 #endif
 
 		const int segmentLength = 1000;
@@ -1231,14 +1234,14 @@ double ElapsedTime::Duration(bool reset) {
 // - Win32 API with Fox 1.0 and Win32 platforms without autotools (VC++)
 // ====================================================================
 
-// Fox 1.2 has dynamic librarie handling
-#if HAVE_FOX_1_2
+// Fox >= 1.2 has dynamic librarie handling
+#if !HAVE_FOX_1_0
 
 # if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 #  if HAVE_FOX_1_2
 #   include <fox-1.2/FXDLL.h>
-#  else
-#   include <fox/FXDLL.h>
+#  elif HAVE_FOX_1_4
+#   include <fox-1.4/FXDLL.h>
 #  endif
 # else
 #  include <FXDLL.h>

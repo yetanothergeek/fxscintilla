@@ -9,6 +9,10 @@ if HAVE_FOX_1_2
 LDADD += -lFOX-1.2
 endif
 
+if HAVE_FOX_1_4
+LDADD += -lFOX-1.4
+endif
+
 AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER
 
 ## Cygwin

@@ -42,6 +42,9 @@
 # if HAVE_FOX_1_2
 #  include <fox-1.2/fx.h>
 #  include <fox-1.2/fxkeys.h>
+# elif HAVE_FOX_1_4
+#  include <fox-1.4/fx.h>
+#  include <fox-1.4/fxkeys.h>
 # else
 #  include <fox/fx.h>
 #  include <fox/fxkeys.h>
@@ -400,9 +403,17 @@ void ScintillaFOX::SetTicking(bool on)
 	if (timer.ticking != on) {
 		timer.ticking = on;
 		if (timer.ticking) {
+#if HAVE_FOX_1_4
+			FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
+#else
 			timer.tickerID = FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
+#endif
 		} else {
+#if HAVE_FOX_1_4
+			FXApp::instance()->removeTimeout(&_fxsc, _fxsc.ID_TICK);
+#else
 			FXApp::instance()->removeTimeout(static_cast<FXTimer *>(timer.tickerID));
+#endif
 		}
 	}
 	timer.ticksToWait = caret.period;
@@ -413,13 +424,21 @@ bool ScintillaFOX::SetIdle(bool on) {
 		// Start idler, if it's not running.
 		if (idler.state == false) {
 			idler.state = true;
+#if HAVE_FOX_1_4
+			FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
+#else
 			idler.idlerID = FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
+#endif
 		}
 	} else {
 		// Stop idler, if it's running
 		if (idler.state == true) {
 			idler.state = false;
+#if HAVE_FOX_1_4
+			FXApp::instance()->removeChore(&_fxsc, FXScintilla::ID_IDLE);
+#else
 			FXApp::instance()->removeChore(idler.idlerID);
+#endif
 		}
 	}
 	return true;
@@ -686,7 +705,11 @@ long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
 
 long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
 {
+#if HAVE_FOX_1_4
+	FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
+#else
 	_scint->timer.tickerID = FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
+#endif
 	_scint->Tick();
 	return 1;
 }
