@@ -27,6 +27,7 @@ libscintilla_la_SOURCES = \
 	Style.cxx \
 	Indicator.cxx \
 	AutoComplete.cxx \
+	XPM.cxx \
   \
 	KeyWords.cxx \
 	LexAda.cxx \
@@ -37,6 +38,7 @@ libscintilla_la_SOURCES = \
 	LexConf.cxx \
 	LexCPP.cxx \
 	LexCrontab.cxx \
+	LexCSS.cxx \
 	LexEiffel.cxx \
 	LexFortran.cxx \
 	LexHTML.cxx \
@@ -75,6 +77,7 @@ libscintillanolexer_la_SOURCES = \
 	RESearch.cxx \
 	Style.cxx \
 	Indicator.cxx \
-	AutoComplete.cxx
+	AutoComplete.cxx \
+	XPM.cxx
 
 endif # NOLEXER

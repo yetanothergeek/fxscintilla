@@ -53,6 +53,14 @@
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
+#if HAVE_FOX_1_1
+#define getRoot getRootWindow
+#define setTextFont setFont
+#endif
+
+#include <map>
+using namespace std;
+
 // X has a 16 bit coordinate space, so stop drawing here to avoid wrapping
 static const int maxCoordinate = 32000;
 
@@ -320,6 +328,7 @@ public:
 	void FlushCachedState();
 
 	void SetUnicodeMode(bool unicodeMode_);
+	virtual void SetDBCSMode(int codePage) {}
 };
 
 SurfaceImpl * SurfaceImpl::s_dc_owner = NULL;
@@ -754,8 +763,49 @@ void Window::SetTitle(const char *s) {
 }
 
 // ====================================================================
-// ListBox
+// ListBoxFox
 // ====================================================================
+
+class ListBoxFox : public ListBox
+{
+	FXList * list;
+	map<int, FXXPMIcon *> * pixhash;
+	int desiredVisibleRows;
+	unsigned int maxItemCharacters;
+	unsigned int aveCharWidth;
+public:
+	CallBackAction doubleClickAction;
+	void *doubleClickActionData;
+
+	ListBoxFox() : list(0), pixhash(NULL), desiredVisibleRows(5), maxItemCharacters(0),
+		doubleClickAction(NULL), doubleClickActionData(NULL) {
+	}
+	virtual ~ListBoxFox() {
+		ClearRegisteredImages();
+	}
+	virtual void Show(bool show=true);
+	virtual void SetFont(Font &font);
+	virtual void Create(Window &parent, int ctrlID, int lineHeight_, bool unicodeMode_);
+	virtual void SetAverageCharWidth(int width);
+	virtual void SetVisibleRows(int rows);
+	virtual PRectangle GetDesiredRect();
+	virtual int CaretFromEdge();
+	virtual void Clear();
+	virtual void Append(char *s, int type = -1);
+	virtual int Length();
+	virtual void Select(int n);
+	virtual int GetSelection();
+	virtual int Find(const char *prefix);
+	virtual void GetValue(int n, char *value, int len);
+	virtual void Sort();
+	virtual void RegisterImage(int type, const char *xpm_data);
+	virtual void ClearRegisteredImages();
+	virtual void SetDoubleClickAction(CallBackAction action, void *data) {
+		doubleClickAction = action;
+		doubleClickActionData = data;
+	}
+};
+
 
 static int sListSortFunction(const FXListItem* item1, const FXListItem* item2) {
 	return compare(item1->getText(), item2->getText());
@@ -767,7 +817,7 @@ FXDECLARE(PopupListBox)
 protected:
 	PopupListBox() {}
 protected:
-	ListBox * listBox;
+	ListBoxFox * listBox;
 	FXList * list;
 public:
 	enum {
@@ -779,7 +829,7 @@ public:
 	long onListKeyPress(FXObject *, FXSelector, void *);
 	long onDoubleClicked(FXObject *, FXSelector, void *);
 public:
-	PopupListBox(FXComposite * parent, ListBox * lb);
+	PopupListBox(FXComposite * parent, ListBoxFox * lb);
 	FXList * getList() { return list; }
 	virtual void setFocus() {
 		FXPopup::setFocus();
@@ -799,7 +849,7 @@ FXDEFMAP(PopupListBox) PopupListBoxMap[]={
 
 FXIMPLEMENT(PopupListBox,FXPopup,PopupListBoxMap,ARRAYNUMBER(PopupListBoxMap))
 
-PopupListBox::PopupListBox(FXComposite * parent, ListBox * lb) :
+PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
 	FXPopup(parent), listBox(lb)
 {
 	list = new FXList(this, 0, this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
@@ -848,30 +898,25 @@ long PopupListBox::onDoubleClicked(FXObject * sender, FXSelector sel, void * ptr
 
 // ====================================================================
 
-ListBox::ListBox() : list(0), desiredVisibleRows(5), maxItemCharacters(0),
-	doubleClickAction(NULL), doubleClickActionData(NULL) {}
-
-ListBox::~ListBox() {}
-
-void ListBox::Create(Window & parent, int) {
+void ListBoxFox::Create(Window & parent, int, int, bool) {
 	id = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
 	id->create();
 	list = (static_cast<PopupListBox *>(id))->getList();
 }
 
-void ListBox::SetFont(Font &scint_font) {
+void ListBoxFox::SetFont(Font &scint_font) {
 	list->setFont(scint_font.GetID());
 }
 
-void ListBox::SetAverageCharWidth(int width) {
+void ListBoxFox::SetAverageCharWidth(int width) {
     aveCharWidth = width;
 }
 
-void ListBox::SetVisibleRows(int rows) {
+void ListBoxFox::SetVisibleRows(int rows) {
 	list->setNumVisible(rows);
 }
 
-PRectangle ListBox::GetDesiredRect() {
+PRectangle ListBoxFox::GetDesiredRect() {
 	// Before any size allocated pretend its 100 wide so not scrolled
 	PRectangle rc(0, 0, 100, 100);
 	if (id) {
@@ -921,20 +966,33 @@ PRectangle ListBox::GetDesiredRect() {
     
 }
 
-void ListBox::Show() {
-	(static_cast<FXPopup *>(id))->popup(NULL,
-																			id->getX(), id->getY(),
-																			id->getWidth(), id->getHeight());
-	list->selectItem(0);
+void ListBoxFox::Show(bool show) {
+	if (show) {
+		(static_cast<FXPopup *>(id))->popup(NULL,
+																				id->getX(), id->getY(),
+																				id->getWidth(), id->getHeight());
+		list->selectItem(0);
+	}
 }
 
-void ListBox::Clear() {
+int ListBoxFox::CaretFromEdge() {
+	// <FIXME/> return 4 + GetWidth();
+	return 0;
+}
+
+void ListBoxFox::Clear() {
 	list->clearItems();
 	maxItemCharacters = 0;
 }
 
-void ListBox::Append(char *s) {
-	list->appendItem(s);
+void ListBoxFox::Append(char *s, int type) {
+	FXXPMIcon * icon = NULL;
+	if ((type >= 0) && pixhash) {
+		map<int, FXXPMIcon *>::iterator it = pixhash->find(type);
+		if (it != pixhash->end())
+			icon = (*it).second;
+	}
+	list->appendItem(s, icon);
 	size_t len = strlen(s);
 	if (maxItemCharacters < len)
         	maxItemCharacters = len;
@@ -942,21 +1000,21 @@ void ListBox::Append(char *s) {
 		list->setNumVisible(list->getNumItems());
 }
 
-int ListBox::Length() {
+int ListBoxFox::Length() {
 	if (id)
 		return list->getNumItems();
 	return 0;
 }
 
-void ListBox::Select(int n) {
+void ListBoxFox::Select(int n) {
 	list->setCurrentItem(n, true);
 }
 
-int ListBox::GetSelection() {
+int ListBoxFox::GetSelection() {
 	return list->getCurrentItem();
 }
 
-int ListBox::Find(const char *prefix) {
+int ListBoxFox::Find(const char *prefix) {
 	int count = Length();
 	for (int i = 0; i < count; i++) {
 		FXString text = list->getItemText(i);
@@ -968,9 +1026,9 @@ int ListBox::Find(const char *prefix) {
 	return - 1;
 }
 
-void ListBox::GetValue(int n, char *value, int len) {
+void ListBoxFox::GetValue(int n, char *value, int len) {
 	FXString text = list->getItemText(n);
-	if (text.size() && len > 0) {
+	if (text.length() && len > 0) {
 		strncpy(value, text.text(), len);
 		value[len - 1] = '\0';
 	} else {
@@ -978,9 +1036,51 @@ void ListBox::GetValue(int n, char *value, int len) {
 	}
 }
 
-void ListBox::Sort() {
+void ListBoxFox::Sort() {
 	list->sortItems();
 }
+
+void ListBoxFox::RegisterImage(int type, const char *xpm_data)
+{
+	FXXPMIcon * icon = new FXXPMIcon(FXApp::instance(), &xpm_data);
+	icon->create();
+	FXXPMIcon * old = (*pixhash)[type];
+	if (old)
+		delete old;
+	(*pixhash)[type] = icon;
+}
+
+void ListBoxFox::ClearRegisteredImages()
+{
+	if (pixhash) {
+		map<int, FXXPMIcon *>::iterator it;
+		for (it = pixhash->begin(); it != pixhash->end(); it++) {
+			delete (*it).second;
+		}
+		delete pixhash;
+	}	
+}
+
+// ====================================================================
+// ListBox
+// ====================================================================
+
+ListBox::ListBox()
+{
+}
+
+ListBox::~ListBox()
+{
+}
+
+ListBox * ListBox::Allocate()
+{
+	return new ListBoxFox();
+}
+
+// ====================================================================
+// Menu
+// ====================================================================
 
 Menu::Menu() : id(0) {}
 
@@ -1130,6 +1230,18 @@ long Platform::SendScintillaPointer(WindowID w, unsigned int msg,
 
 bool Platform::IsDBCSLeadByte(int /*codePage*/, char /*ch*/) {
 	return false;
+}
+
+int Platform::DBCSCharLength(int /*codePage*/, const char *s) {
+	int bytes = mblen(s, MB_CUR_MAX);
+	if (bytes >= 1)
+		return bytes;
+	else
+		return 1;
+}
+
+int Platform::DBCSCharMaxLength() {
+	return MB_CUR_MAX;
 }
 
 // These are utility functions not really tied to a platform

@@ -48,6 +48,8 @@
 
 #include "Platform.h"
 
+#include "XPM.h"
+
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 #ifdef SCI_LEXER
@@ -82,6 +84,11 @@
 #ifdef _MSC_VER
 // Constant conditional expressions are because of GTK+ headers
 #pragma warning(disable: 4127)
+#endif
+
+#if HAVE_FOX_1_1
+#define SELID FXSELID
+#define SELTYPE FXSELTYPE
 #endif
 
 // ====================================================================
@@ -794,6 +801,13 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 	if (!consumed)
 		consumed = added;
 	//Platform::DebugPrintf("SK-key: %d %x %x\n",event->code, event->state, consumed);
+	if (event->code == 0xffffff && event->text.length() > 0) {
+		_scint->ClearSelection();
+		if (_scint->pdoc->InsertString(_scint->CurrentPosition(), event->text.text())) {
+			_scint->MovePositionTo(_scint->CurrentPosition() + event->text.length());
+		}
+		consumed = true;
+	}
 	return consumed ? 1 : 0;
 }
 
