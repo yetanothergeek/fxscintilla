@@ -1,4 +1,8 @@
+#ifndef WIN32
+#include <fox/fx.h>
+#else
 #include <fx.h>
+#endif // WIN32
 #include <Scintilla.h>
 #include <SciLexer.h>
 #include <FXScintilla.h>
