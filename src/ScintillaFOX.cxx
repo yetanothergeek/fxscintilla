@@ -1179,11 +1179,7 @@ FXint FXScintilla::getContentHeight()
 		_scint->cs.LinesDisplayed() * _scint->vs.lineHeight +
 		// This part is a kind of magic, to have the correct scrollbar
 		// behavior regarding the last line of the text
-#ifndef WIN32
-		(getViewportHeight() + 1) % _scint->vs.lineHeight - 1;
-#else
-		(getViewportHeight() - 2) % _scint->vs.lineHeight;
-#endif
+		(getViewportHeight() + _scint->vs.maxDescent) % _scint->vs.lineHeight;
 }
 
 void FXScintilla::moveContents(FXint x,FXint y)
