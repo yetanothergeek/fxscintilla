@@ -839,7 +839,11 @@ void Window::SetCursor(Cursor curs) {
 				hinstPlatformRes = ::GetModuleHandle("SciLexer");
 			if (!hinstPlatformRes)
 				hinstPlatformRes = ::GetModuleHandle(NULL);
-			::SetCursor(::LoadCursor(hinstPlatformRes, MAKEINTRESOURCE(IDC_MARGIN)));
+			HCURSOR hcursor = ::LoadCursor(hinstPlatformRes, MAKEINTRESOURCE(IDC_MARGIN));
+			if (hcursor)
+				::SetCursor(hcursor);
+			else
+				::SetCursor(::LoadCursor(NULL,IDC_ARROW));
 		}
 		break;
 	case cursorArrow:
@@ -1286,6 +1290,37 @@ double ElapsedTime::Duration(bool reset) {
 		littleBit = endLittleBit;
 	}
 	return result;
+}
+
+class DynamicLibraryImpl : public DynamicLibrary {
+protected:
+	HMODULE h;
+public:
+	DynamicLibraryImpl(const char *modulePath) {
+		h = ::LoadLibrary(modulePath);
+	}
+
+	virtual ~DynamicLibraryImpl() {
+		if (h != NULL)
+			::FreeLibrary(h);
+	}
+
+	// Use GetProcAddress to get a pointer to the relevant function.
+	virtual Function FindFunction(const char *name) {
+		if (h != NULL) {
+			return static_cast<Function>(
+				(void *)(::GetProcAddress(h, name)));
+		} else
+			return NULL;
+	}
+
+	virtual bool IsValid() {
+		return h != NULL;
+	}
+};
+
+DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
+	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
 }
 
 ColourDesired Platform::Chrome() {

@@ -52,6 +52,14 @@
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
 
+#ifndef WM_UNICHAR
+#define WM_UNICHAR                      0x0109
+#endif
+
+#ifndef UNICODE_NOCHAR
+#define UNICODE_NOCHAR                  0xFFFF
+#endif
+
 // These undefinitions are required to work around differences between different versions
 // of the mingw headers, some of which define these twice, in both winuser.h and imm.h.
 #ifdef __MINGW_H
@@ -212,7 +220,7 @@ class ScintillaWin :
 	void AddCharBytes(char b0, char b1=0);
 
 	void GetIntelliMouseParameters();
-	void CopySelTextToClipboard();
+	virtual void CopyToClipboard(const SelectionText &selectedText);
 	void ScrollMessage(WPARAM wParam);
 	void HorizontalScrollMessage(WPARAM wParam);
 	void RealizeWindowPalette(bool inBackGround);
@@ -629,12 +637,36 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case WM_CHAR:
 		if (!iscntrl(wParam&0xff) || !lastKeyDownConsumed) {
 			if (IsUnicodeMode()) {
+				// For a wide character version of the window:
+				//char utfval[4];
+				//wchar_t wcs[2] = {wParam, 0};
+				//unsigned int len = UTF8Length(wcs, 1);
+				//UTF8FromUCS2(wcs, 1, utfval, len);
+				//AddCharUTF(utfval, len);
 				AddCharBytes(static_cast<char>(wParam & 0xff));
 			} else {
 				AddChar(static_cast<char>(wParam & 0xff));
 			}
 		}
 		return 1;
+
+	case WM_UNICHAR:
+		if (wParam == UNICODE_NOCHAR) {
+			return 1;
+		} else if (lastKeyDownConsumed) {
+			return 1;
+		} else {
+			if (IsUnicodeMode()) {
+				char utfval[4];
+				wchar_t wcs[2] = {wParam, 0};
+				unsigned int len = UTF8Length(wcs, 1);
+				UTF8FromUCS2(wcs, 1, utfval, len);
+				AddCharUTF(utfval, len);
+				return 1;
+			} else {
+				return 0;
+			}
+		}
 
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN: {
@@ -842,7 +874,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 #ifdef SCI_LEXER
 	case SCI_LOADLEXERLIBRARY:
-		//LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(lParam));
+		LexerManager::GetInstance()->Load(reinterpret_cast<const char*>(lParam));
 		break;
 #endif
 
@@ -1004,13 +1036,9 @@ void ScintillaWin::NotifyDoubleClick(Point pt, bool shift) {
 void ScintillaWin::Copy() {
 	//Platform::DebugPrintf("Copy\n");
 	if (currentPos != anchor) {
-		::OpenClipboard(MainHWND());
-		::EmptyClipboard();
-		CopySelTextToClipboard();
-		if (selType == selRectangle) {
-			::SetClipboardData(cfColumnSelect, 0);
-		}
-		::CloseClipboard();
+		SelectionText selectedText;
+		CopySelectionRange(&selectedText);
+		CopyToClipboard(selectedText);
 	}
 }
 
@@ -1502,11 +1530,9 @@ void ScintillaWin::GetIntelliMouseParameters() {
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
 }
 
-void ScintillaWin::CopySelTextToClipboard() {
-	SelectionText selectedText;
-	CopySelectionRange(&selectedText);
-	if (selectedText.len == 0)
-		return;
+void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
+	::OpenClipboard(MainHWND());
+	::EmptyClipboard();
 
 	HGLOBAL hand = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
 		selectedText.len + 1);
@@ -1530,6 +1556,12 @@ void ScintillaWin::CopySelTextToClipboard() {
 		}
 		::SetClipboardData(CF_UNICODETEXT, uhand);
 	}
+
+	if (selectedText.rectangular) {
+		::SetClipboardData(cfColumnSelect, 0);
+	}
+
+	::CloseClipboard();
 }
 
 void ScintillaWin::ScrollMessage(WPARAM wParam) {
@@ -2026,8 +2058,6 @@ bool Scintilla_RegisterClasses(void *hInstance) {
 	bool result = ScintillaWin::Register(reinterpret_cast<HINSTANCE>(hInstance));
 #ifdef SCI_LEXER
 	Scintilla_LinkLexers();
-	LexerManager *lexMan = LexerManager::GetInstance();
-	lexMan->Load();
 #endif
 	return result;
 }

@@ -119,9 +119,11 @@ LEXOBJS=\
 	$(DIR_O)\LexCrontab.obj \
 	$(DIR_O)\LexCSS.obj \
 	$(DIR_O)\LexEiffel.obj \
+	$(DIR_O)\LexEScript.obj \
 	$(DIR_O)\LexFortran.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexLisp.obj \
+	$(DIR_O)\LexLout.obj \
 	$(DIR_O)\LexLua.obj \
 	$(DIR_O)\LexMatlab.obj \
 	$(DIR_O)\LexOthers.obj \
@@ -226,10 +228,10 @@ $(DIR_O)\Editor.obj: ../src/Editor.cxx ../include/Platform.h \
  ../src/CellBuffer.h ../src/KeyMap.h ../src/Indicator.h \
  ../src/LineMarker.h ../src/Style.h ../src/ViewStyle.h \
  ../src/Document.h ../src/Editor.h ../src/XPM.h
-$(DIR_O)\ExternalLexer.obj: ExternalLexer.cxx ../include/Platform.h \
+$(DIR_O)\ExternalLexer.obj: ../src/ExternalLexer.cxx ../include/Platform.h \
  ../include/SciLexer.h ../include/PropSet.h ../include/SString.h \
  ../include/Accessor.h ../src/DocumentAccessor.h ../include/KeyWords.h \
- ExternalLexer.h
+ ../src/ExternalLexer.h
 $(DIR_O)\Indicator.obj: ../src/Indicator.cxx ../include/Platform.h \
  ../include/Scintilla.h ../src/Indicator.h
 $(DIR_O)\KeyMap.obj: ../src/KeyMap.cxx ../include/Platform.h \
@@ -261,11 +263,15 @@ $(DIR_O)\LexCSS.obj: ..\src\LexCSS.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexEiffel.obj: ..\src\LexEiffel.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexEScript.obj: ..\src\LexEScript.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexFortran.obj: ..\src\LexFortran.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexLisp.obj: ..\src\LexLisp.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexLout.obj: ..\src\LexLout.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexLua.obj: ..\src\LexLua.cxx $(LEX_HEADERS)
 
