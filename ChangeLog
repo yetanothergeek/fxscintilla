@@ -1,3 +1,9 @@
+2004-09-05  Gilles Filippini <pini@free.fr>
+
+	* Scrollbar bug fixed
+	
+	* Default Fox version set to 1.2
+	
 2004-06-24  Gilles Filippini <pini@free.fr>
 
 	* Updated to Scintilla 1.61
