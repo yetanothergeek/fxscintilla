@@ -161,6 +161,10 @@ SOURCE=..\..\..\scintilla\src\LexBullant.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexCLW.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexConf.cxx
 # End Source File
 # Begin Source File
@@ -209,6 +213,18 @@ SOURCE=..\..\..\scintilla\src\LexMatlab.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexMMIXAL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexMPT.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexNsis.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexOthers.cxx
 # End Source File
 # Begin Source File
@@ -225,6 +241,10 @@ SOURCE=..\..\..\scintilla\src\LexPOV.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexPS.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexPython.cxx
 # End Source File
 # Begin Source File
@@ -233,11 +253,19 @@ SOURCE=..\..\..\scintilla\src\LexRuby.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexScriptol.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexSQL.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexVB.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexYAML.cxx
 # End Source File
 # Begin Source File
 
