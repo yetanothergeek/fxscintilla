@@ -778,6 +778,9 @@ void SciTEBase::ReadProperties() {
 	bufferedDraw = props.GetInt("buffered.draw", 1);
 	SendEditor(SCI_SETBUFFEREDDRAW, bufferedDraw);
 
+	SendEditor(SCI_SETLAYOUTCACHE, props.GetInt("cache.layout"));
+	SendOutput(SCI_SETLAYOUTCACHE, props.GetInt("output.cache.layout"));
+
 	bracesCheck = props.GetInt("braces.check");
 	bracesSloppy = props.GetInt("braces.sloppy");
 
@@ -789,22 +792,9 @@ void SciTEBase::ReadProperties() {
 		wordCharacters = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	}
 
-	SString useTabs = props.GetNewExpand("use.tab.characters.",
-	                                     fileNameForExtension.c_str());
-	if (useTabs.length())
-		SendEditor(SCI_SETUSETABS, useTabs.value());
-	else
-		SendEditor(SCI_SETUSETABS, props.GetInt("use.tabs", 1));
-
 	SendEditor(SCI_SETTABINDENTS, props.GetInt("tab.indents", 1));
 	SendEditor(SCI_SETBACKSPACEUNINDENTS, props.GetInt("backspace.unindents", 1));
 
-	int tabSize = props.GetInt("tabsize");
-	if (tabSize) {
-		SendEditor(SCI_SETTABWIDTH, tabSize);
-	}
-	indentSize = props.GetInt("indent.size");
-	SendEditor(SCI_SETINDENT, indentSize);
 	indentOpening = props.GetInt("indent.opening");
 	indentClosing = props.GetInt("indent.closing");
 	indentMaintain = props.GetNewExpand("indent.maintain.", fileNameForExtension.c_str()).value();
@@ -843,8 +833,6 @@ void SciTEBase::ReadProperties() {
 		AssignKey(SCK_HOME, SCMOD_SHIFT, SCI_HOMEEXTEND);
 	}
 	AssignKey('L', SCMOD_SHIFT | SCMOD_CTRL, SCI_LINEDELETE);
-	SendEditor(SCI_SETHSCROLLBAR, props.GetInt("horizontal.scrollbar", 1));
-	SendOutput(SCI_SETHSCROLLBAR, props.GetInt("output.horizontal.scrollbar", 1));
 
 	scrollOutput = props.GetInt("output.scroll", 1);
 
@@ -921,6 +909,10 @@ void SciTEBase::ReadProperties() {
 	SendEditor(SCI_MARKERSETBACK, SciTE_MARKER_BOOKMARK,
 	           ColourOfProperty(props, "bookmark.back", ColourDesired(0x80, 0xff, 0xff)));
 	SendEditor(SCI_MARKERDEFINE, SciTE_MARKER_BOOKMARK, SC_MARK_CIRCLE);
+
+	// Do these last as they force a style refresh
+	SendEditor(SCI_SETHSCROLLBAR, props.GetInt("horizontal.scrollbar", 1));
+	SendOutput(SCI_SETHSCROLLBAR, props.GetInt("output.horizontal.scrollbar", 1));
 
 	if (extender) {
 		extender->Clear();
@@ -1083,6 +1075,30 @@ void SciTEBase::ReadPropertiesInitial() {
 	if (GetSciteUserHome(homepath, sizeof(homepath))) {
 		props.Set("SciteUserHome", homepath);
 	}
+}
+
+bool SciTEBase::GetDefaultPropertiesFileName(char *pathDefaultProps,
+        char *pathDefaultDir, unsigned int lenPath) {
+	if (!GetSciteDefaultHome(pathDefaultDir, lenPath)) {
+		return false;
+	}
+	return BuildPath(pathDefaultProps, pathDefaultDir, propGlobalFileName, lenPath);
+}
+
+bool SciTEBase::GetAbbrevPropertiesFileName(char *pathAbbrevProps,
+        char *pathDefaultDir, unsigned int lenPath) {
+	if (!GetSciteDefaultHome(pathDefaultDir, lenPath)) {
+		return false;
+	}
+	return BuildPath(pathAbbrevProps, pathDefaultDir, propAbbrevFileName, lenPath);
+}
+
+bool SciTEBase::GetUserPropertiesFileName(char *pathUserProps,
+        char *pathUserDir, unsigned int lenPath) {
+	if (!GetSciteUserHome(pathUserDir, lenPath)) {
+		return false;
+	}
+	return BuildPath(pathUserProps, pathUserDir, propUserFileName, lenPath);
 }
 
 void SciTEBase::OpenProperties(int propsFile) {

@@ -74,7 +74,7 @@ SCI_GETTEXT(int length, char *text)
 SCI_SETTEXT(&lt;unused&gt;, char *text)
 SCI_GETLINE(int line, char *text)
 SCI_REPLACESEL(&lt;unused&gt;, char *text)
-SCI_SETREADONLY
+SCI_SETREADONLY(bool readOnly)
 SCI_GETREADONLY
 SCI_GETTEXTRANGE(&lt;unused&gt;, TEXTRANGE *tr)
 SCI_ADDTEXT(int length, char *s)
@@ -466,8 +466,12 @@ SCI_STYLESETCHANGEABLE(int stylenumber, bool changeable)
 	when Scintilla was initialised.
     </p>
     <p>
-	The EOLFILLED style allows to colourise from the end of the line to 
-	the right side of the window.
+	The EOLFILLED style uses the background colour at the end of the line
+	to colour from the last character of the line to the right side of the window.
+	This is useful when a document contains embedded sections in another 
+	language such as HTML pages with embedded JavaScript. By setting both 
+	the EOLFILLED style and a consistent background colour to all JavaScript 
+	styles then JavaScript sections will be easily distinguished from HTML.
     </p>
     <p>
 	SCI_STYLESETCHARACTERSET can set a style to use a different 
@@ -924,6 +928,7 @@ SCI_AUTOCGETDROPRESTOFWORD
 	SCI_AUTOCPOSSTART returns the value of the current position when 
 	SCI_AUTOCSHOW started display of the list.
 	An entry can be selected SCI_AUTOCSELECT.
+	The list of words should be in sorted order.
     </p>
     <p>
 	The current selection can be triggered with the SCI_AUTOCCOMPLETE 
@@ -933,6 +938,12 @@ SCI_AUTOCGETDROPRESTOFWORD
 	such as '.', '(' or '[' when typing an identifier. A set of 
 	characters which will cancel autocompletion can be specified
 	with the SCI_AUTOCSTOPS.
+    </p>
+    <p>
+	If set to ignore case mode with SCI_AUTOCSETIGNORECASE, 
+	then strings are matched after being converted to upper case.
+	One result of this is that the list should be sorted with the punctuation 
+	characters '[', '\', ']', '^', '_', and '`' sorted after letters.
     </p>
     <p>
 	The default behaviour is for the list to be cancelled if the caret 
@@ -1277,8 +1288,6 @@ SCI_SETWRAPMODE(SC_WRAP_NONE or SC_WRAP_WORD)
 SCI_GETWRAPMODE
 </pre>
     <p>
-	Line wrapping is an experimental feature that currently has 
-	performance and appearence problems. 
 	When the wrap mode is set to SC_WRAP_WORD lines wider than the 
 	window width are continued on the following lines. Lines are 
 	broken after space or tab characters or between runs of different
@@ -1286,6 +1295,30 @@ SCI_GETWRAPMODE
 	wider than the window then the break occurs before after the last 
 	character that completely fits on the line.
 	The horizontal scroll bar does not appear when wrap mode is on.
+    </p>
+<pre>
+SCI_SETLAYOUTCACHE(SC_CACHE_NONE or SC_CACHE_CARET or SC_CACHE_PAGE or SC_CACHE_DOCUMENT)
+SCI_GETLAYOUTCACHE
+</pre>
+    <p>
+	Much of the time used by Scintilla is spent on laying out and drawing text.
+	The same text layout calculations may be performed many times
+	even when the data used in these calculations does not change. 
+	To avoid these unnecessary calculations in some circumstances, the line
+	layout cache can store the results of the calculations. 
+	The cache in invalidated whenever the underlying data, such as the contents 
+	or styling of the document changes.
+	Caching the layout of the whole document has the most effect, making dynamic
+	line wrap as much as 20 times faster but this requires 7 times the memory 
+	required by the document contents.
+    </p>
+    <p>
+	SC_CACHE_NONE performs no caching and is the default.
+	SC_CACHE_CARET caches the layout information for the line containing the
+	caret. 
+	SC_CACHE_PAGE caches the layout of the visible lines and the caret
+	line. 
+	SC_CACHE_DOCUMENT caches the layout of the entire document.
     </p>
     <h3>
     	Zooming

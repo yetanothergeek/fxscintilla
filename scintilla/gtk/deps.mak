@@ -40,6 +40,9 @@ LexAda.o: ../src/LexAda.cxx ../include/Platform.h ../include/PropSet.h \
 LexAVE.o: ../src/LexAVE.cxx ../include/Platform.h ../include/PropSet.h \
   ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
   ../include/Scintilla.h ../include/SciLexer.h
+LexBaan.o: ../src/LexBaan.cxx ../include/Platform.h ../include/PropSet.h \
+  ../include/SString.h ../include/Accessor.h ../src/StyleContext.h \
+  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
 LexBullant.o: ../src/LexBullant.cxx ../include/Platform.h \
   ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
   ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
@@ -57,14 +60,18 @@ LexEiffel.o: ../src/LexEiffel.cxx ../include/Platform.h \
   ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
   ../include/SciLexer.h
 LexHTML.o: ../src/LexHTML.cxx ../include/Platform.h ../include/PropSet.h \
-  ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
-  ../include/Scintilla.h ../include/SciLexer.h
+  ../include/SString.h ../include/Accessor.h ../src/StyleContext.h \
+  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
 LexLisp.o: ../src/LexLisp.cxx ../include/Platform.h ../include/PropSet.h \
   ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
   ../include/Scintilla.h ../include/SciLexer.h
 LexLua.o: ../src/LexLua.cxx ../include/Platform.h ../include/PropSet.h \
-  ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
-  ../include/Scintilla.h ../include/SciLexer.h
+  ../include/SString.h ../include/Accessor.h ../src/StyleContext.h \
+  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
+LexMatlab.o: ../src/LexMatlab.cxx ../include/Platform.h \
+  ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
+  ../src/StyleContext.h ../include/KeyWords.h ../include/Scintilla.h \
+  ../include/SciLexer.h
 LexOthers.o: ../src/LexOthers.cxx ../include/Platform.h \
   ../include/PropSet.h ../include/SString.h ../include/Accessor.h \
   ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
@@ -85,8 +92,8 @@ LexSQL.o: ../src/LexSQL.cxx ../include/Platform.h ../include/PropSet.h \
   ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
   ../include/Scintilla.h ../include/SciLexer.h
 LexVB.o: ../src/LexVB.cxx ../include/Platform.h ../include/PropSet.h \
-  ../include/SString.h ../include/Accessor.h ../include/KeyWords.h \
-  ../include/Scintilla.h ../include/SciLexer.h
+  ../include/SString.h ../include/Accessor.h ../src/StyleContext.h \
+  ../include/KeyWords.h ../include/Scintilla.h ../include/SciLexer.h
 LineMarker.o: ../src/LineMarker.cxx ../include/Platform.h \
   ../include/Scintilla.h ../src/LineMarker.h
 PropSet.o: ../src/PropSet.cxx ../include/Platform.h ../include/PropSet.h \

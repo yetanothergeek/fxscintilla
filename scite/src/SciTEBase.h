@@ -307,7 +307,6 @@ protected:
 	WordList apis;
 	SString functionDefinition;
 
-	int indentSize;
 	bool indentOpening;
 	bool indentClosing;
 	bool indentMaintain;
@@ -353,6 +352,7 @@ protected:
 	bool topMost;
 	bool wrap;
 	bool wrapOutput;
+	bool isReadOnly;
 	bool checkIfOpen;
 	bool fullScreen;
 	enum { toolMax = 10 };
@@ -471,6 +471,7 @@ protected:
 	void SaveRecentStack();
 	void LoadSession(const char *sessionName);
 	void SaveSession(const char *sessionName);
+	void SetIndentSettings();
 	void New();
 	void Close(bool updateUI = true);
 	bool IsAbsolutePath(const char *path);
@@ -503,12 +504,12 @@ protected:
 	virtual void GetDefaultDirectory(char *directory, size_t size) = 0;
 	virtual bool GetSciteDefaultHome(char *path, unsigned int lenPath) = 0;
 	virtual bool GetSciteUserHome(char *path, unsigned int lenPath) = 0;
-	virtual bool GetDefaultPropertiesFileName(char *pathDefaultProps,
-	        char *pathDefaultDir, unsigned int lenPath) = 0;
-	virtual bool GetUserPropertiesFileName(char *pathUserProps,
-	                                       char *pathUserDir, unsigned int lenPath) = 0;
-	virtual bool GetAbbrevPropertiesFileName(char *pathAbbrevProps,
-	        char *pathDefaultDir, unsigned int lenPath) = 0;
+	bool GetDefaultPropertiesFileName(char *pathDefaultProps,
+	        char *pathDefaultDir, unsigned int lenPath);
+	bool GetUserPropertiesFileName(char *pathUserProps,
+		char *pathUserDir, unsigned int lenPath);
+	bool GetAbbrevPropertiesFileName(char *pathAbbrevProps,
+	        char *pathDefaultDir, unsigned int lenPath);
 	void OpenProperties(int propsFile);
 	virtual void Print(bool) {};
 	virtual void PrintSetup() {};
@@ -567,6 +568,7 @@ protected:
 	void SetTextProperties(PropSet &ps);
 	void SetFileProperties(PropSet &ps);
 	virtual void UpdateStatusBar(bool bUpdateSlowData);
+	int GetLineLength(int line);
 	int GetCurrentLineNumber();
 	int GetCurrentScrollPosition();
 	virtual void AddCommand(const SString &cmd, const SString &dir, JobSubsystem jobType, bool forceQueue = false);
@@ -709,6 +711,8 @@ const int blockSize = 131072;
 #endif
 
 int ControlIDOfCommand(unsigned long);
+bool BuildPath(char *path, const char *dir, const char *fileName, 
+	unsigned int lenPath);
 time_t GetModTime(const char *fullPath);
 bool IsUntitledFileName(const char *name);
 void LowerCaseString(char *s);

@@ -269,6 +269,18 @@ bool SciTEBase::Exists(const char *dir, const char *path, char *testPath) {
 	return true;
 }
 
+bool BuildPath(char *path, const char *dir, const char *fileName, 
+	unsigned int lenPath) {
+	*path = '\0';
+	if ((strlen(dir) + strlen(pathSepString) + strlen(fileName)) < lenPath) {
+		strcpy(path, dir);
+		strcat(path, pathSepString);
+		strcat(path, fileName);
+		return true;
+	}
+	return false;
+}
+
 time_t GetModTime(const char *fullPath) {
 	if (IsUntitledFileName(fullPath))
 		return 0;
@@ -363,7 +375,9 @@ bool SciTEBase::Open(const char *file, bool initialCmdLine,
 	file = fixedFileName;
 #endif
 
-	int index = buffers.GetDocumentByName(file);
+	char absPath[MAX_PATH];
+	AbsolutePath(absPath, file, MAX_PATH);
+ 	int index = buffers.GetDocumentByName(absPath);
 	if (index >= 0) {
 		SetDocumentAt(index);
 		DeleteFileStackMenu();
@@ -386,9 +400,10 @@ bool SciTEBase::Open(const char *file, bool initialCmdLine,
 	}
 
 	//Platform::DebugPrintf("Opening %s\n", file);
-	SetFileName(file);
+	SetFileName(absPath);
 	overrideExtension = "";
 	ReadProperties();
+	SetIndentSettings();
 	if (useMonoFont) {
 		SetMonoFont();
 	}
@@ -405,12 +420,15 @@ bool SciTEBase::Open(const char *file, bool initialCmdLine,
 			LoadSession("");
 	}
 	if (fileName[0]) {
+		SendEditor(SCI_SETREADONLY, 0);
 		SendEditor(SCI_CANCEL);
 		SendEditor(SCI_SETUNDOCOLLECTION, 0);
 
 		OpenFile(initialCmdLine);
 
 		SendEditor(SCI_EMPTYUNDOBUFFER);
+		isReadOnly = props.GetInt("read.only");
+		SendEditor(SCI_SETREADONLY, isReadOnly);
 	}
 	RemoveFileFromStack(fullPath);
 	DeleteFileStackMenu();
@@ -466,7 +484,7 @@ void SciTEBase::OpenSelected() {
 		if (endPath) {	// Visual Studio error message: F:\scite\src\SciTEBase.h(312):	bool Exists(
 			lineNumber = atol(endPath + 1);
 		} else {
-			char *endPath = strchr(selectedFilename + 2, ':');	// Skip Windows' drive separator
+			endPath = strchr(selectedFilename + 2, ':');	// Skip Windows' drive separator
 			if (endPath) {	// grep -n line, perhaps gcc too: F:\scite\src\SciTEBase.h:312:	bool Exists(
 				lineNumber = atol(endPath + 1);
 			}

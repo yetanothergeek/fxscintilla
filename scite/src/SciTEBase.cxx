@@ -119,6 +119,10 @@ const char *contributors[] = {
     "Valentin Valchev",
     "Marcos E. Wurzius",
     "Martin Alderson",
+    "Robert Gustavsson",
+    "José Fonseca",
+    "Holger Kiemes",
+    "Francis Irving",
 };
 
 // AddStyledText only called from About so static size buffer is OK
@@ -151,7 +155,6 @@ SciTEBase::SciTEBase(Extension *ext) : apis(true), extender(ext) {
 	language = "java";
 	lexLanguage = SCLEX_CPP;
 	functionDefinition = 0;
-	indentSize = 8;
 	indentOpening = true;
 	indentClosing = true;
 	statementLookback = 10;
@@ -174,6 +177,7 @@ SciTEBase::SciTEBase(Extension *ext) : apis(true), extender(ext) {
 	topMost = false;
 	wrap = false;
 	wrapOutput = false;
+	isReadOnly = false;
 	checkIfOpen = false;
 	fullScreen = false;
 
@@ -314,12 +318,12 @@ void SciTEBase::SetAboutMessage(WindowID wsci, const char *appTitle) {
 		AddStyledText(wsci, appTitle, 0);
 		AddStyledText(wsci, "\n", 0);
 		SetAboutStyle(wsci, 1, ColourDesired(0, 0, 0));
-		AddStyledText(wsci, "Version 1.44\n", 1);
+		AddStyledText(wsci, "Version 1.45\n", 1);
 		SetAboutStyle(wsci, 2, ColourDesired(0, 0, 0));
 		Platform::SendScintilla(wsci, SCI_STYLESETITALIC, 2, 1);
 		AddStyledText(wsci, "by Neil Hodgson.\n", 2);
 		SetAboutStyle(wsci, 3, ColourDesired(0, 0, 0));
-		AddStyledText(wsci, "December 1998-February 2002.\n", 3);
+		AddStyledText(wsci, "December 1998-March 2002.\n", 3);
 		SetAboutStyle(wsci, 4, ColourDesired(0, 0x7f, 0x7f));
 		AddStyledText(wsci, "http://www.scintilla.org\n", 4);
 		SString translator = LocaliseString("TranslationCredit", false);
@@ -410,6 +414,7 @@ void SciTEBase::SetOverrideLanguage(int cmdID) {
 	overrideExtension = "x.";
 	overrideExtension += languageMenu[cmdID].extension;
 	ReadProperties();
+	SetIndentSettings();
 	SendEditor(SCI_COLOURISE, 0, -1);
 	Redraw();
 	DisplayAround(rf);
@@ -431,9 +436,6 @@ void SciTEBase::GetLine(char *text, int sizeText, int line) {
 		line = GetCurrentLineNumber();
 	int lineStart = SendEditor(SCI_POSITIONFROMLINE, line);
 	int lineEnd = SendEditor(SCI_GETLINEENDPOSITION, line);
-	if ((lineStart < 0) || (lineEnd < 0)) {
-		text[0] = '\0';
-	}
 	int lineMax = lineStart + sizeText - 1;
 	if (lineEnd > lineMax)
 		lineEnd = lineMax;
@@ -547,7 +549,7 @@ bool SciTEBase::FindMatchingPreprocessorCondition(
 
 /**
  * Find if there is a preprocessor condition after or before the caret position,
- * @return true if inside a preprocessor condition.
+ * @return @c true if inside a preprocessor condition.
  */
 #ifdef __BORLANDC__
 // Borland warns that isInside is assigned a value that is never used in this method.
@@ -615,7 +617,7 @@ bool SciTEBase::FindMatchingPreprocCondPosition(
 /**
  * Find if there is a brace next to the caret, checking before caret first, then
  * after caret. If brace found also find its matching brace.
- * @return true if inside a bracket pair.
+ * @return @c true if inside a bracket pair.
  */
 bool SciTEBase::FindMatchingBracePosition(bool editor, int &braceAtCaret, int &braceOpposite, bool sloppy) {
 	bool isInside = false;
@@ -693,7 +695,7 @@ void SciTEBase::BraceMatch(bool editor) {
 			int indentPosNext = Platform::SendScintilla(win.GetID(), SCI_GETLINEINDENTPOSITION, lineStart + 1, 0);
 			columnAtCaret = Platform::SendScintilla(win.GetID(), SCI_GETCOLUMN, indentPos, 0);
 			int columnAtCaretNext = Platform::SendScintilla(win.GetID(), SCI_GETCOLUMN, indentPosNext, 0);
-			indentSize = props.GetInt("indent.size");
+			int indentSize = Platform::SendScintilla(win.GetID(), SCI_GETINDENT);
 			if (columnAtCaretNext - indentSize > 1)
 				columnAtCaret = columnAtCaretNext - indentSize;
 			//Platform::DebugPrintf(": %d %d %d\n", lineStart, indentPos, columnAtCaret);
@@ -1713,7 +1715,7 @@ bool SciTEBase::StartBlockComment() {
 	int selEndLine = SendEditor(SCI_LINEFROMPOSITION, selectionEnd);
 	int lines = selEndLine - selStartLine;
 	int firstSelLineStart = SendEditor(SCI_POSITIONFROMLINE, selStartLine);
-	// "carret return" is part of the last selected line
+	// "caret return" is part of the last selected line
 	if (lines > 0 && selectionEnd == SendEditor(SCI_POSITIONFROMLINE, selEndLine))
 		selEndLine--;
 	SendEditor(SCI_BEGINUNDOACTION);
@@ -1812,7 +1814,7 @@ bool SciTEBase::StartBoxComment() {
 	int selStartLine = SendEditor(SCI_LINEFROMPOSITION, selectionStart);
 	int selEndLine = SendEditor(SCI_LINEFROMPOSITION, selectionEnd);
 	int lines = selEndLine - selStartLine;
-	// "carret return" is part of the last selected line
+	// "caret return" is part of the last selected line
 	if (lines > 0 && selectionEnd == SendEditor(SCI_POSITIONFROMLINE, selEndLine)) {
 		selEndLine--;
 		lines--;
@@ -1926,6 +1928,13 @@ bool SciTEBase::StartStreamComment() {
 	return true;
 }
 
+/**
+ * Return the length of the given line, not counting the EOL.
+ */
+int SciTEBase::GetLineLength(int line) {
+	return SendEditor(SCI_GETLINEENDPOSITION, line) - SendEditor(SCI_POSITIONFROMLINE, line);
+}
+
 int SciTEBase::GetCurrentLineNumber() {
 	return SendEditor(SCI_LINEFROMPOSITION,
 	                  SendEditor(SCI_GETCURRENTPOS));
@@ -1964,7 +1973,7 @@ void SciTEBase::SetFileProperties(
 		                NULL, temp, TEMP_LEN);
 		ps.Set("FileDate", temp);
 
-		DWORD attr = GetFileAttributes(fullPath);
+		DWORD attr = ::GetFileAttributes(fullPath);
 		SString fa;
 		if (attr & FILE_ATTRIBUTE_READONLY) {
 			fa += "R";
@@ -2003,13 +2012,16 @@ void SciTEBase::SetFileProperties(
 }
 
 /**
- * Set up properties for EOLMode, BufferLength, NbOfLines, SelLength.
+ * Set up properties for ReadOnly, EOLMode, BufferLength, NbOfLines, SelLength, SelHeight.
  */
 void SciTEBase::SetTextProperties(
     PropSet &ps) {			///< Property set to update.
 
 	const int TEMP_LEN = 100;
 	char temp[TEMP_LEN];
+
+	SString ro = LocaliseString("READ");
+	ps.Set("ReadOnly", isReadOnly ? ro.c_str() : "");
 
 	int eolMode = SendEditor(SCI_GETEOLMODE);
 	ps.Set("EOLMode", eolMode == SC_EOL_CRLF ? "CR+LF" : (eolMode == SC_EOL_LF ? "LF" : "CR"));
@@ -2023,6 +2035,10 @@ void SciTEBase::SetTextProperties(
 	CharacterRange crange = GetSelection();
 	sprintf(temp, "%ld", crange.cpMax - crange.cpMin);
 	ps.Set("SelLength", temp);
+	int selFirstLine = SendEditor(SCI_LINEFROMPOSITION, crange.cpMin);
+	int selLastLine = SendEditor(SCI_LINEFROMPOSITION, crange.cpMax);
+	sprintf(temp, "%d", selLastLine - selFirstLine + 1);
+	ps.Set("SelHeight", temp);
 }
 
 void SciTEBase::UpdateStatusBar(bool bUpdateSlowData) {
@@ -2186,6 +2202,7 @@ IndentationStatus SciTEBase::GetIndentState(int line) {
 int SciTEBase::IndentOfBlock(int line) {
 	if (line < 0)
 		return 0;
+	int indentSize = SendEditor(SCI_GETINDENT);
 	int indentBlock = GetLineIndentation(line);
 	int backLine = line;
 	IndentationStatus indentState = isNone;
@@ -2218,21 +2235,25 @@ int SciTEBase::IndentOfBlock(int line) {
 }
 
 void SciTEBase::MaintainIndentation(char ch) {
-	int curLine = GetCurrentLineNumber();
-	int lastLine = curLine - 1;
-	int indentAmount = 0;
 	int eolMode = SendEditor(SCI_GETEOLMODE);
-
-	if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && ch == '\n') || (eolMode == SC_EOL_CR && ch == '\r')) {
-		if (props.GetInt("indent.automatic"))
-			while (indentAmount == 0 && lastLine > 0)
-				indentAmount = GetLineIndentation(lastLine--);
-		else
-			if (curLine > 0)
-				indentAmount = GetLineIndentation(lastLine);
-
-		if (indentAmount > 0)
+	int curLine = GetCurrentLineNumber();
+	int lastLine = curLine;
+	int indentAmount = 0;
+	
+	if (((eolMode == SC_EOL_CRLF || eolMode == SC_EOL_LF) && ch == '\n') ||
+		(eolMode == SC_EOL_CR && ch == '\r')) {
+		if (lastLine >= 1 && props.GetInt("indent.automatic")) {
+			int lineLen;
+			do {
+				lineLen = GetLineLength(--lastLine);
+			} while (lineLen == 0 && lastLine > 0);
+		}
+		if (lastLine >= 0) {
+			indentAmount = GetLineIndentation(lastLine);
+		}
+		if (indentAmount > 0) {
 			SetLineIndentation(curLine, indentAmount);
+		}
 	}
 }
 
@@ -2241,6 +2262,7 @@ void SciTEBase::AutomaticIndentation(char ch) {
 	int selStart = crange.cpMin;
 	int curLine = GetCurrentLineNumber();
 	int thisLineStart = SendEditor(SCI_POSITIONFROMLINE, curLine);
+	int indentSize = SendEditor(SCI_GETINDENT);
 	int indentBlock = IndentOfBlock(curLine - 1);
 
 	if (blockEnd.IsSingleChar() && ch == blockEnd.words[0]) {	// Dedent maybe
@@ -2277,7 +2299,7 @@ void SciTEBase::AutomaticIndentation(char ch) {
 
 /**
  * Upon a character being added, SciTE may decide to perform some action
- * such as displaying a completion list.
+ * such as displaying a completion list or auto-indentation.
  */
 void SciTEBase::CharAdded(char ch) {
 	if (recording)
@@ -2417,10 +2439,10 @@ void SciTEBase::MenuCommand(int cmdID) {
 	case IDM_NEW:
 		// For the New command, the "are you sure" question is always asked as this gives
 		// an opportunity to abandon the edits made to a file when are.you.sure is turned off.
-
 		if (CanMakeRoom()) {
 			New();
 			ReadProperties();
+			SetIndentSettings();
 			UpdateStatusBar(true);
 		}
 		break;
@@ -2703,6 +2725,13 @@ void SciTEBase::MenuCommand(int cmdID) {
 		CheckMenus();
 		break;
 
+	case IDM_READONLY:
+		isReadOnly = !isReadOnly;
+		SendEditor(SCI_SETREADONLY, isReadOnly);
+		UpdateStatusBar(true);
+		CheckMenus();
+		break;
+
 	case IDM_VIEWTABBAR:
 		tabVisible = !tabVisible;
 		ShowTabBar();
@@ -2864,42 +2893,7 @@ void SciTEBase::MenuCommand(int cmdID) {
 		useMonoFont = !useMonoFont;
 		SetMonoFont();
 		break;
-/*
-	case IDM_LEXER_NONE:
-	case IDM_LEXER_CPP:
-	case IDM_LEXER_VB:
-	case IDM_LEXER_RC:
-	case IDM_LEXER_HTML:
-	case IDM_LEXER_XML:
-	case IDM_LEXER_JS:
-	case IDM_LEXER_WSCRIPT:
-	case IDM_LEXER_PROPS:
-	case IDM_LEXER_BATCH:
-	case IDM_LEXER_MAKE:
-	case IDM_LEXER_ERRORL:
-	case IDM_LEXER_JAVA:
-	case IDM_LEXER_LUA:
-	case IDM_LEXER_PYTHON:
-	case IDM_LEXER_PERL:
-	case IDM_LEXER_SQL:
-	case IDM_LEXER_PLSQL:
-	case IDM_LEXER_PHP:
-	case IDM_LEXER_LATEX:
-	case IDM_LEXER_DIFF:
-	case IDM_LEXER_CS:
-	case IDM_LEXER_CONF:
-	case IDM_LEXER_PASCAL:
-	case IDM_LEXER_AVE:
-	case IDM_LEXER_ADA:
-	case IDM_LEXER_LISP:
-	case IDM_LEXER_RUBY:
-	case IDM_LEXER_EIFFEL:
-	case IDM_LEXER_TCL:
-	case IDM_LEXER_NNCRONTAB:
-	case IDM_LEXER_BULLANT:
-		SetOverrideLanguage(cmdID);
-		break;
-*/
+
 	case IDM_MACROLIST:
 		AskMacroList();
 		break;
@@ -2942,14 +2936,10 @@ void SciTEBase::MenuCommand(int cmdID) {
 			CheckReload();
 		} else if ((cmdID >= fileStackCmdID) &&
 		           (cmdID < fileStackCmdID + fileStackMax)) {
-			if (CanMakeRoom()) {
-				StackMenu(cmdID - fileStackCmdID);
-			}
+			StackMenu(cmdID - fileStackCmdID);
 		} else if (cmdID >= importCmdID &&
 		           (cmdID < importCmdID + importMax)) {
-			if (CanMakeRoom()) {
-				ImportMenu(cmdID - importCmdID);
-			}
+			ImportMenu(cmdID - importCmdID);
 		} else if (cmdID >= IDM_TOOLS && cmdID < IDM_TOOLS + 10) {
 			ToolsMenu(cmdID - IDM_TOOLS);
 		} else if (cmdID >= IDM_LANGUAGE && cmdID < IDM_LANGUAGE + 100) {
@@ -3094,9 +3084,6 @@ void SciTEBase::NewLineInOutput() {
 	                  SendOutput(SCI_GETCURRENTPOS)) - 1;
 	int lineStart = SendOutput(SCI_POSITIONFROMLINE, line);
 	int lineEnd = SendOutput(SCI_GETLINEENDPOSITION, line);
-	if ((lineStart < 0) || (lineEnd < 0)) {
-		cmd[0] = '\0';
-	}
 	int lineMax = lineStart + sizeof(cmd) - 1;
 	if (lineEnd > lineMax)
 		lineEnd = lineMax;
@@ -3279,6 +3266,7 @@ void SciTEBase::CheckMenus() {
 	CheckAMenuItem(IDM_CHECKIFOPEN, checkIfOpen);
 	CheckAMenuItem(IDM_WRAP, wrap);
 	CheckAMenuItem(IDM_WRAPOUTPUT, wrapOutput);
+	CheckAMenuItem(IDM_READONLY, isReadOnly);
 	CheckAMenuItem(IDM_FULLSCREEN, fullScreen);
 	CheckAMenuItem(IDM_VIEWTOOLBAR, tbVisible);
 	CheckAMenuItem(IDM_VIEWTABBAR, tabVisible);
@@ -3292,9 +3280,12 @@ void SciTEBase::CheckMenus() {
 	CheckAMenuItem(IDM_TOGGLEOUTPUT, heightOutput > 0);
 	CheckAMenuItem(IDM_TOGGLEPARAMETERS, wParameters.Created());
 	CheckAMenuItem(IDM_MONOFONT, useMonoFont);
-	EnableAMenuItem(IDM_COMPILE, !executing);
-	EnableAMenuItem(IDM_BUILD, !executing);
-	EnableAMenuItem(IDM_GO, !executing);
+	EnableAMenuItem(IDM_COMPILE, !executing && 
+		props.GetWild("command.compile.", fileName).size() != 0);
+	EnableAMenuItem(IDM_BUILD, !executing && 
+		props.GetWild("command.build.", fileName).size() != 0);
+	EnableAMenuItem(IDM_GO, !executing && 
+		props.GetWild("command.go.", fileName).size() != 0);
 	for (int toolItem = 0; toolItem < toolMax; toolItem++)
 		EnableAMenuItem(IDM_TOOLS + toolItem, !executing);
 	EnableAMenuItem(IDM_STOPEXECUTE, executing);
@@ -3419,7 +3410,20 @@ void SciTEBase::PerformOne(char *action) {
 			findWhat = arg;
 			FindNext(false, false);
 		} else if (isprefix(action, "goto:") && fnEditor) {
-			GotoLineEnsureVisible(atoi(arg) - 1);
+			int line = atoi(arg) - 1;
+			GotoLineEnsureVisible(line);
+			// jump to column if given and greater than 0
+			char *colstr = strchr(arg, ',');
+			if (colstr != NULL) { 
+				int col = atoi(colstr+1);
+				if (col > 0) {
+					int pos =SendEditor(SCI_GETCURRENTPOS) + col;
+					// select the word you have found there
+					int wordStart = SendEditor(SCI_WORDSTARTPOSITION, pos, true);
+					int wordEnd = SendEditor(SCI_WORDENDPOSITION, pos, true);
+					SendEditor(SCI_SETSEL, wordStart, wordEnd);     
+				}
+			}
 		} else if (isprefix(action, "insert:") && fnEditor) {
 			SendEditorString(SCI_REPLACESEL, 0, arg);
 		} else if (isprefix(action, "macrocommand:")) {

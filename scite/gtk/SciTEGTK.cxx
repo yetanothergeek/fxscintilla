@@ -165,12 +165,6 @@ protected:
 	virtual void GetDefaultDirectory(char *directory, size_t size);
 	virtual bool GetSciteDefaultHome(char *path, unsigned int lenPath);
 	virtual bool GetSciteUserHome(char *path, unsigned int lenPath);
-	virtual bool GetDefaultPropertiesFileName(char *pathDefaultProps,
-	        char *pathDefaultDir, unsigned int lenPath);
-	virtual bool GetUserPropertiesFileName(char *pathUserProps,
-	                                       char *pathUserDir, unsigned int lenPath);
-	virtual bool GetAbbrevPropertiesFileName(char *pathAbbrevProps,
-	        char *pathDefaultDir, unsigned int lenPath);
 
 	virtual void SetStatusBarText(const char *s);
 	virtual void UpdateStatusBar(bool bUpdateSlowData);
@@ -415,32 +409,6 @@ bool SciTEGTK::GetSciteDefaultHome(char *path, unsigned int lenPath) {
 	return false;
 }
 
-bool SciTEGTK::GetDefaultPropertiesFileName(char *pathDefaultProps,
-        char *pathDefaultDir, unsigned int lenPath) {
-	if (!GetSciteDefaultHome(pathDefaultDir, lenPath))
-		return false;
-	if (strlen(pathDefaultProps) + 1 + strlen(propGlobalFileName) < lenPath) {
-		strncpy(pathDefaultProps, pathDefaultDir, lenPath);
-		strncat(pathDefaultProps, pathSepString, lenPath);
-		strncat(pathDefaultProps, propGlobalFileName, lenPath);
-		return true;
-	}
-	return false;
-}
-
-bool SciTEGTK::GetAbbrevPropertiesFileName(char *pathAbbrevProps,
-        char *pathDefaultDir, unsigned int lenPath) {
-	if (!GetSciteDefaultHome(pathDefaultDir, lenPath))
-		return false;
-	if (strlen(pathAbbrevProps) + 1 + strlen(propAbbrevFileName) < lenPath) {
-		strncpy(pathAbbrevProps, pathDefaultDir, lenPath);
-		strncat(pathAbbrevProps, pathSepString, lenPath);
-		strncat(pathAbbrevProps, propAbbrevFileName, lenPath);
-		return true;
-	}
-	return false;
-}
-
 bool SciTEGTK::GetSciteUserHome(char *path, unsigned int lenPath) {
 	char *where = getenv("SciTE_HOME");
 	if (!where) {
@@ -448,19 +416,6 @@ bool SciTEGTK::GetSciteUserHome(char *path, unsigned int lenPath) {
 	}
 	if (where) {
 		strncpy(path, where, lenPath);
-		return true;
-	}
-	return false;
-}
-
-bool SciTEGTK::GetUserPropertiesFileName(char *pathUserProps,
-        char *pathUserDir, unsigned int lenPath) {
-	if (!GetSciteUserHome(pathUserDir, lenPath))
-		return false;
-	if (strlen(pathUserProps) + 1 + strlen(propUserFileName) < lenPath) {
-		strncpy(pathUserProps, pathUserDir, lenPath);
-		strncat(pathUserProps, pathSepString, lenPath);
-		strncat(pathUserProps, propUserFileName, lenPath);
 		return true;
 	}
 	return false;
@@ -2301,6 +2256,7 @@ void SciTEGTK::CreateMenu() {
 	    {"/Options/Vertical _Split", "", menuSig, IDM_SPLITVERTICAL, "<CheckItem>"},
 	    {"/Options/_Wrap", "", menuSig, IDM_WRAP, "<CheckItem>"},
 	    {"/Options/Wrap Out_put", "", menuSig, IDM_WRAPOUTPUT, "<CheckItem>"},
+	    {"/Options/_Read-Only", "", menuSig, IDM_READONLY, "<CheckItem>"},
 	    {"/Options/sep1", NULL, NULL, 0, "<Separator>"},
 	    {"/Options/_Line End Characters", "", 0, 0, "<Branch>"},
 	    {"/Options/Line End Characters/CR _+ LF", "", menuSig, IDM_EOL_CRLF, "<RadioItem>"},

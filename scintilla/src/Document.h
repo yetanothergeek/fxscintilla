@@ -37,11 +37,21 @@ public:
 		return (start != invalidPosition) && (end != invalidPosition);
 	}
 
+	// Is the position within the range?
 	bool Contains(Position pos) const {
 		if (start < end) {
 			return (pos >= start && pos <= end);
 		} else {
 			return (pos <= start && pos >= end);
+		}
+	}
+
+	// Is the character after pos within the range?
+	bool ContainsCharacter(Position pos) const {
+		if (start < end) {
+			return (pos >= start && pos < end);
+		} else {
+			return (pos < start && pos >= end);
 		}
 	}
 
@@ -85,6 +95,7 @@ private:
 	charClassification charClass[256];
 	char stylingMask;
 	int endStyled;
+	int styleClock;
 	int enteredCount;
 	int enteredReadOnlyCount;
 
@@ -195,6 +206,7 @@ public:
 	void SetStyles(int length, char *styles);
 	int GetEndStyled() { return endStyled; }
 	bool EnsureStyledTo(int pos);
+	int GetStyleClock() { return styleClock; }
 
 	int SetLineState(int line, int state) { return cb.SetLineState(line, state); }
 	int GetLineState(int line) { return cb.GetLineState(line); }

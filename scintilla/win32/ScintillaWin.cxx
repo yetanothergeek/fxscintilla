@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
+#include <limits.h>
 
 #define _WIN32_WINNT  0x0400
 #include <windows.h>
@@ -90,6 +91,7 @@
 
 // GCC has trouble with the standard COM ABI so do it the old C way with explicit vtables.
 
+const char scintillaClassName[] = "Scintilla";
 const char callClassName[] = "CallTip";
 
 class ScintillaWin; 	// Forward declaration for COM interface subobjects
@@ -231,7 +233,9 @@ public:
 	void SetLexer(uptr_t wParam);
 #endif
 
-	static void Register(HINSTANCE hInstance_);
+	static bool Register(HINSTANCE hInstance_);
+	static bool Unregister();
+
 	friend class DropSource;
 	friend class DataObject;
 	friend class DropTarget;
@@ -273,11 +277,6 @@ void ScintillaWin::Initialise() {
 	// no effect.  If the app hasnt, we really shouldnt ask them to call
 	// it just so this internal feature works.
 	::OleInitialize(NULL);
-
-#ifdef SCI_LEXER
-	LexerManager *lexMan = LexerManager::GetInstance();
-	lexMan->Load();
-#endif
 }
 
 void ScintillaWin::Finalise() {
@@ -543,11 +542,16 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		wheelDelta -= static_cast<short>(HiWord(wParam));
 		if (abs(wheelDelta) >= WHEEL_DELTA && linesPerScroll > 0) {
 			int linesToScroll = linesPerScroll;
+			if (linesPerScroll == WHEEL_PAGESCROLL)
+				linesToScroll = LinesOnScreen() - 1;
 			if (linesToScroll == 0) {
 				linesToScroll = 1;
 			}
 			linesToScroll *= (wheelDelta / WHEEL_DELTA);
-			wheelDelta = wheelDelta % WHEEL_DELTA;
+			if (wheelDelta >= 0)
+				wheelDelta = wheelDelta % WHEEL_DELTA;
+			else
+				wheelDelta = - (-wheelDelta % WHEEL_DELTA);
 
 			if (wParam & MK_CONTROL) {
 				// Zoom! We play with the font sizes in the styles.
@@ -1783,11 +1787,10 @@ STDMETHODIMP ScintillaWin::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 	return S_OK;
 }
 
-const char scintillaClassName[] = "Scintilla";
-
-void ScintillaWin::Register(HINSTANCE hInstance_) {
+bool ScintillaWin::Register(HINSTANCE hInstance_) {
 
 	hInstance = hInstance_;
+	bool result;
 #if 0
 	// Register the Scintilla class
 	if (IsNT()) {
@@ -1806,7 +1809,7 @@ void ScintillaWin::Register(HINSTANCE hInstance_) {
 		wndclass.lpszMenuName = NULL;
 		wndclass.lpszClassName = L"Scintilla";
 		wndclass.hIconSm = 0;
-		::RegisterClassExW(&wndclass);
+		result = ::RegisterClassExW(&wndclass);
 	} else {
 #endif
 		// Register Scintilla as a normal character window
@@ -1823,28 +1826,36 @@ void ScintillaWin::Register(HINSTANCE hInstance_) {
 		wndclass.lpszMenuName = NULL;
 		wndclass.lpszClassName = scintillaClassName;
 		wndclass.hIconSm = 0;
-		::RegisterClassEx(&wndclass);
+		result = ::RegisterClassEx(&wndclass) != 0;
 	//}
 
-	// Register the CallTip class
-	WNDCLASSEX wndclassc;
-	wndclassc.cbSize = sizeof(wndclass);
-	wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-	wndclassc.cbClsExtra = 0;
-	wndclassc.cbWndExtra = sizeof(ScintillaWin *);
-	wndclassc.hInstance = hInstance;
-	wndclassc.hIcon = NULL;
-	wndclassc.hbrBackground = NULL;
-	wndclassc.lpszMenuName = NULL;
-	wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
-	wndclassc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	wndclassc.lpszClassName = callClassName;
-	wndclassc.hIconSm = 0;
-
-	if (!::RegisterClassEx(&wndclassc)) {
-		//Platform::DebugPrintf("Could not register class\n");
-		return;
+	if (result) {
+		// Register the CallTip class
+		WNDCLASSEX wndclassc;
+		wndclassc.cbSize = sizeof(wndclass);
+		wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
+		wndclassc.cbClsExtra = 0;
+		wndclassc.cbWndExtra = sizeof(ScintillaWin *);
+		wndclassc.hInstance = hInstance;
+		wndclassc.hIcon = NULL;
+		wndclassc.hbrBackground = NULL;
+		wndclassc.lpszMenuName = NULL;
+		wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
+		wndclassc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wndclassc.lpszClassName = callClassName;
+		wndclassc.hIconSm = 0;
+	
+		result = ::RegisterClassEx(&wndclassc) != 0;
 	}
+
+	return result;
+}
+
+bool ScintillaWin::Unregister() {
+	bool result = ::UnregisterClass(scintillaClassName, hInstance) != 0;
+	if (::UnregisterClass(callClassName, hInstance) == 0)
+		result = false;
+	return result;
 }
 
 sptr_t PASCAL ScintillaWin::CTWndProc(
@@ -1916,19 +1927,36 @@ sptr_t PASCAL ScintillaWin::SWndProc(
 	}
 }
 
-extern HINSTANCE hinstPlatformRes;
+extern void Platform_Initialise(void *hInstance);
+extern void Platform_Finalise();
 
-// This function is externally visible so it can be called from container when building statically
-void Scintilla_RegisterClasses(void *hInstance) {
-	hinstPlatformRes = reinterpret_cast<HINSTANCE>(hInstance);
-	ScintillaWin::Register(hinstPlatformRes);
+// This function is externally visible so it can be called from container when building statically.
+// Must be called once only.
+bool Scintilla_RegisterClasses(void *hInstance) {
+	Platform_Initialise(hInstance);
+	bool result = ScintillaWin::Register(reinterpret_cast<HINSTANCE>(hInstance));
+#ifdef SCI_LEXER
+	LexerManager *lexMan = LexerManager::GetInstance();
+	lexMan->Load();
+#endif
+	return result;
+}
+
+// This function is externally visible so it can be called from container when building statically.
+bool Scintilla_ReleaseResources() {
+	bool result = ScintillaWin::Unregister();
+	Platform_Finalise();
+	return result;
 }
 
 #ifndef STATIC_BUILD
 extern "C" int APIENTRY DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID) {
 	//Platform::DebugPrintf("Scintilla::DllMain %d %d\n", hInstance, dwReason);
 	if (dwReason == DLL_PROCESS_ATTACH) {
-		Scintilla_RegisterClasses(hInstance);
+		if (!Scintilla_RegisterClasses(hInstance))
+			return FALSE;
+	} else if (dwReason == DLL_PROCESS_DETACH) {
+		Scintilla_ReleaseResources();
 	}
 	return TRUE;
 }

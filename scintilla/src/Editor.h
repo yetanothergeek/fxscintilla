@@ -34,28 +34,81 @@ public:
 /**
  */
 class LineLayout {
-public:
+private:
+	friend class LineLayoutCache;
+	int *lineStarts;
+	int lenLineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
-	enum {maxLineLength = 8000};
+	int lineNumber;
+	bool inCache;
+public:
+	enum { wrapWidthInfinite = 0x7ffffff };
+	int maxLineLength;
 	int numCharsInLine;
+	enum validLevel { llInvalid, llPositions, llLines } validity;
 	int xHighlightGuide;
 	bool highlightColumn;
 	int selStart;
 	int selEnd;
 	bool containsCaret;
 	int edgeColumn;
-	char chars[maxLineLength+1];
-	char styles[maxLineLength+1];
-	char indicators[maxLineLength+1];
-	int positions[maxLineLength+1];
+	char *chars;
+	char *styles;
+	char *indicators;
+	int *positions;
+	char bracePreviousStyles[2];
 
 	// Wrapped line support
 	int widthLine;
 	int lines;
-	enum {maxDisplayLines = 400};
-	int lineStarts[maxDisplayLines];
 
-	LineLayout() : numCharsInLine(0) {}
+	LineLayout(int maxLineLength_);
+	virtual ~LineLayout();
+	void Resize(int maxLineLength_);
+	void Free();
+	void Invalidate(validLevel validity_);
+	int LineStart(int line) {
+		if (line <= 0) {
+			return 0;
+		} else if ((line >= lines) || !lineStarts) {
+			return numCharsInLine;
+		} else {
+			return lineStarts[line];
+		}
+	}
+	void SetLineStart(int line, int start);
+	void SetBracesHighlight(Range rangeLine, Position braces[], 
+		char bracesMatchStyle, int xHighlight);
+	void RestoreBracesHighlight(Range rangeLine, Position braces[]);
+};
+
+/**
+ */
+class LineLayoutCache {
+	int level;
+	int length;
+	int size;
+	LineLayout **cache;
+	bool allInvalidated;
+	int styleClock;
+	void Allocate(int length_);
+	void AllocateForLevel(int linesOnScreen, int linesInDoc);
+public:
+	LineLayoutCache();
+	virtual ~LineLayoutCache();
+	void Deallocate();
+	enum { 
+		llcNone=SC_CACHE_NONE, 
+		llcCaret=SC_CACHE_CARET, 
+		llcPage=SC_CACHE_PAGE, 
+		llcDocument=SC_CACHE_DOCUMENT
+	};
+	void Invalidate(LineLayout::validLevel validity_);
+	void SetLevel(int level_);
+	int GetLevel() { return level; }
+	LineLayout *Retrieve(int lineNumber, int lineCaret, int maxChars, int styleClock_, 
+		int linesOnScreen, int linesInDoc);
+	void Dispose(LineLayout *ll);
 };
 
 class SelectionText {
@@ -154,6 +207,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Surface *pixmapIndentGuide;
 	Surface *pixmapIndentGuideHighlight;
 
+	LineLayoutCache llc;
+
 	KeyMap kmap;
 
 	Caret caret;
@@ -217,7 +272,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	// Wrapping support
 	enum { eWrapNone, eWrapWord } wrapState;
-	enum { wrapWidthInfinite = 0x7ffffff };
 	int wrapWidth;
 	int docLineLastWrapped;
 
@@ -281,10 +335,11 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	int SubstituteMarkerIfEmpty(int markerCheck, int markerDefault);
 	void PaintSelMargin(Surface *surface, PRectangle &rc);
-	void LayoutLine(int line, Surface *surface, ViewStyle &vstyle, LineLayout &ll, 
-		int width=wrapWidthInfinite);
+	LineLayout *RetrieveLineLayout(int lineNumber);
+	void LayoutLine(int line, Surface *surface, ViewStyle &vstyle, LineLayout *ll, 
+		int width=LineLayout::wrapWidthInfinite);
 	void DrawLine(Surface *surface, ViewStyle &vsDraw, int line, int lineVisible, int xStart,
-		PRectangle rcLine, LineLayout &ll, int subLine=0);
+		PRectangle rcLine, LineLayout *ll, int subLine=0);
 	void Paint(Surface *surfaceWindow, PRectangle rcArea);
 	long FormatRange(bool draw, RangeToFormat *pfr);
 

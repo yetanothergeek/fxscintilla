@@ -164,9 +164,13 @@ NameError: mistake
        commands of ':' as the first character that is not '.' or alphabetic.
        Properties use the syntax used in property set files and override any
        properties set in property files. If there is no value given for a property, it is set to 1.
-       Double quotes
-       may be placed around arguments that contain spaces. On Linux, the standard shell
-       quoting is available. The "-p" argument causes SciTE to print the file and then exit.
+       Double quotes may be placed around arguments that contain spaces but they must be 
+       placed around the whole argument, not just around a file name, so "-open:x y.txt" works but
+       -open:"x y.txt" doesn't.
+       On Linux, the standard shell quoting is available. 
+       The "-p" argument causes SciTE to print the file and then exit.
+    </p>
+    <p>
        For example, <br />
        <code>
        SciTE "-font.base=font:MS Gothic,size:11" -save.recent ScintillaGTK.cxx
@@ -189,7 +193,7 @@ NameError: mistake
 	<tr><td>close:</td><td></td></tr>
 	<tr><td>cwd:</td><td>change working directory</td></tr>
 	<tr><td>find:</td><td>search text</td></tr>
-	<tr><td>goto:</td><td>line number</td></tr>
+	<tr><td>goto:</td><td>line number[,column number]</td></tr>
 	<tr><td>open:</td><td>file name</td></tr>
 	<tr><td>quit:</td><td></td></tr>
 	<tr><td>replaceall:</td><td>search text\000replacement text</td></tr>
@@ -220,7 +224,7 @@ NameError: mistake
        On Windows, the following opens C:\Program Files\SciTE\SciTEDoc.html
        and goes to the 123th line:<br />
        <code>
-       SciTE -open:"C:\\Program Files\\SciTE\\SciTEDoc.html" -goto:123
+       SciTE "-open:C:\\Program Files\\SciTE\\SciTEDoc.html" -goto:123
        </code><br />
     <p>
 	Command line arguments are evaluated left to right in two phases because
@@ -763,21 +767,15 @@ NameError: mistake
         </td>
         <td>
 	The statusbar.text.1 option defines the information displayed in the status bar 
-	by default.
+	by default on all platforms.
 	Property values may be used in this text using the $() syntax. 
-	Extra properties defined for the status bar are LineNumber, ColumnNumber, and 
-	OverType which is either "OVR" or "INS" depending on the overtype status.
+	Extra properties defined for the status bar are LineNumber, ColumnNumber, 
+	SelHeight (the number of selected lines), ReadOnly 
+	(set to "READ" (localised) when in Read-Only mode), 
+	and OverType which is either "OVR" or "INS" depending on the overtype status.
 	On Windows only, further texts may be set as statusbar.text.2 ... and these may be 
 	cycled between by clicking the status bar. 
 	The statusbar.number option defines how many texts are to be cycled through.
-        </td>
-      </tr>
-      <tr class="windowsonly">
-        <td>
-          statusbar.size
-        </td>
-        <td>
-          On Windows only, sets the width in pixels of the status bar text.
         </td>
       </tr>
       <tr class="windowsonly">
@@ -827,6 +825,15 @@ NameError: mistake
 	file already open as the command line argument is switched to.
 	On Windows an arbitrary instance is chosen and asked to open the 
 	command line argument.
+        </td>
+      </tr>
+      <tr>
+        <td>
+           read.only
+        </td>
+        <td>
+	When this option is set then opened documents are initially read only.
+	New files are not affected by this setting.
         </td>
       </tr>
       <tr>
@@ -902,7 +909,7 @@ NameError: mistake
 	equally whereas if it is not set then displaying text to the left is preferred.<br />
 	If caret.policy.xjumps is set then the display is not horizontally repositioned until
 	the caret reaches themargin at which time the display jumps to ensure the 
-	caret is not within the unwanted area. f caret.policy.xjumps is not set then the 
+	caret is not within the unwanted area. If caret.policy.xjumps is not set then the 
 	caret stays out of the unwanted area causing more but smaller movements.<br />
 	Default: caret.policy.slop=1, all others = 0.
         </td>
@@ -1165,6 +1172,24 @@ NameError: mistake
 	so should be turned off for large documents on slow machines.
         </td>
       </tr>
+      <tr>
+        <td>
+	cache.layout<br />
+	output.cache.layout
+        </td>
+        <td>
+	A large proportion of the time spent in the editor is used to lay out text prior
+	to drawing it. This information often stays static between repaints so can 
+	be cached with these settings. There are four levels of caching. 0 is no caching,
+	1 caches the line that the caret is on, 2 caches the visible page as well as the caret, 
+	and 3 caches the whole document. The more that is cached, the greater the 
+	amount of memory used, with 3 using large amounts of memory, 7 times the 
+	size of the text in the document. However,
+	level 3 dramatically speeds up dynamic wrapping by around 25 times on large 
+	source files so is a very good option to use when wrapping is turned on and 
+	memory is plentiful.
+        </td>
+      </tr>
       <tr class="windowsonly">
         <td>
           open.filter
@@ -1300,8 +1325,9 @@ c:\cygwin\bin\xargs -0 fgrep -G -n "$(find.what)"
         <td>
           This setting allows changing the character set that is asked for when setting up fonts.
 	To use Russian Cyrillic characters, set character.set to
-	204. Other values that may work include Chinese (134 or 136), Korean (129), Greek (161),
-	Eastern European (234), Baltic (186), 
+	204. Other values that may work include Chinese (GB2312=134 or BIG5=136), 
+	Korean (129), Greek (161),
+	Eastern European (238), Baltic (186), 
 	Turkish (162), Hebrew (177), Arabic (178), Thai (222), or Japanese (128). 
 	All of these values may work on Windows, but on GTK+ Baltic, Turkish, Thai and Vietnamese
 	will probably not work.
@@ -1757,7 +1783,7 @@ c:\cygwin\bin\xargs -0 fgrep -G -n "$(find.what)"
           fold.compact<br />
         </td>
         <td>
-	For HTML, XML and C++ and similar files, turning this option on leads to blank lines following the
+	For HTML, XML, Lua and C++ and similar files, turning this option on leads to blank lines following the
 	end of an element folding with that element. Defaults to on.
         </td>
       </tr>
@@ -1800,24 +1826,28 @@ c:\cygwin\bin\xargs -0 fgrep -G -n "$(find.what)"
       <tr>
         <td>
           tabsize<br />
-	  indent.size<br />
+          tabsize.<i>filepattern</i><br />
+	indent.size<br />
+	indent.size.<i>filepattern</i><br />
           use.tabs<br />
-	  use.tab.for.<i>filepattern</i><br />
-	  tab.indents<br />
-	  backspace.unindents
+          use.tabs.<i>filepattern</i><br />
+	tab.indents<br />
+	backspace.unindents
         </td>
         <td>
           Sets the size of a tab as a multiple of the size of a space character in the style of the
           default style definition. The indent size is the size to use when performing automatic
-	  indentation and may be different from the tab size. Many people use a tab size of 8 but
-	  4 character indentation. When creating indentation, use.tabs determines whether the
-	  indentation is made up purely from space characters or from a mix of tabs and spaces
-	  using as many tabs as possible. The default use.tabs property can be overridden for
-	  files that match a pattern by a use.tab.characters.<i>filepattern</i> property.
-	  If tab.indents set then pressing tab within indentation whitespace indents by indent.size
-	  rather than inserting a tab character. If backspace.unindents then pressing backspace 
-	  within indentation whitespace unindents by indent.size rather than deleting the character 
-	  before the caret.
+	indentation and may be different from the tab size. Many people use a tab size of 8 but
+	4 character indentation. When creating indentation, use.tabs determines whether the
+	indentation is made up purely from space characters or from a mix of tabs and spaces
+	using as many tabs as possible. <br />
+	The global tabsize, indent.size, and use.tabs properties can be overridden for
+	files that match a pattern by using the using the file pattern forms: <br /><code>
+	indent.size.*.pas=3</code><br />
+	If tab.indents is set then pressing tab within indentation whitespace indents by indent.size
+	rather than inserting a tab character. If backspace.unindents then pressing backspace 
+	within indentation whitespace unindents by indent.size rather than deleting the character 
+	before the caret.
         </td>
       </tr>
       <tr>
