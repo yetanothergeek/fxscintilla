@@ -5,7 +5,7 @@
 # example:
 #		tarball 1_40 3
 # produces
-#		snapshot/scite140fox3.zip
+#		snapshot/fxscintilla-1.40.3.tgz
 
 if [ "$1" = "devel" ]; then
 		devel=true
