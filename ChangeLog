@@ -1,0 +1,18 @@
+2004-02-11  Gilles Filippini <pini@free.fr>
+
+	* Fox-1.1 branch: sync'ed with version 1.1.46
+	
+	* Added ChangeLog
+
+2004-02-09  Gilles Filippini <pini@free.fr>
+
+	* Fox-1.1 branch: sync'ed with version 1.1.45
+	* configure: option --with-fox-1-1 to force or disable Fox 1.1 usage
+	
+	* FXScintilla is now compatible with Xft when enabled in Fox 1.1
+	  (thanks to Rafael de Pelegrini Soares)
+
+2004-01-26  Gilles Filippini <pini@free.fr>
+
+	* Merged with Scintilla 1.58
+
