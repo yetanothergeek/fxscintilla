@@ -5,7 +5,10 @@
 # example:
 #		tarball release 1_40 3
 # produces
-#		snapshot/fxscintilla-1.40.3.tgz
+#		snapshot/fxscintilla-1.40.3.tar.gz
+# and
+#		snapshot/fxscintilla-1.40.3.zip
+
 
 if [ "$1" = "devel" ]; then
 		devel=true
@@ -46,25 +49,22 @@ cd snapshot
 rm -fr fxscintilla
 cvs -z3 -w export -r "${tag}" fxscintilla
 
-find fxscintilla/scintilla -type f ! \( \
-		-name 'Makefile.*' -o \
-		-name '*.png' -o \
-		-name '*.ico' -o \
-		-name '*.cur' -o \
-		-name '*.jpg' -o \
-		-name '*.bmp' \) \
-	-exec unix2dos -o {} \;
-
-cd fxscintilla
-
 if [ "$devel" = "false" ]; then
+		cd fxscintilla
 		rm -fr scintilla/gtk scintilla/win32
+		cd ..
 fi
 
-cd ..
 mv fxscintilla $name
-tar cvzf ${name}.tgz $name
+
+binaries='*.png *.ico *.cur *.jpg *.bmp'
+
+rm ${name}.tar.gz ${name}.zip
+tar cvzf ${name}.tar.gz $name
+zip -lr ${name}.zip ${name} -x ${binaries}
+zip -ur ${name}.zip ${name} -i ${binaries}
+
 mv $name fxscintilla
 
-ls -l ${name}.tgz
+ls -l ${name}.*
 cd ..
