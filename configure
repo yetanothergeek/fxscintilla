@@ -463,7 +463,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE HAVE_MINGW32_TRUE HAVE_MINGW32_FALSE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP CXX CXXFLAGS ac_ct_CXX CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MAJOR_VERSION MINOR_VERSION PATCH_LEVEL INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LT_FXSCINTILLA_CURRENT LT_FXSCINTILLA_REVISION LT_FXSCINTILLA_AGE LT_FXSCINTILLANOLEXER_CURRENT LT_FXSCINTILLANOLEXER_REVISION LT_FXSCINTILLANOLEXER_AGE INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL NOLEXER_TRUE NOLEXER_FALSE PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS FOX_INCLUDE_DIR FOX_LIB_DIR HAVE_FOX_1_0_TRUE HAVE_FOX_1_0_FALSE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os HAVE_CYGWIN_TRUE HAVE_CYGWIN_FALSE HAVE_MINGW32_TRUE HAVE_MINGW32_FALSE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP CPP CXX CXXFLAGS ac_ct_CXX CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL MAJOR_VERSION MINOR_VERSION PATCH_LEVEL INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh INSTALL_STRIP_PROGRAM AWK SET_MAKE am__leading_dot DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE LT_FXSCINTILLA_CURRENT LT_FXSCINTILLA_REVISION LT_FXSCINTILLA_AGE LT_FXSCINTILLANOLEXER_CURRENT LT_FXSCINTILLANOLEXER_REVISION LT_FXSCINTILLANOLEXER_AGE INSTALL_LTDL_TRUE INSTALL_LTDL_FALSE CONVENIENCE_LTDL_TRUE CONVENIENCE_LTDL_FALSE LIBADD_DL NOLEXER_TRUE NOLEXER_FALSE PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS FOX_INCLUDE_DIR FOX_LIB_DIR HAVE_FOX_1_0_TRUE HAVE_FOX_1_0_FALSE HAVE_FOX_1_1_TRUE HAVE_FOX_1_1_FALSE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1043,8 +1043,9 @@ Optional Packages:
                           both]
   --with-tags[=TAGS]
                           include additional configurations [automatic]
-  --with-foxinclude=DIR   use Fox 1.0 includes from DIR
-  --with-foxlib=DIR       use Fox 1.0 libs from DIR
+  --with-fox-1-1   use Fox 1.1
+  --with-foxinclude=DIR   use Fox includes from DIR
+  --with-foxlib=DIR       use Fox libs from DIR
 
 Some influential environment variables:
   CC          C compiler command
@@ -3077,7 +3078,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3080 "configure"' > conftest.$ac_ext
+  echo '#line 3081 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4532,7 +4533,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:4535:" \
+echo "$as_me:4536:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -5564,11 +5565,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:5567: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:5568: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:5571: \$? = $ac_status" >&5
+   echo "$as_me:5572: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -5797,11 +5798,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:5800: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:5801: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:5804: \$? = $ac_status" >&5
+   echo "$as_me:5805: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -5864,11 +5865,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:5867: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:5868: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:5871: \$? = $ac_status" >&5
+   echo "$as_me:5872: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8039,7 +8040,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8042 "configure"
+#line 8043 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8137,7 +8138,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8140 "configure"
+#line 8141 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -10314,11 +10315,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10317: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10318: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10321: \$? = $ac_status" >&5
+   echo "$as_me:10322: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -10381,11 +10382,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10384: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10385: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10388: \$? = $ac_status" >&5
+   echo "$as_me:10389: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11735,7 +11736,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11738 "configure"
+#line 11739 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11833,7 +11834,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11836 "configure"
+#line 11837 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12660,11 +12661,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12663: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12664: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:12667: \$? = $ac_status" >&5
+   echo "$as_me:12668: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -12727,11 +12728,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:12730: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:12731: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:12734: \$? = $ac_status" >&5
+   echo "$as_me:12735: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14759,11 +14760,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14762: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14763: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14766: \$? = $ac_status" >&5
+   echo "$as_me:14767: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14992,11 +14993,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14995: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14996: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14999: \$? = $ac_status" >&5
+   echo "$as_me:15000: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15059,11 +15060,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15062: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15063: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15066: \$? = $ac_status" >&5
+   echo "$as_me:15067: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17234,7 +17235,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17237 "configure"
+#line 17238 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -17332,7 +17333,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 17335 "configure"
+#line 17336 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20672,7 +20673,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 20675 "configure"
+#line 20676 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -22211,6 +22212,14 @@ esac
 # Handle user hints
 #
 
+# Check whether --with-fox-1-1 or --without-fox-1-1 was given.
+if test "${with_fox_1_1+set}" = set; then
+  withval="$with_fox_1_1"
+  WITH_FOX_1_1=$withval
+else
+  FOX_INCLUDE_DIR=/usr/local/include
+fi;
+
 # Check whether --with-foxinclude or --without-foxinclude was given.
 if test "${with_foxinclude+set}" = set; then
   withval="$with_foxinclude"
@@ -22226,6 +22235,11 @@ if test "${with_foxlib+set}" = set; then
 else
   FOX_LIB_DIR=/usr/local/lib
 fi;
+
+if test x"$WITH_FOX_1_1" != xyes; then
+	#
+# Internal Function to check a given Fox version
+#
 
 #
 # FLAGS backup
@@ -22396,21 +22410,20 @@ echo "${ECHO_T}$ac_cv_header_fox_fx_h" >&6
 
 fi
 if test $ac_cv_header_fox_fx_h = yes; then
-  :
+  have_FOX=yes
 else
-  { { echo "$as_me:$LINENO: error: FOX needed" >&5
-echo "$as_me: error: FOX needed" >&2;}
-   { (exit 1); exit 1; }; }
+  have_FOX=no
 fi
 
 
 
-#
-# Check FOX lib without pthread
-#
-echo "$as_me:$LINENO: checking for FOX library" >&5
+if test x"$have_FOX" = xyes; then
+	#
+	# Check FOX lib without pthread
+	#
+		echo "$as_me:$LINENO: checking for FOX library" >&5
 echo $ECHO_N "checking for FOX library... $ECHO_C" >&6
-cat >conftest.$ac_ext <<_ACEOF
+	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -22462,14 +22475,14 @@ have_FOX=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-echo "$as_me:$LINENO: result: $have_FOX" >&5
+	echo "$as_me:$LINENO: result: $have_FOX" >&5
 echo "${ECHO_T}$have_FOX" >&6
 
-#
-# Check FOX lib with pthread
-# (needed under FreeBSD when using MesaGL build with pthread support)
-#
-if test x"$have_FOX" = xno; then
+	#
+	# Check FOX lib with pthread
+	# (needed under FreeBSD when using MesaGL build with pthread support)
+	#
+	if test x"$have_FOX" = xno; then
 
 
 acx_pthread_ok=no
@@ -22882,10 +22895,10 @@ else
 fi
 
 
-	CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
-  echo "$as_me:$LINENO: checking for FOX library with pthread" >&5
+		CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
+	  echo "$as_me:$LINENO: checking for FOX library with pthread" >&5
 echo $ECHO_N "checking for FOX library with pthread... $ECHO_C" >&6
-  cat >conftest.$ac_ext <<_ACEOF
+	  cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -22937,18 +22950,9 @@ have_FOX=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-  echo "$as_me:$LINENO: result: $have_FOX" >&5
+	  echo "$as_me:$LINENO: result: $have_FOX" >&5
 echo "${ECHO_T}$have_FOX" >&6
-fi
-
-#
-# Abort if no FOX lib
-#
-
-if test x"$have_FOX" = xno; then
-  { { echo "$as_me:$LINENO: error: FOX needed" >&5
-echo "$as_me: error: FOX needed" >&2;}
-   { (exit 1); exit 1; }; }
+	fi
 fi
 
 #
@@ -22966,111 +22970,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
-if test x"$have_FOX" = xyes; then
-        :
-        :
-else
-
-        :
-fi
-
-
-#
-# FLAGS backup
-#
-FOX_OLD_CPPFLAGS=$CPPFLAGS
-FOX_OLD_LDFLAGS=$LDFLAGS
-
-
-
-#
-# Temporary FLAGS setting
-#
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
-ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-#
-# Check Fox version
-#
-echo "$as_me:$LINENO: checking FOX version 1.0.x" >&5
-echo $ECHO_N "checking FOX version 1.0.x... $ECHO_C" >&6
-if test "$cross_compiling" = yes; then
-  { echo "$as_me:$LINENO: WARNING: Cross compiling" >&5
-echo "$as_me: WARNING: Cross compiling" >&2;}
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-	#include <fox/fxver.h>
-	int main(int argc, char** argv) {
-		return (FOX_MAJOR == 1 && FOX_MINOR == 0) ? 0 : -1;
-	}
-
-_ACEOF
-rm -f conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; check_libfox_version_ok=yes
-else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-( exit $ac_status )
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
-fi
-
-#
-# Restore FLAGS
-#
-CPPFLAGS=$FOX_OLD_CPPFLAGS
-LDFLAGS=$FOX_OLD_LDFLAGS
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
-if test x"$check_libfox_version_ok" = xyes; then
+	if test x"$have_FOX" = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_FOX_1_0 1
 _ACEOF
 
-        :
-else
-        check_libfox_version_ok=no
-
+	fi
 fi
 
 
-
-if test x"$check_libfox_version_ok" = xyes; then
+if test x"$have_FOX" = xyes; then
   HAVE_FOX_1_0_TRUE=
   HAVE_FOX_1_0_FALSE='#'
 else
@@ -23078,21 +22988,29 @@ else
   HAVE_FOX_1_0_FALSE=
 fi
 
-if test x"$check_libfox_version_ok" = xno; then
+have_FOX_1_0=$have_FOX
+
+if test x"$WITH_FOX_1_1" != xno; then
+	if test x"$have_FOX" != xyes; then
+		#
+# Internal Function to check a given Fox version
+#
 
 #
 # FLAGS backup
 #
 FOX_OLD_CPPFLAGS=$CPPFLAGS
 FOX_OLD_LDFLAGS=$LDFLAGS
+FOX_OLD_LIBS=$LIBS
 
 
 
 #
 # Temporary FLAGS setting
 #
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
+CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
+LIBS=-lFOX-1.1
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23100,58 +23018,704 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
+  LDFLAGS="$LDFLAGS -mwindows"
+	if test x"$HAVE_CYGWIN" = xyes; then
+		CPPFLAGS="$CPPFLAGS -DWIN32"
+	fi
+fi
+
 #
-# Check Fox version
+# Check Fox headers
 #
-echo "$as_me:$LINENO: checking FOX version 1.1.x" >&5
-echo $ECHO_N "checking FOX version 1.1.x... $ECHO_C" >&6
-if test "$cross_compiling" = yes; then
-  { echo "$as_me:$LINENO: WARNING: Cross compiling" >&5
-echo "$as_me: WARNING: Cross compiling" >&2;}
+if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for fox-1.1/fx.h" >&5
+echo $ECHO_N "checking for fox-1.1/fx.h... $ECHO_C" >&6
+if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_1_fx_h" >&5
+echo "${ECHO_T}$ac_cv_header_fox_1_1_fx_h" >&6
 else
-  cat >conftest.$ac_ext <<_ACEOF
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking fox-1.1/fx.h usability" >&5
+echo $ECHO_N "checking fox-1.1/fx.h usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <fox-1.1/fx.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking fox-1.1/fx.h presence" >&5
+echo $ECHO_N "checking fox-1.1/fx.h presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <fox-1.1/fx.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_cxx_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_cxx_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: fox-1.1/fx.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: fox-1.1/fx.h: in the future, the compiler will take precedence" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------------ ##
+## Report this to the AC_PACKAGE_NAME lists.  ##
+## ------------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for fox-1.1/fx.h" >&5
+echo $ECHO_N "checking for fox-1.1/fx.h... $ECHO_C" >&6
+if test "${ac_cv_header_fox_1_1_fx_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_fox_1_1_fx_h=$ac_header_preproc
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_fox_1_1_fx_h" >&5
+echo "${ECHO_T}$ac_cv_header_fox_1_1_fx_h" >&6
+
+fi
+if test $ac_cv_header_fox_1_1_fx_h = yes; then
+  have_FOX=yes
+else
+  have_FOX=no
+fi
+
+
+
+if test x"$have_FOX" = xyes; then
+	#
+	# Check FOX lib without pthread
+	#
+		echo "$as_me:$LINENO: checking for FOX library" >&5
+echo $ECHO_N "checking for FOX library... $ECHO_C" >&6
+	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 
-	#include <fox/fxver.h>
-	int main(int argc, char** argv) {
-		return (FOX_MAJOR == 1 && FOX_MINOR == 1) ? 0 : -1;
-	}
-
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char fxfindfox ();
+int
+main ()
+{
+fxfindfox ();
+  ;
+  return 0;
+}
 _ACEOF
-rm -f conftest$ac_exeext
+rm -f conftest.$ac_objext conftest$ac_exeext
 if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; check_libfox_version_ok=yes
+  have_FOX=yes
 else
-  echo "$as_me: program exited with status $ac_status" >&5
-echo "$as_me: failed program was:" >&5
+  echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-( exit $ac_status )
-echo "$as_me:$LINENO: result: no" >&5
+have_FOX=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	echo "$as_me:$LINENO: result: $have_FOX" >&5
+echo "${ECHO_T}$have_FOX" >&6
+
+	#
+	# Check FOX lib with pthread
+	# (needed under FreeBSD when using MesaGL build with pthread support)
+	#
+	if test x"$have_FOX" = xno; then
+
+
+acx_pthread_ok=no
+
+# We used to check for pthread.h first, but this fails if pthread.h
+# requires special compiler flags (e.g. on True64 or Sequent).
+# It gets checked for in the link test anyway.
+
+# First of all, check if the user has set any of the PTHREAD_LIBS,
+# etcetera environment variables, and if threads linking works using
+# them:
+if test x"$PTHREAD_LIBS$PTHREAD_CFLAGS" != x; then
+        save_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+        save_LIBS="$LIBS"
+        LIBS="$PTHREAD_LIBS $LIBS"
+        echo "$as_me:$LINENO: checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD_CFLAGS" >&5
+echo $ECHO_N "checking for pthread_join in LIBS=$PTHREAD_LIBS with CFLAGS=$PTHREAD_CFLAGS... $ECHO_C" >&6
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char pthread_join ();
+int
+main ()
+{
+pthread_join ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  acx_pthread_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+        echo "$as_me:$LINENO: result: $acx_pthread_ok" >&5
+echo "${ECHO_T}$acx_pthread_ok" >&6
+        if test x"$acx_pthread_ok" = xno; then
+                PTHREAD_LIBS=""
+                PTHREAD_CFLAGS=""
+        fi
+        LIBS="$save_LIBS"
+        CFLAGS="$save_CFLAGS"
+fi
+
+# We must check for the threads library under a number of different
+# names; the ordering is very important because some systems
+# (e.g. DEC) have both -lpthread and -lpthreads, where one of the
+# libraries is broken (non-POSIX).
+
+# Create a list of thread flags to try.  Items starting with a "-" are
+# C compiler flags, and other items are library names, except for "none"
+# which indicates that we try without any flags at all.
+
+acx_pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads pthread --thread-safe -mt"
+
+# The ordering *is* (sometimes) important.  Some notes on the
+# individual items follow:
+
+# pthreads: AIX (must check this before -lpthread)
+# none: in case threads are in libc; should be tried before -Kthread and
+#       other compiler flags to prevent continual compiler warnings
+# -Kthread: Sequent (threads in libc, but -Kthread needed for pthread.h)
+# -kthread: FreeBSD kernel threads (preferred to -pthread since SMP-able)
+# lthread: LinuxThreads port on FreeBSD (also preferred to -pthread)
+# -pthread: Linux/gcc (kernel threads), BSD/gcc (userland threads)
+# -pthreads: Solaris/gcc
+# -mthreads: Mingw32/gcc, Lynx/gcc
+# -mt: Sun Workshop C (may only link SunOS threads [-lthread], but it
+#      doesn't hurt to check since this sometimes defines pthreads too;
+#      also defines -D_REENTRANT)
+# pthread: Linux, etcetera
+# --thread-safe: KAI C++
+
+case "${host_cpu}-${host_os}" in
+        *solaris*)
+
+        # On Solaris (at least, for some versions), libc contains stubbed
+        # (non-functional) versions of the pthreads routines, so link-based
+        # tests will erroneously succeed.  (We need to link with -pthread or
+        # -lpthread.)  (The stubs are missing pthread_cleanup_push, or rather
+        # a function called by this macro, so we could check for that, but
+        # who knows whether they'll stub that too in a future libc.)  So,
+        # we'll just look for -pthreads and -lpthread first:
+
+        acx_pthread_flags="-pthread -pthreads pthread -mt $acx_pthread_flags"
+        ;;
+esac
+
+if test x"$acx_pthread_ok" = xno; then
+for flag in $acx_pthread_flags; do
+
+        case $flag in
+                none)
+                echo "$as_me:$LINENO: checking whether pthreads work without any flags" >&5
+echo $ECHO_N "checking whether pthreads work without any flags... $ECHO_C" >&6
+                ;;
+
+                -*)
+                echo "$as_me:$LINENO: checking whether pthreads work with $flag" >&5
+echo $ECHO_N "checking whether pthreads work with $flag... $ECHO_C" >&6
+                PTHREAD_CFLAGS="$flag"
+                ;;
+
+                *)
+                echo "$as_me:$LINENO: checking for the pthreads library -l$flag" >&5
+echo $ECHO_N "checking for the pthreads library -l$flag... $ECHO_C" >&6
+                PTHREAD_LIBS="-l$flag"
+                ;;
+        esac
+
+        save_LIBS="$LIBS"
+        save_CFLAGS="$CFLAGS"
+        LIBS="$PTHREAD_LIBS $LIBS"
+        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+
+        # Check for various functions.  We must include pthread.h,
+        # since some functions may be macros.  (On the Sequent, we
+        # need a special flag -Kthread to make this header compile.)
+        # We check for pthread_join because it is in -lpthread on IRIX
+        # while pthread_create is in libc.  We check for pthread_attr_init
+        # due to DEC craziness with -lpthreads.  We check for
+        # pthread_cleanup_push because it is one of the few pthread
+        # functions on Solaris that doesn't have a non-functional libc stub.
+        # We try pthread_create on general principles.
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+pthread_t th; pthread_join(th, 0);
+                     pthread_attr_init(0); pthread_cleanup_push(0, 0);
+                     pthread_create(0,0,0,0); pthread_cleanup_pop(0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  acx_pthread_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+
+        LIBS="$save_LIBS"
+        CFLAGS="$save_CFLAGS"
+
+        echo "$as_me:$LINENO: result: $acx_pthread_ok" >&5
+echo "${ECHO_T}$acx_pthread_ok" >&6
+        if test "x$acx_pthread_ok" = xyes; then
+                break;
+        fi
+
+        PTHREAD_LIBS=""
+        PTHREAD_CFLAGS=""
+done
+fi
+
+# Various other checks:
+if test "x$acx_pthread_ok" = xyes; then
+        save_LIBS="$LIBS"
+        LIBS="$PTHREAD_LIBS $LIBS"
+        save_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+
+        # Detect AIX lossage: threads are created detached by default
+        # and the JOINABLE attribute has a nonstandard name (UNDETACHED).
+        echo "$as_me:$LINENO: checking for joinable pthread attribute" >&5
+echo $ECHO_N "checking for joinable pthread attribute... $ECHO_C" >&6
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+int attr=PTHREAD_CREATE_JOINABLE;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ok=PTHREAD_CREATE_JOINABLE
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ok=unknown
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+        if test x"$ok" = xunknown; then
+                cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+int attr=PTHREAD_CREATE_UNDETACHED;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ok=PTHREAD_CREATE_UNDETACHED
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ok=unknown
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+        fi
+        if test x"$ok" != xPTHREAD_CREATE_JOINABLE; then
+
+cat >>confdefs.h <<\_ACEOF
+#define PTHREAD_CREATE_JOINABLE $ok
+_ACEOF
+
+        fi
+        echo "$as_me:$LINENO: result: ${ok}" >&5
+echo "${ECHO_T}${ok}" >&6
+        if test x"$ok" = xunknown; then
+                { echo "$as_me:$LINENO: WARNING: we do not know how to create joinable pthreads" >&5
+echo "$as_me: WARNING: we do not know how to create joinable pthreads" >&2;}
+        fi
+
+        echo "$as_me:$LINENO: checking if more special flags are required for pthreads" >&5
+echo $ECHO_N "checking if more special flags are required for pthreads... $ECHO_C" >&6
+        flag=no
+        case "${host_cpu}-${host_os}" in
+                *-aix* | *-freebsd*)     flag="-D_THREAD_SAFE";;
+                *solaris* | alpha*-osf*) flag="-D_REENTRANT";;
+        esac
+        echo "$as_me:$LINENO: result: ${flag}" >&5
+echo "${ECHO_T}${flag}" >&6
+        if test "x$flag" != xno; then
+                PTHREAD_CFLAGS="$flag $PTHREAD_CFLAGS"
+        fi
+
+        LIBS="$save_LIBS"
+        CFLAGS="$save_CFLAGS"
+
+        # More AIX lossage: must compile with cc_r
+        # Extract the first word of "cc_r", so it can be a program name with args.
+set dummy cc_r; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_PTHREAD_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$PTHREAD_CC"; then
+  ac_cv_prog_PTHREAD_CC="$PTHREAD_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_PTHREAD_CC="cc_r"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_PTHREAD_CC" && ac_cv_prog_PTHREAD_CC="${CC}"
+fi
+fi
+PTHREAD_CC=$ac_cv_prog_PTHREAD_CC
+if test -n "$PTHREAD_CC"; then
+  echo "$as_me:$LINENO: result: $PTHREAD_CC" >&5
+echo "${ECHO_T}$PTHREAD_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+
+else
+        PTHREAD_CC="$CC"
+fi
+
+
+
+
+
+# Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
+if test x"$acx_pthread_ok" = xyes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTHREAD 1
+_ACEOF
+
+        :
+else
+        acx_pthread_ok=no
+
+fi
+
+
+		CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
+	  echo "$as_me:$LINENO: checking for FOX library with pthread" >&5
+echo $ECHO_N "checking for FOX library with pthread... $ECHO_C" >&6
+	  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char fxfindfox ();
+int
+main ()
+{
+fxfindfox ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  have_FOX=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+have_FOX=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	  echo "$as_me:$LINENO: result: $have_FOX" >&5
+echo "${ECHO_T}$have_FOX" >&6
+	fi
 fi
 
 #
-# Restore FLAGS
+# End
 #
 CPPFLAGS=$FOX_OLD_CPPFLAGS
 LDFLAGS=$FOX_OLD_LDFLAGS
+LIBS=$FOX_OLD_LIBS
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -23159,22 +23723,37 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
-if test x"$check_libfox_version_ok" = xyes; then
+
+
+		if test x"$have_FOX" = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_FOX_1_1 1
 _ACEOF
 
-        :
+		fi
+	fi
+fi
+
+
+if test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes; then
+  HAVE_FOX_1_1_TRUE=
+  HAVE_FOX_1_1_FALSE='#'
 else
-        check_libfox_version_ok=no
-        { { echo "$as_me:$LINENO: error: Incompatible FOX version" >&5
-echo "$as_me: error: Incompatible FOX version" >&2;}
+  HAVE_FOX_1_1_TRUE='#'
+  HAVE_FOX_1_1_FALSE=
+fi
+
+
+#
+# Abort if no FOX lib
+#
+if test x"$have_FOX" = xno; then
+  { { echo "$as_me:$LINENO: error: FOX needed" >&5
+echo "$as_me: error: FOX needed" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-fi
 
                                                                                 ac_config_files="$ac_config_files scintilla/src/Makefile scintilla/Makefile include/Makefile ltdl/Makefile src/Makefile src/version.h tests/Makefile Makefile"
 cat >confcache <<\_ACEOF
@@ -23359,6 +23938,13 @@ if test -z "${HAVE_FOX_1_0_TRUE}" && test -z "${HAVE_FOX_1_0_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_FOX_1_0\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"HAVE_FOX_1_0\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_FOX_1_1_TRUE}" && test -z "${HAVE_FOX_1_1_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_FOX_1_1\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_FOX_1_1\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -23983,6 +24569,8 @@ s,@FOX_INCLUDE_DIR@,$FOX_INCLUDE_DIR,;t t
 s,@FOX_LIB_DIR@,$FOX_LIB_DIR,;t t
 s,@HAVE_FOX_1_0_TRUE@,$HAVE_FOX_1_0_TRUE,;t t
 s,@HAVE_FOX_1_0_FALSE@,$HAVE_FOX_1_0_FALSE,;t t
+s,@HAVE_FOX_1_1_TRUE@,$HAVE_FOX_1_1_TRUE,;t t
+s,@HAVE_FOX_1_1_FALSE@,$HAVE_FOX_1_1_FALSE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

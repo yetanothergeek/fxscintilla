@@ -65,13 +65,13 @@ AM_CONDITIONAL(NOLEXER, test x"$enable_nolexer" = xyes)
 
 dnl Check FOX library
 CHECK_LIBFOX(:)
-CHECK_LIBFOX_VERSION(1, 0)
-dnl Conditional used to include libltdl for Fox 1.0
-AM_CONDITIONAL(HAVE_FOX_1_0, test x"$check_libfox_version_ok" = xyes)
-dnl Check Fox 1.1
-if test x"$check_libfox_version_ok" = xno; then
-	CHECK_LIBFOX_VERSION(1, 1,, AC_MSG_ERROR(Incompatible FOX version))
-fi
+dnl# CHECK_LIBFOX_VERSION(1, 0)
+dnl# dnl Conditional used to include libltdl for Fox 1.0
+dnl# AM_CONDITIONAL(HAVE_FOX_1_0, test x"$check_libfox_version_ok" = xyes)
+dnl# dnl Check Fox 1.1
+dnl# if test x"$check_libfox_version_ok" = xno; then
+dnl# 	CHECK_LIBFOX_VERSION(1, 1,, AC_MSG_ERROR(Incompatible FOX version))
+dnl# fi
 
 dnl Generated makefiles
 AC_OUTPUT( \

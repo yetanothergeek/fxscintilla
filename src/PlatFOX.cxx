@@ -42,8 +42,13 @@ extern "C" {
 #  endif
 # endif
 # include <sys/time.h>
-# include <fox/fx.h>
-# include <fox/fxkeys.h>
+# if HAVE_FOX_1_1
+#  include <fox-1.1/fx.h>
+#  include <fox-1.1/fxkeys.h>
+# else
+#  include <fox/fx.h>
+#  include <fox/fxkeys.h>
+# endif
 #else
 # include <time.h>
 # include <windows.h>
@@ -173,30 +178,15 @@ void Font::Create(const char *faceName, int characterSet,
 	Release();
 	// If name of the font begins with a '-', assume, that it is
 	// a full fontspec.
-	if (faceName[0] == '-'){
+	if (faceName[0] == '-') {
 		id = new FXFont(FXApp::instance(), faceName);
-		if (id)
-			return;
 	}
-	char fontspec[300];
-	fontspec[0] = '\0';
-	strcat(fontspec, "-*-");
-	strcat(fontspec, faceName);
-	if (bold)
-		strcat(fontspec, "-bold");
-	else
-		strcat(fontspec, "-medium");
-	if (italic)
-		strcat(fontspec, "-i");
-	else
-		strcat(fontspec, "-r");
-	strcat(fontspec, "-*-*-*");
-	char sizePts[100];
-	sprintf(sizePts, "-%0d", size * 10);
-	strcat(fontspec, sizePts);
-	strcat(fontspec, "-*-*-*-*-");
-	strcat(fontspec, CharacterSetName(characterSet));
-	id = new FXFont(FXApp::instance(), fontspec);
+	else {
+        id = new FXFont(FXApp::instance(), faceName, size,
+        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
+			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
+			characterSet);
+	}
 	if (!id) {
 		// Font not available so substitute with the app default font.
 		id = FXApp::instance()->getNormalFont();
@@ -1210,7 +1200,11 @@ double ElapsedTime::Duration(bool reset) {
 #if HAVE_FOX_1_1
 
 # if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-#  include <fox/FXDLL.h>
+#  if HAVE_FOX_1_1
+#   include <fox-1.1/FXDLL.h>
+#  else
+#   include <fox/FXDLL.h>
+#  endif
 # else
 #  include <FXDLL.h>
 # endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)

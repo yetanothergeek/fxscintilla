@@ -39,8 +39,13 @@
 #   define FOXDLL
 #  endif
 # endif
-# include <fox/fx.h>
-# include <fox/fxkeys.h>
+# if HAVE_FOX_1_1
+#  include <fox-1.1/fx.h>
+#  include <fox-1.1/fxkeys.h>
+# else
+#  include <fox/fx.h>
+#  include <fox/fxkeys.h>
+# endif
 #else
 # include <fx.h>
 # include <fxkeys.h>

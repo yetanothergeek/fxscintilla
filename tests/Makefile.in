@@ -36,7 +36,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-@HAVE_CYGWIN_TRUE@am__append_1 = -DWIN32
+@HAVE_FOX_1_0_TRUE@am__append_1 = -lFOX
+@HAVE_FOX_1_1_TRUE@am__append_2 = -lFOX-1.1
+@HAVE_CYGWIN_TRUE@am__append_3 = -DWIN32
 ACLOCAL = @ACLOCAL@
 AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
@@ -74,6 +76,8 @@ HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
 HAVE_FOX_1_0_FALSE = @HAVE_FOX_1_0_FALSE@
 HAVE_FOX_1_0_TRUE = @HAVE_FOX_1_0_TRUE@
+HAVE_FOX_1_1_FALSE = @HAVE_FOX_1_1_FALSE@
+HAVE_FOX_1_1_TRUE = @HAVE_FOX_1_1_TRUE@
 HAVE_MINGW32_FALSE = @HAVE_MINGW32_FALSE@
 HAVE_MINGW32_TRUE = @HAVE_MINGW32_TRUE@
 INSTALL_DATA = @INSTALL_DATA@
@@ -158,8 +162,9 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/include -I$(FOX_INCLUDE_DIR)
-LDADD = -L$(FOX_LIB_DIR) $(top_builddir)/src/libfxscintilla.la -lFOX
-AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER $(am__append_1)
+LDADD = -L$(FOX_LIB_DIR) $(top_builddir)/src/libfxscintilla.la $(am__append_1) $(am__append_2)
+
+AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER $(am__append_3)
 @HAVE_CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 
 @HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
@@ -177,7 +182,14 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_OBJECTS = test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
-test_DEPENDENCIES = $(top_builddir)/src/libfxscintilla.la
+@HAVE_FOX_1_0_FALSE@@HAVE_FOX_1_1_TRUE@test_DEPENDENCIES = \
+@HAVE_FOX_1_0_FALSE@@HAVE_FOX_1_1_TRUE@	$(top_builddir)/src/libfxscintilla.la
+@HAVE_FOX_1_0_FALSE@@HAVE_FOX_1_1_FALSE@test_DEPENDENCIES = \
+@HAVE_FOX_1_0_FALSE@@HAVE_FOX_1_1_FALSE@	$(top_builddir)/src/libfxscintilla.la
+@HAVE_FOX_1_0_TRUE@@HAVE_FOX_1_1_TRUE@test_DEPENDENCIES = \
+@HAVE_FOX_1_0_TRUE@@HAVE_FOX_1_1_TRUE@	$(top_builddir)/src/libfxscintilla.la
+@HAVE_FOX_1_0_TRUE@@HAVE_FOX_1_1_FALSE@test_DEPENDENCIES = \
+@HAVE_FOX_1_0_TRUE@@HAVE_FOX_1_1_FALSE@	$(top_builddir)/src/libfxscintilla.la
 test_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir)

@@ -1,5 +1,14 @@
 INCLUDES = -I$(top_srcdir)/include -I$(FOX_INCLUDE_DIR)
-LDADD = -L$(FOX_LIB_DIR) $(top_builddir)/src/libfxscintilla.la -lFOX
+LDADD = -L$(FOX_LIB_DIR) $(top_builddir)/src/libfxscintilla.la
+
+if HAVE_FOX_1_0
+LDADD += -lFOX
+endif
+
+if HAVE_FOX_1_1
+LDADD += -lFOX-1.1
+endif
+
 AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER
 
 ## Cygwin

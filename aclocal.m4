@@ -7151,6 +7151,74 @@ AC_CHECK_TYPES([error_t],
 AC_CHECK_FUNCS([argz_append argz_create_sep argz_insert argz_next argz_stringify])
 ])# AC_LTDL_FUNC_ARGZ
 
+AC_DEFUN([CHECK_LIBFOX__],
+dnl $1 = FOX_VERSION_STRING ("" => 1.0, "-1.1" => 1.1)
+#
+# Internal Function to check a given Fox version
+#
+[
+#
+# FLAGS backup
+#
+FOX_OLD_CPPFLAGS=$CPPFLAGS
+FOX_OLD_LDFLAGS=$LDFLAGS
+FOX_OLD_LIBS=$LIBS
+AC_LANG_SAVE
+
+#
+# Temporary FLAGS setting
+#
+CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
+LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
+LIBS=-lFOX$1
+AC_LANG_CPLUSPLUS
+
+if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
+  LDFLAGS="$LDFLAGS -mwindows"
+	if test x"$HAVE_CYGWIN" = xyes; then
+		CPPFLAGS="$CPPFLAGS -DWIN32"
+	fi
+fi
+
+#
+# Check Fox headers
+#
+AC_CHECK_HEADER(fox$1/fx.h, have_FOX=yes, have_FOX=no)
+
+if test x"$have_FOX" = xyes; then
+	#
+	# Check FOX lib without pthread
+	#
+	dnl LDFLAGS="-mwindows $LDFLAGS"
+	AC_MSG_CHECKING(for FOX library)
+	AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
+	AC_MSG_RESULT($have_FOX)
+
+	#
+	# Check FOX lib with pthread
+	# (needed under FreeBSD when using MesaGL build with pthread support)
+	#
+	if test x"$have_FOX" = xno; then
+	  ACX_PTHREAD
+		CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
+	  AC_MSG_CHECKING(for FOX library with pthread)
+	  AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
+	  AC_MSG_RESULT($have_FOX)
+	fi
+fi
+
+#
+# End
+#
+CPPFLAGS=$FOX_OLD_CPPFLAGS
+LDFLAGS=$FOX_OLD_LDFLAGS
+LIBS=$FOX_OLD_LIBS
+AC_LANG_RESTORE
+AC_SUBST(FOX_INCLUDE_DIR)
+AC_SUBST(FOX_LIB_DIR)
+])
+
+
 AC_DEFUN([CHECK_LIBFOX],
 [
 #
@@ -7165,132 +7233,37 @@ esac
 #
 # Handle user hints
 #
-AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox 1.0 includes from DIR],
+AC_ARG_WITH(fox-1-1, [  --with-fox-1-1   use Fox 1.1],
+        WITH_FOX_1_1=$withval, FOX_INCLUDE_DIR=/usr/local/include)
+AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox includes from DIR],
         FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
-AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox 1.0 libs from DIR],
+AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox libs from DIR],
         FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
 
-#
-# FLAGS backup
-#
-FOX_OLD_CPPFLAGS=$CPPFLAGS
-FOX_OLD_LDFLAGS=$LDFLAGS
-FOX_OLD_LIBS=$LIBS
-AC_LANG_SAVE
-
-#
-# Temporary FLAGS setting
-#
-CPPFLAGS="$CPPFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR}"
-LIBS=-lFOX
-AC_LANG_CPLUSPLUS
-
-if test x"$HAVE_CYGWIN" = xyes -o x"$HAVE_MINGW32" = xyes; then
-  LDFLAGS="$LDFLAGS -mwindows"
-	if test x"$HAVE_CYGWIN" = xyes; then
-		CPPFLAGS="$CPPFLAGS -DWIN32"
+if test x"$WITH_FOX_1_1" != xyes; then
+	CHECK_LIBFOX__()
+	if test x"$have_FOX" = xyes; then
+		AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
 	fi
 fi
+AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX" = xyes)
+have_FOX_1_0=$have_FOX
 
-#
-# Check Fox headers
-#
-AC_CHECK_HEADER(fox/fx.h,, AC_MSG_ERROR(FOX needed))
-
-#
-# Check FOX lib without pthread
-#
-dnl LDFLAGS="-mwindows $LDFLAGS"
-AC_MSG_CHECKING(for FOX library)
-AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
-AC_MSG_RESULT($have_FOX)
-
-#
-# Check FOX lib with pthread
-# (needed under FreeBSD when using MesaGL build with pthread support)
-#
-if test x"$have_FOX" = xno; then
-  ACX_PTHREAD
-	CPPFLAGS="$PTHREAD_CFLAGS $CPPFLAGS"
-  AC_MSG_CHECKING(for FOX library with pthread)
-  AC_TRY_LINK_FUNC(fxfindfox, have_FOX=yes, have_FOX=no)
-  AC_MSG_RESULT($have_FOX)
+if test x"$WITH_FOX_1_1" != xno; then
+	if test x"$have_FOX" != xyes; then
+		CHECK_LIBFOX__(-1.1)
+		if test x"$have_FOX" = xyes; then
+			AC_DEFINE(HAVE_FOX_1_1,1,[Define FOX version 1.1.])
+		fi
+	fi
 fi
+AM_CONDITIONAL(HAVE_FOX_1_1, test x"$have_FOX_1_0" != xyes -a x"$have_FOX" = xyes)
 
 #
 # Abort if no FOX lib
 #
-
 if test x"$have_FOX" = xno; then
   AC_MSG_ERROR(FOX needed)
-fi
-
-#
-# End
-#
-CPPFLAGS=$FOX_OLD_CPPFLAGS
-LDFLAGS=$FOX_OLD_LDFLAGS
-LIBS=$FOX_OLD_LIBS
-AC_LANG_RESTORE
-AC_SUBST(FOX_INCLUDE_DIR)
-AC_SUBST(FOX_LIB_DIR)
-
-# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
-if test x"$have_FOX" = xyes; then
-        ifelse([$1],,AC_DEFINE(HAVE_FOX,1,[Define you have FOX library and header files.]),[$1])
-        :
-else
-        $2
-        :
-fi
-])
-
-AC_DEFUN([CHECK_LIBFOX_VERSION],
-dnl $1 = FOX MAJOR VERSION
-dnl $2 = FOX_MINOR_VERSION
-dnl $3 = ACTION-IF-OK
-dnl $4 = ACTION-IF-NOT-OK
-[
-#
-# FLAGS backup
-#
-FOX_OLD_CPPFLAGS=$CPPFLAGS
-FOX_OLD_LDFLAGS=$LDFLAGS
-AC_LANG_SAVE
-
-#
-# Temporary FLAGS setting
-#
-CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS -I${FOX_INCLUDE_DIR}"
-LDFLAGS="$LDFLAGS -L${FOX_LIB_DIR} -lFOX"
-AC_LANG_CPLUSPLUS
-
-#
-# Check Fox version
-#
-AC_MSG_CHECKING(FOX version $1.$2.x)
-AC_TRY_RUN([
-	#include <fox/fxver.h>
-	int main(int argc, char** argv) {
-		return (FOX_MAJOR == $1 && FOX_MINOR == $2) ? 0 : -1;
-	}
-	], AC_MSG_RESULT(yes); check_libfox_version_ok=yes, AC_MSG_RESULT(no), AC_MSG_WARN(Cross compiling))
-
-#
-# Restore FLAGS
-#
-CPPFLAGS=$FOX_OLD_CPPFLAGS
-LDFLAGS=$FOX_OLD_LDFLAGS
-AC_LANG_RESTORE
-
-# Finally, execute ACTION-IF-OK/ACTION-IF-NOT-OK:
-if test x"$check_libfox_version_ok" = xyes; then
-        ifelse([$3],,AC_DEFINE(HAVE_FOX_$1_$2,1,[Define FOX version $1.$2.]),[$3])
-        :
-else
-        check_libfox_version_ok=no
-        $4
 fi
 ])
 
@@ -7330,7 +7303,7 @@ dnl (with help from M. Frigo), as well as ac_pthread and hb_pthread
 dnl macros posted by AFC to the autoconf macro repository.  We are also
 dnl grateful for the helpful feedback of numerous users.
 dnl
-dnl @version $Id: aclocal.m4,v 1.63 2004/01/26 14:28:49 pini Exp $
+dnl @version $Id: aclocal.m4,v 1.64 2004/02/09 15:13:19 pini Exp $
 dnl @author Steven G. Johnson <stevenj@alum.mit.edu> and Alejandro Forero Cuervo <bachue@bachue.com>
 
 AC_DEFUN([ACX_PTHREAD], [

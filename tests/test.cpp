@@ -1,5 +1,9 @@
 #if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-# include <fox/fx.h>
+# if HAVE_FOX_1_1
+#  include <fox-1.1/fx.h>
+# else
+#  include <fox/fx.h>
+# endif
 #else
 # include <fx.h>
 #endif // !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
@@ -53,50 +57,91 @@ static const char sRubyKeyWords[] =
 	"else for nil retry true while alias class elsif "
 	"if not return undef yield";
 
+class Test : public FXMainWindow
+{
+	FXDECLARE(Test)
+protected:
+	FXScintilla * scint;
+protected:
+	Test() {}
+public:
+	enum {
+		ID_FONT = FXMainWindow::ID_LAST,
+		ID_LAST
+	};
+public:
+	Test(FXApp * app) : FXMainWindow(app, "Test", NULL, NULL, DECOR_ALL, 0, 0, 600, 400)
+	{
+		// Font selector button
+		new FXButton(this, "Change Font", NULL, this, ID_FONT);
+		
+		// FXScintilla widget
+		scint = new FXScintilla(this, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);	
+		// Preparing the widget to do syntax coloring for Ruby
+		scint->sendMessage(SCI_SETLEXERLANGUAGE, 0, reinterpret_cast<long>("ruby"));
+		scint->sendMessage(SCI_SETKEYWORDS, 0, reinterpret_cast<long>(sRubyKeyWords));
+		setFont("courier", 12);
+	}
+	virtual void create()
+	{
+		FXMainWindow::create();
+		// Feeding the widget with some initial text
+		scint->sendMessage(SCI_INSERTTEXT, 0, reinterpret_cast<long>(sInitialText));
+	}
+	void setFont(const FXString & font, int size)
+	{
+		scint->sendMessage(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<long>(font.text()));
+		scint->sendMessage(SCI_STYLESETSIZE, STYLE_DEFAULT, size);
+		scint->sendMessage(SCI_STYLECLEARALL, 0, 0);
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_DEFAULT, FXRGB(0x80, 0x80, 0x80));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_COMMENTLINE, FXRGB(0x00, 0x7f, 0x00));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_NUMBER, FXRGB(0x00, 0x7f, 0x7f));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_STRING, FXRGB(0x7f, 0x00, 0x7f));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_CHARACTER, FXRGB(0x7f, 0x00, 0x7f));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_WORD, FXRGB(0x00, 0x00, 0x7f));
+		scint->sendMessage(SCI_STYLESETBOLD, SCE_P_WORD, 1);
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_TRIPLE, FXRGB(0x7f, 0x00, 0x00));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_TRIPLEDOUBLE, FXRGB(0x7f, 0x00, 0x00));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_CLASSNAME, FXRGB(0x00, 0x00, 0xff));
+		scint->sendMessage(SCI_STYLESETBOLD, SCE_P_CLASSNAME, 1);
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_DEFNAME, FXRGB(0x00, 0x7f, 0x7f));
+		scint->sendMessage(SCI_STYLESETBOLD, SCE_P_DEFNAME, 1);
+		scint->sendMessage(SCI_STYLESETBOLD, SCE_P_OPERATOR, 1);
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_IDENTIFIER, FXRGB(0x7f, 0x7f, 0x7f));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_COMMENTBLOCK, FXRGB(0x7f, 0x7f, 0x7f));
+		scint->sendMessage(SCI_STYLESETFORE, SCE_P_STRINGEOL, FXRGB(0x00, 0x00, 0x00));
+		scint->sendMessage(SCI_STYLESETBACK, SCE_P_STRINGEOL, FXRGB(0xe0, 0xc0, 0xe0));
+		scint->sendMessage(SCI_STYLESETEOLFILLED, SCE_P_STRINGEOL, 1);
+		scint->sendMessage(SCI_STYLESETFORE, 34, FXRGB(0x00, 0x00, 0xff));
+		scint->sendMessage(SCI_STYLESETBOLD, 34, 1);
+		scint->sendMessage(SCI_STYLESETFORE, 35, FXRGB(0xff, 0x00, 0x00));
+		scint->sendMessage(SCI_STYLESETBOLD, 35, 1);
+	}
+	long onCmdFont(FXObject *, FXSelector, void *)
+	{
+		FXFontDialog diag(this, 0);
+		if (diag.execute()) {
+			FXFontDesc desc;
+			diag.getFontSelection(desc);
+			setFont(desc.face, desc.size / 10);
+		}
+		return 1;
+	}
+};
+
+FXDEFMAP(Test) TestMap[]={
+  FXMAPFUNC(SEL_COMMAND, Test::ID_FONT, Test::onCmdFont),
+};
+
+FXIMPLEMENT(Test,FXMainWindow,TestMap,ARRAYNUMBER(TestMap))
+
+
 int main(int argc, char ** argv)
 {
 	// Fox stuff
-	FXApp application("test");
+	FXApp application(FXString("test"));
 	application.init(argc, argv);
-	FXMainWindow * win = new FXMainWindow(&application, "Test", NULL, NULL, DECOR_ALL, 0, 0, 600, 400);
-
-	// The FXScintilla widget
-	FXScintilla * scint = new FXScintilla(win, NULL, 0, LAYOUT_FILL_X|LAYOUT_FILL_Y);
-
-	// Preparing the widget to do syntax coloring for Ruby
-	scint->sendMessage(SCI_SETLEXERLANGUAGE, 0, reinterpret_cast<long>("ruby"));
-	scint->sendMessage(SCI_SETKEYWORDS, 0, reinterpret_cast<long>(sRubyKeyWords));
-	scint->sendMessage(SCI_STYLESETFONT, STYLE_DEFAULT, reinterpret_cast<long>("fixed"));
-	scint->sendMessage(SCI_STYLESETSIZE, STYLE_DEFAULT, 12);
-	scint->sendMessage(SCI_STYLECLEARALL, 0, 0);
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_DEFAULT, FXRGB(0x80, 0x80, 0x80));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_COMMENTLINE, FXRGB(0x00, 0x7f, 0x00));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_NUMBER, FXRGB(0x00, 0x7f, 0x7f));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_STRING, FXRGB(0x7f, 0x00, 0x7f));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_CHARACTER, FXRGB(0x7f, 0x00, 0x7f));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_WORD, FXRGB(0x00, 0x00, 0x7f));
-	scint->sendMessage(SCI_STYLESETBOLD, SCE_P_WORD, 1);
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_TRIPLE, FXRGB(0x7f, 0x00, 0x00));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_TRIPLEDOUBLE, FXRGB(0x7f, 0x00, 0x00));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_CLASSNAME, FXRGB(0x00, 0x00, 0xff));
-	scint->sendMessage(SCI_STYLESETBOLD, SCE_P_CLASSNAME, 1);
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_DEFNAME, FXRGB(0x00, 0x7f, 0x7f));
-	scint->sendMessage(SCI_STYLESETBOLD, SCE_P_DEFNAME, 1);
-	scint->sendMessage(SCI_STYLESETBOLD, SCE_P_OPERATOR, 1);
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_IDENTIFIER, FXRGB(0x7f, 0x7f, 0x7f));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_COMMENTBLOCK, FXRGB(0x7f, 0x7f, 0x7f));
-	scint->sendMessage(SCI_STYLESETFORE, SCE_P_STRINGEOL, FXRGB(0x00, 0x00, 0x00));
-	scint->sendMessage(SCI_STYLESETBACK, SCE_P_STRINGEOL, FXRGB(0xe0, 0xc0, 0xe0));
-	scint->sendMessage(SCI_STYLESETEOLFILLED, SCE_P_STRINGEOL, 1);
-	scint->sendMessage(SCI_STYLESETFORE, 34, FXRGB(0x00, 0x00, 0xff));
-	scint->sendMessage(SCI_STYLESETBOLD, 34, 1);
-	scint->sendMessage(SCI_STYLESETFORE, 35, FXRGB(0xff, 0x00, 0x00));
-	scint->sendMessage(SCI_STYLESETBOLD, 35, 1);
-
-	// Feeding the widget with some initial text
-	scint->sendMessage(SCI_INSERTTEXT, 0, reinterpret_cast<long>(sInitialText));
-
-	// Fox stuff
+	Test * win = new Test(&application);
 	application.create();
 	win->show(PLACEMENT_SCREEN);
 	application.run();
