@@ -1,7 +1,6 @@
 FXScintilla and FXSciTE are a derivated work from the Scintilla widget
 and the SciTE editor.
-See the file COPYING for the FXScintilla license (LGPL).
-See the file scite/COPYING for the FXSciTE license (GPL).
+See the file COPYING for the FXScintilla and FXSciTE license.
 Below is the original license for Scintilla and SciTE.
 
 ------------------------------------------------------------------------
