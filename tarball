@@ -1,9 +1,9 @@
 #! /bin/bash
 
 # usage:
-#		tarball devel|release [<scintilla_release> [<minor_release>]]
+#		tarball devel|release [<version>]
 # example:
-#		tarball release 1_40 3
+#		tarball release 1.40.3
 # produces
 #		snapshot/1.40.3/fxscintilla-1.40.3.tar.gz
 # and
@@ -16,26 +16,18 @@ else
 		devel=false
 fi
 	
-major=$2
-minor=$3
+version=$2
 
 # Name
 name="fxscintilla-"
-if [ ! -z $major ]; then
-		version=`echo $major | sed 's/_/./'`
-		if [ ! -z $minor ]; then
-				version="${version}.${minor}"
-		fi
-else
+if [ -z $version ]; then
 		version="cvs"
 fi
+version_tag=`echo $version | sed 's/\./_/g'`
 name="${name}${version}"
 # Tag
-if [ ! -z $major ]; then
-		tag="FXSCINTILLA-${major}"
-		if [ ! -z $minor ]; then
-				tag="${tag}_${minor}"
-		fi
+if [ ! "$version" = "cvs" ]; then
+		tag="FXSCINTILLA-${version_tag}"
 else
 		tag="HEAD"
 fi
