@@ -71,12 +71,12 @@ FOX_LIB_DIR = @FOX_LIB_DIR@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LT_FXSCINTILLANOLEXER_AGE = @LT_FXSCINTILLANOLEXER_AGE@
+LT_FXSCINTILLANOLEXER_CURRENT = @LT_FXSCINTILLANOLEXER_CURRENT@
+LT_FXSCINTILLANOLEXER_REVISION = @LT_FXSCINTILLANOLEXER_REVISION@
 LT_FXSCINTILLA_AGE = @LT_FXSCINTILLA_AGE@
 LT_FXSCINTILLA_CURRENT = @LT_FXSCINTILLA_CURRENT@
 LT_FXSCINTILLA_REVISION = @LT_FXSCINTILLA_REVISION@
-LT_SCILEXER_AGE = @LT_SCILEXER_AGE@
-LT_SCILEXER_CURRENT = @LT_SCILEXER_CURRENT@
-LT_SCILEXER_REVISION = @LT_SCILEXER_REVISION@
 MAJOR_VERSION = @MAJOR_VERSION@
 MINOR_VERSION = @MINOR_VERSION@
 OBJDUMP = @OBJDUMP@
@@ -96,26 +96,32 @@ install_sh = @install_sh@
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include -I$(top_srcdir)/scintilla/src
 AM_CXXFLAGS = -W -Wall -DFOX
 
-lib_LTLIBRARIES = libfxscintillanolexer.la libfxscintilla.la
-
-libfxscintillanolexer_la_SOURCES = \
+libfxscintilla_la_SOURCES = \
 	PlatFOX.cxx \
 	ScintillaFOX.cxx
 
 
-libfxscintilla_la_SOURCES = \
-	$(libfxscintillanolexer_la_SOURCES)
-
-
-libfxscintillanolexer_la_LIBADD = $(top_builddir)/scintilla/src/libscintillanolexer.la
 libfxscintilla_la_LIBADD = $(top_builddir)/scintilla/src/libscintilla.la
 
-libfxscintillanolexer_la_LDFLAGS = \
+libfxscintilla_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
 
-libfxscintilla_la_LDFLAGS = $(libfxscintillanolexer_la_LDFLAGS)
 
 libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
+
+@NOLEXER_TRUE@lib_LTLIBRARIES = libfxscintilla.la libfxscintillanolexer.la
+@NOLEXER_FALSE@lib_LTLIBRARIES = libfxscintilla.la
+
+@NOLEXER_TRUE@libfxscintillanolexer_la_SOURCES = \
+@NOLEXER_TRUE@	PlatFOX.cxx \
+@NOLEXER_TRUE@	ScintillaFOX.cxx
+
+
+@NOLEXER_TRUE@libfxscintillanolexer_la_LIBADD = $(top_builddir)/scintilla/src/libscintillanolexer.la
+
+@NOLEXER_TRUE@libfxscintillanolexer_la_LDFLAGS = \
+@NOLEXER_TRUE@	-version-info $(LT_FXSCINTILLANOLEXER_CURRENT):$(LT_FXSCINTILLANOLEXER_REVISION):$(LT_FXSCINTILLANOLEXER_AGE)
+
 subdir = src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
@@ -126,9 +132,12 @@ libfxscintilla_la_DEPENDENCIES = \
 am_libfxscintilla_la_OBJECTS = libfxscintilla_la-PlatFOX.lo \
 	libfxscintilla_la-ScintillaFOX.lo
 libfxscintilla_la_OBJECTS = $(am_libfxscintilla_la_OBJECTS)
-libfxscintillanolexer_la_DEPENDENCIES = \
-	$(top_builddir)/scintilla/src/libscintillanolexer.la
-am_libfxscintillanolexer_la_OBJECTS = PlatFOX.lo ScintillaFOX.lo
+@NOLEXER_TRUE@libfxscintillanolexer_la_DEPENDENCIES = \
+@NOLEXER_TRUE@	$(top_builddir)/scintilla/src/libscintillanolexer.la
+@NOLEXER_FALSE@libfxscintillanolexer_la_DEPENDENCIES =
+@NOLEXER_TRUE@am_libfxscintillanolexer_la_OBJECTS = PlatFOX.lo \
+@NOLEXER_TRUE@	ScintillaFOX.lo
+@NOLEXER_FALSE@am_libfxscintillanolexer_la_OBJECTS =
 libfxscintillanolexer_la_OBJECTS = \
 	$(am_libfxscintillanolexer_la_OBJECTS)
 

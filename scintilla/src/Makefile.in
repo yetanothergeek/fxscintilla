@@ -71,12 +71,12 @@ FOX_LIB_DIR = @FOX_LIB_DIR@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
+LT_FXSCINTILLANOLEXER_AGE = @LT_FXSCINTILLANOLEXER_AGE@
+LT_FXSCINTILLANOLEXER_CURRENT = @LT_FXSCINTILLANOLEXER_CURRENT@
+LT_FXSCINTILLANOLEXER_REVISION = @LT_FXSCINTILLANOLEXER_REVISION@
 LT_FXSCINTILLA_AGE = @LT_FXSCINTILLA_AGE@
 LT_FXSCINTILLA_CURRENT = @LT_FXSCINTILLA_CURRENT@
 LT_FXSCINTILLA_REVISION = @LT_FXSCINTILLA_REVISION@
-LT_SCILEXER_AGE = @LT_SCILEXER_AGE@
-LT_SCILEXER_CURRENT = @LT_SCILEXER_CURRENT@
-LT_SCILEXER_REVISION = @LT_SCILEXER_REVISION@
 MAJOR_VERSION = @MAJOR_VERSION@
 MINOR_VERSION = @MINOR_VERSION@
 OBJDUMP = @OBJDUMP@
@@ -96,9 +96,7 @@ install_sh = @install_sh@
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
 AM_CXXFLAGS = -W -Wall -DFOX
 
-noinst_LTLIBRARIES = libscintillanolexer.la libscintilla.la
-
-libscintillanolexer_la_SOURCES = \
+libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
 	StyleContext.cxx \
@@ -115,11 +113,8 @@ libscintillanolexer_la_SOURCES = \
 	RESearch.cxx \
 	Style.cxx \
 	Indicator.cxx \
-	AutoComplete.cxx
-
-
-libscintilla_la_SOURCES = \
-	$(libscintillanolexer_la_SOURCES) \
+	AutoComplete.cxx \
+  \
 	KeyWords.cxx \
 	LexAda.cxx \
 	LexAVE.cxx \
@@ -143,6 +138,29 @@ libscintilla_la_SOURCES = \
 
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
+
+@NOLEXER_TRUE@libscintillanolexer_la_SOURCES = \
+@NOLEXER_TRUE@	DocumentAccessor.cxx \
+@NOLEXER_TRUE@	WindowAccessor.cxx \
+@NOLEXER_TRUE@	StyleContext.cxx \
+@NOLEXER_TRUE@	Document.cxx \
+@NOLEXER_TRUE@	CallTip.cxx \
+@NOLEXER_TRUE@	ScintillaBase.cxx \
+@NOLEXER_TRUE@	ContractionState.cxx \
+@NOLEXER_TRUE@	Editor.cxx \
+@NOLEXER_TRUE@	PropSet.cxx \
+@NOLEXER_TRUE@	KeyMap.cxx \
+@NOLEXER_TRUE@	LineMarker.cxx \
+@NOLEXER_TRUE@	CellBuffer.cxx \
+@NOLEXER_TRUE@	ViewStyle.cxx \
+@NOLEXER_TRUE@	RESearch.cxx \
+@NOLEXER_TRUE@	Style.cxx \
+@NOLEXER_TRUE@	Indicator.cxx \
+@NOLEXER_TRUE@	AutoComplete.cxx
+
+
+@NOLEXER_TRUE@noinst_LTLIBRARIES = libscintilla.la libscintillanolexer.la
+@NOLEXER_FALSE@noinst_LTLIBRARIES = libscintilla.la
 subdir = scintilla/src
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_CLEAN_FILES =
@@ -173,11 +191,13 @@ am_libscintilla_la_OBJECTS = libscintilla_la-DocumentAccessor.lo \
 libscintilla_la_OBJECTS = $(am_libscintilla_la_OBJECTS)
 libscintillanolexer_la_LDFLAGS =
 libscintillanolexer_la_LIBADD =
-am_libscintillanolexer_la_OBJECTS = DocumentAccessor.lo \
-	WindowAccessor.lo StyleContext.lo Document.lo CallTip.lo \
-	ScintillaBase.lo ContractionState.lo Editor.lo PropSet.lo \
-	KeyMap.lo LineMarker.lo CellBuffer.lo ViewStyle.lo RESearch.lo \
-	Style.lo Indicator.lo AutoComplete.lo
+@NOLEXER_TRUE@am_libscintillanolexer_la_OBJECTS = DocumentAccessor.lo \
+@NOLEXER_TRUE@	WindowAccessor.lo StyleContext.lo Document.lo \
+@NOLEXER_TRUE@	CallTip.lo ScintillaBase.lo ContractionState.lo \
+@NOLEXER_TRUE@	Editor.lo PropSet.lo KeyMap.lo LineMarker.lo \
+@NOLEXER_TRUE@	CellBuffer.lo ViewStyle.lo RESearch.lo Style.lo \
+@NOLEXER_TRUE@	Indicator.lo AutoComplete.lo
+@NOLEXER_FALSE@am_libscintillanolexer_la_OBJECTS =
 libscintillanolexer_la_OBJECTS = $(am_libscintillanolexer_la_OBJECTS)
 
 DEFS = @DEFS@

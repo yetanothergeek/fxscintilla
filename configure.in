@@ -1,10 +1,6 @@
 AC_INIT(src/ScintillaFOX.cxx)
 AC_CONFIG_AUX_DIR(config)
 
-dnl FXScintilla version
-dnl TODO: handle libtool versioning information
-AM_INIT_AUTOMAKE(fxscintilla, 1.45)
-
 dnl Using libtool
 AM_PROG_LIBTOOL
 
@@ -19,6 +15,7 @@ PATCH_LEVEL=1
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
+AM_INIT_AUTOMAKE(fxscintilla, "$MAJOR_VERSION.$MINOR_VERSION.$PATCH_LEVEL")
 
 dnl - Libtool versioning scheme
 dnl   current:revision:age
@@ -28,22 +25,29 @@ dnl   . if any interface has been added, removed or changed, increment
 dnl     current and set revision to 0
 dnl   . if backward compatibility has been preserved, then increment age
 dnl   . if backward compatibility has been broken, then set age to 0
-LT_FXSCINTILLA_CURRENT=0
+LT_FXSCINTILLA_CURRENT=1
 LT_FXSCINTILLA_REVISION=0
-LT_FXSCINTILLA_AGE=0
+LT_FXSCINTILLA_AGE=1
 AC_SUBST(LT_FXSCINTILLA_CURRENT)
 AC_SUBST(LT_FXSCINTILLA_REVISION)
 AC_SUBST(LT_FXSCINTILLA_AGE)
 
-LT_SCILEXER_CURRENT=0
-LT_SCILEXER_REVISION=0
-LT_SCILEXER_AGE=0
-AC_SUBST(LT_SCILEXER_CURRENT)
-AC_SUBST(LT_SCILEXER_REVISION)
-AC_SUBST(LT_SCILEXER_AGE)
+LT_FXSCINTILLANOLEXER_CURRENT=0
+LT_FXSCINTILLANOLEXER_REVISION=0
+LT_FXSCINTILLANOLEXER_AGE=0
+AC_SUBST(LT_FXSCINTILLANOLEXER_CURRENT)
+AC_SUBST(LT_FXSCINTILLANOLEXER_REVISION)
+AC_SUBST(LT_FXSCINTILLANOLEXER_AGE)
+
+dnl Enabling libfxscintillanolexer
+AC_MSG_CHECKING(for nolexer library build)
+AC_ARG_ENABLE(nolexer, [  --enable-nolexer        enable libfxscintillanolexer [default=no]],,
+              enable_nolexer=no)
+AC_MSG_RESULT([$enable_nolexer])
+AM_CONDITIONAL(NOLEXER, test x"$enable_nolexer" = xyes)
 
 dnl Check FOX library
-CHECK_FOX(1, 0)
+CHECK_LIBFOX(1, 0)
 
 dnl Generated makefiles
 AC_OUTPUT( \
