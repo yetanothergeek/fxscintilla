@@ -94,7 +94,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 
 INCLUDES = -I$(top_srcdir)/include -I$(FOX_INCLUDE_DIR)/fox
-LDADD = -L$(FOX_LIB_DIR) -lFOX $(top_srcdir)/src/libfxscintilla.la
+LDADD = -L$(FOX_LIB_DIR) -lFOX $(top_builddir)/src/libfxscintilla.la
 
 noinst_PROGRAMS = test
 
@@ -108,7 +108,7 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_OBJECTS = test.$(OBJEXT)
 test_OBJECTS = $(am_test_OBJECTS)
 test_LDADD = $(LDADD)
-test_DEPENDENCIES = $(top_srcdir)/src/libfxscintilla.la
+test_DEPENDENCIES = $(top_builddir)/src/libfxscintilla.la
 test_LDFLAGS =
 
 DEFS = @DEFS@

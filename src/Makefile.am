@@ -10,8 +10,8 @@ libfxscintillanolexer_la_SOURCES = \
 libfxscintilla_la_SOURCES = \
 	$(libfxscintillanolexer_la_SOURCES)
 
-libfxscintillanolexer_la_LIBADD = $(top_srcdir)/scintilla/src/libscintillanolexer.la
-libfxscintilla_la_LIBADD = $(top_srcdir)/scintilla/src/libscintilla.la
+libfxscintillanolexer_la_LIBADD = $(top_builddir)/scintilla/src/libscintillanolexer.la
+libfxscintilla_la_LIBADD = $(top_builddir)/scintilla/src/libscintilla.la
 
 libfxscintillanolexer_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)

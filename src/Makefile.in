@@ -107,8 +107,8 @@ libfxscintilla_la_SOURCES = \
 	$(libfxscintillanolexer_la_SOURCES)
 
 
-libfxscintillanolexer_la_LIBADD = $(top_srcdir)/scintilla/src/libscintillanolexer.la
-libfxscintilla_la_LIBADD = $(top_srcdir)/scintilla/src/libscintilla.la
+libfxscintillanolexer_la_LIBADD = $(top_builddir)/scintilla/src/libscintillanolexer.la
+libfxscintilla_la_LIBADD = $(top_builddir)/scintilla/src/libscintilla.la
 
 libfxscintillanolexer_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
@@ -122,12 +122,12 @@ CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(lib_LTLIBRARIES)
 
 libfxscintilla_la_DEPENDENCIES = \
-	$(top_srcdir)/scintilla/src/libscintilla.la
+	$(top_builddir)/scintilla/src/libscintilla.la
 am_libfxscintilla_la_OBJECTS = libfxscintilla_la-PlatFOX.lo \
 	libfxscintilla_la-ScintillaFOX.lo
 libfxscintilla_la_OBJECTS = $(am_libfxscintilla_la_OBJECTS)
 libfxscintillanolexer_la_DEPENDENCIES = \
-	$(top_srcdir)/scintilla/src/libscintillanolexer.la
+	$(top_builddir)/scintilla/src/libscintillanolexer.la
 am_libfxscintillanolexer_la_OBJECTS = PlatFOX.lo ScintillaFOX.lo
 libfxscintillanolexer_la_OBJECTS = \
 	$(am_libfxscintillanolexer_la_OBJECTS)
