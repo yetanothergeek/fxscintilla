@@ -1,3 +1,10 @@
+2004-06-24  Gilles Filippini <pini@free.fr>
+
+	* Updated to Scintilla 1.61
+
+	* Added support for Fox-1.2.x
+	* Dropped support for Fox-1.1
+
 2004-05-10  Gilles Filippini <pini@free.fr>
 
 	* Updated to Scintilla 1.60
