@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?eclipse-cdt version="2.0"?>
+
 <cdtproject id="org.eclipse.cdt.make.core.make">
-    <extension id="org.eclipse.cdt.make.core.MakeScannerProvider" point="org.eclipse.cdt.core.ScannerInfoProvider"/>
-    <data>
-        <item id="org.eclipse.cdt.make.core.makeScannerInfo"/>
-    </data>
+<extension point="org.eclipse.cdt.core.ScannerInfoProvider" id="org.eclipse.cdt.make.core.MakeScannerProvider"/>
+<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.Elf"/>
+<data>
+        
+    <item id="org.eclipse.cdt.make.core.buildtargets">
+<buildTargets>
+<target name="all" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+<buildCommand>make</buildCommand>
+<buildTarget>all</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>true</useDefaultCommand>
+</target>
+<target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+<buildCommand>make</buildCommand>
+<buildTarget>clean</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>true</useDefaultCommand>
+</target>
+</buildTargets>
+</item>
+</data>
 </cdtproject>
