@@ -2,7 +2,6 @@
 <?eclipse-cdt version="2.0"?>
 
 <cdtproject id="org.eclipse.cdt.make.core.make">
-<extension point="org.eclipse.cdt.core.ScannerInfoProvider" id="org.eclipse.cdt.make.core.MakeScannerProvider"/>
 <extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.Elf"/>
 <data>
         
@@ -21,6 +20,10 @@
 <useDefaultCommand>true</useDefaultCommand>
 </target>
 </buildTargets>
+</item>
+<item id="org.eclipse.cdt.core.pathentry">
+<pathentry kind="src" path=""/>
+<pathentry kind="out" path=""/>
 </item>
 </data>
 </cdtproject>
