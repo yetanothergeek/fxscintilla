@@ -1,6 +1,6 @@
 %define name    fxscintilla
-%define version 1.46
-%define release 1
+%define version 1.46.1
+%define release 2
 
 Summary: FXScintilla - Scintilla Editor Widget for FOX
 Name:           %{name}       
@@ -9,6 +9,7 @@ Release:        %{release}
 License:	LGPL
 Group: 		System Environment/Libraries
 Source: 	fxscintilla-%{version}.tgz
+Patch1: 	%{name}-test.patch
 URL: 		http://savannah.gnu.org/projects/fxscintilla/
 BuildRequires:	libfox0-devel >= 1.0
 Requires: 	fox >= 1.0
@@ -37,9 +38,10 @@ library itself and all include files needed by developers.
 
 %prep
 %setup -q
+%patch1 -p0 -b .test
 
 %build
-%configure
+%configure --enable-nolexer
 %make
 
 %install
@@ -68,5 +70,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/lib*.a
 
 %changelog
+* Wed May 29 2002 Laurent Julliard (laurent AT moldus DOT org) 1.46-1
+- upgraded to 1.46.1
+- enabled the generation of the nolexer library (--enable-nolexer)
+- made a patch to test.cpp for a correct include of fx.h
+
+* Wed May 29 2002 Laurent Julliard (laurent AT moldus DOT org) 1.46-1
+- initial package
+
 * Wed May 29 2002 Laurent Julliard (laurent AT moldus DOT org) 1.46-1
 - initial package
