@@ -836,7 +836,7 @@ static int KeyTranslate(int keyIn) {
 			return keyIn;
 	}
 }
-
+#include <iostream>
 long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 {
   // Try handling it in base class first
@@ -853,6 +853,8 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 #else
 	int key = ((event->text[0] >= 32) && !ctrl && !alt) ?
 		event->text[0] : event->code;
+	if ((!event->text[0]) && (event->code >= 32) && (event->code < 256))
+		return 1;
 #endif
 	// </FIXME>
 	if (ctrl && (key < 128))
