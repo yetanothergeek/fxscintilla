@@ -34,6 +34,7 @@ libscintilla_la_SOURCES = \
 	AutoComplete.cxx \
 	XPM.cxx \
   \
+	ExternalLexer.cxx \
 	KeyWords.cxx \
 	LexAda.cxx \
 	LexAsm.cxx \
@@ -45,9 +46,11 @@ libscintilla_la_SOURCES = \
 	LexCrontab.cxx \
 	LexCSS.cxx \
 	LexEiffel.cxx \
+	LexEScript.cxx \
 	LexFortran.cxx \
 	LexHTML.cxx \
 	LexLisp.cxx \
+	LexLout.cxx \
 	LexLua.cxx \
 	LexMatlab.cxx \
 	LexOthers.cxx \

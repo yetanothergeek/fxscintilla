@@ -26,10 +26,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  **/
 
+#include <ltdl.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 # if defined(__CYGWIN__) || defined(__MINGW32__)
@@ -1199,6 +1200,46 @@ double ElapsedTime::Duration(bool reset) {
 	return result;
 }
 #endif	// WIN32
+
+// ====================================================================
+// Dynamic library handling
+// ====================================================================
+
+class DynamicLibraryImpl : public DynamicLibrary {
+protected:
+	lt_dlhandle m;
+public:
+	DynamicLibraryImpl(const char *modulePath) {
+		lt_dlinit();
+		m = lt_dlopen(modulePath);
+	}
+
+	virtual ~DynamicLibraryImpl() {
+		if (m != NULL)
+			lt_dlclose(m);
+		lt_dlexit();
+	}
+
+	// Use g_module_symbol to get a pointer to the relevant function.
+	virtual Function FindFunction(const char *name) {
+		if (m != NULL) {
+			return lt_dlsym(m, name);
+		} else
+			return NULL;
+	}
+
+	virtual bool IsValid() {
+		return m != NULL;
+	}
+};
+
+DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
+	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
+}
+
+// ====================================================================
+// Platform
+// ====================================================================
 
 ColourDesired Platform::Chrome() {
 	return ColourDesired(0xe0, 0xe0, 0xe0);

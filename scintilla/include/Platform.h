@@ -49,27 +49,27 @@
 
 #if PLAT_FOX
 
-#if HAVE_FOX_1_1
-#define horizontalScrollbar horizontalScrollBar
-#define verticalScrollbar verticalScrollBar
+# if HAVE_FOX_1_1
+#  define horizontalScrollbar horizontalScrollBar
+#  define verticalScrollbar verticalScrollBar
 namespace FX {
-#endif
+# endif
 
 class FXFont;
 class FXDrawable;
 class FXWindow;
 class FXMenuPane;
 class FXList;
-#ifndef WIN32
+# ifndef WIN32
 class FXTimer;
-#else
+# else
 struct FXTimer;
-#endif	// WIN32
+# endif	// WIN32
 
-#if HAVE_FOX_1_1 
+# if HAVE_FOX_1_1 
 };
 using namespace FX;
-#endif
+# endif
 
 typedef FXFont * FontID;
 typedef FXDrawable * SurfaceID;
@@ -83,6 +83,7 @@ typedef void *WindowID;
 typedef void *MenuID;
 typedef void *TickerID;
 #endif
+typedef void *Function;
 
 /**
  * A geometric point class.
@@ -461,6 +462,23 @@ class ElapsedTime {
 public:
 	ElapsedTime();
 	double Duration(bool reset=false);
+};
+
+/**
+ * Dynamic Library (DLL/SO/...) loading
+ */
+class DynamicLibrary {
+public:
+	virtual ~DynamicLibrary() {};
+
+	/// @return Pointer to function "name", or NULL on failure.
+	virtual Function FindFunction(const char *name) = 0;
+
+	/// @return true if the library was loaded successfully.
+	virtual bool IsValid() = 0;
+
+	/// @return An instance of a DynamicLibrary subclass with "modulePath" loaded.
+	static DynamicLibrary *Load(const char *modulePath);
 };
 
 /**

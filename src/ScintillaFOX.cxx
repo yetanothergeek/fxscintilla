@@ -53,10 +53,11 @@
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 #ifdef SCI_LEXER
-#include "SciLexer.h"
-#include "PropSet.h"
-#include "Accessor.h"
-#include "KeyWords.h"
+# include "SciLexer.h"
+# include "PropSet.h"
+# include "Accessor.h"
+# include "KeyWords.h"
+# include "ExternalLexer.h"
 #endif
 #include "ContractionState.h"
 #include "SVector.h"
