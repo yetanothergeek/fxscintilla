@@ -2,7 +2,7 @@
 /** @file Editor.cxx
  ** Main code for the edit control.
  **/
-// Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
+// Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
@@ -3452,6 +3452,7 @@ void Editor::NotifyModified(Document*, DocModification mh, void *) {
 		CheckForChangeOutsidePaint(Range(mh.position, mh.position + mh.length));
 	}
 	if (mh.modificationType & SC_MOD_CHANGESTYLE) {
+		pdoc->IncrementStyleClock();
 		if (paintState == notPainting) {
 			if (mh.position < pdoc->LineStart(topLine)) {
 				// Styling performed before this view
@@ -4929,7 +4930,8 @@ void Editor::ButtonMove(Point pt) {
 		}
 		// While dragging to make rectangular selection, we don't want the current
 		// position to jump to the end of smaller or empty lines.
-		xEndSelect = pt.x - vs.fixedColumnWidth + xOffset;
+		//xEndSelect = pt.x - vs.fixedColumnWidth + xOffset;
+		xEndSelect = XFromPosition(movePos);
 
 		// Autoscroll
 		PRectangle rcClient = GetClientRectangle();
@@ -5238,6 +5240,9 @@ void Editor::SetDocPointer(Document *document) {
 	targetStart = 0;
 	targetEnd = 0;
 
+	braces[0] = invalidPosition;
+	braces[1] = invalidPosition;
+
 	// Reset the contraction state to fully shown.
 	cs.Clear();
 	cs.InsertLines(0, pdoc->LinesTotal() - 1);
@@ -5272,16 +5277,34 @@ void Editor::Expand(int &line, bool doExpand) {
 }
 
 void Editor::ToggleContraction(int line) {
-	if (pdoc->GetLevel(line) & SC_FOLDLEVELHEADERFLAG) {
+	if (line >= 0) {
+		if ((pdoc->GetLevel(line) & SC_FOLDLEVELHEADERFLAG) == 0) {
+			line = pdoc->GetFoldParent(line);
+			if (line < 0)
+				return;
+		}
+
 		if (cs.GetExpanded(line)) {
 			int lineMaxSubord = pdoc->GetLastChild(line);
 			cs.SetExpanded(line, 0);
 			if (lineMaxSubord > line) {
 				cs.SetVisible(line + 1, lineMaxSubord, false);
+
+				int lineCurrent = pdoc->LineFromPosition(currentPos);
+				if (lineCurrent > line && lineCurrent <= lineMaxSubord) {
+					// This does not re-expand the fold
+					EnsureCaretVisible();
+				}
+
 				SetScrollBars();
 				Redraw();
 			}
+
 		} else {
+			if (!(cs.GetVisible(line))) {
+				EnsureLineVisible(line, false);
+				GoToLine(line);
+			}
 			cs.SetExpanded(line, 1);
 			Expand(line, true);
 			SetScrollBars();
@@ -5765,6 +5788,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETLENGTH:
 		return pdoc->Length();
+
+	case SCI_ALLOCATE:
+		pdoc->Allocate(wParam);
+		break;
 
 	case SCI_GETCHARAT:
 		return pdoc->CharAt(wParam);
