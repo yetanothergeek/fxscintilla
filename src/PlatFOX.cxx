@@ -47,6 +47,9 @@
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
+// X has a 16 bit coordinate space, so stop drawing here to avoid wrapping
+static const int maxCoordinate = 32000;
+
 Point Point::FromLong(long lpoint) {
 	return Point(
 		Platform::LowShortFromLong(lpoint), 
@@ -445,9 +448,7 @@ void SurfaceImpl::RectangleDraw(PRectangle rc, ColourAllocated fore, ColourAlloc
 }
 
 void SurfaceImpl::FillRectangle(PRectangle rc, ColourAllocated back) {
-	// Protect against out of range
-	// if (dc()) {
-	if (dc() && (rc.left < 32000)) {
+	if (dc() && (rc.left < maxCoordinate)) {	// Protect against out of range
 		// GTK+ rectangles include their lower and right edges
 		rc.bottom--;
 		rc.right--;
@@ -532,11 +533,25 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 		// instead of
 		//		DrawImageText
 		// cause the latter causes garbage drawings related to the caret
+
+		// Draw text as a series of segments to avoid limitations in X servers
+		// TODO: make this DBCS and UTF-8 safe by not splitting multibyte characters
 		FillRectangle(rc, back);
 		PenColour(fore);
 		BackColour(back);
 		_dc->setTextFont(font_.GetID());
-		_dc->drawText(rc.left, ybase, s, len);
+
+		const int segmentLength = 1000;
+		int x = rc.left;
+		while ((len > 0) && (x < maxCoordinate)) {
+			int lenDraw = Platform::Minimum(len, segmentLength);
+			_dc->drawText(x, ybase, s, lenDraw);
+			len -= lenDraw;
+			if (len > 0) {
+				x += font_.GetID()->getTextWidth(s, lenDraw);
+			}
+			s += lenDraw;
+		}
 	}
 }
 
@@ -544,25 +559,22 @@ void SurfaceImpl::DrawTextNoClip(PRectangle rc, Font &font_, int ybase, const ch
 // <FIXME> what about FOX ? </FIXME>
 void SurfaceImpl::DrawTextClipped(PRectangle rc, Font &font_, int ybase, const char *s, int len,
                        ColourAllocated fore, ColourAllocated back) {
-	if (dc()) {
-		FillRectangle(rc, back);
-		PenColour(fore);
-		BackColour(back);
-		_dc->setTextFont(font_.GetID());
-		_dc->drawText(rc.left, ybase, s, len);
-	}
+	DrawTextNoClip(rc, font_, ybase, s, len, fore, back);
 }
 
 void SurfaceImpl::MeasureWidths(Font &font_, const char *s, int len, int *positions) {
-	int totalWidth = 0;
-	for (int i=0;i<len;i++) {
-		if (font_.GetID()) {
+	if (font_.GetID()) {
+		int totalWidth = 0;
+		for (int i=0;i<len;i++) {
 			int width = font_.GetID()->getTextWidth(s + i, 1);
 			totalWidth += width;
-		} else {
-			totalWidth++;
+			positions[i] = totalWidth;
 		}
-		positions[i] = totalWidth;
+	}
+	else {
+		for (int i=0;i<len;i++) {
+			positions[i] = i + 1;
+		}
 	}
 }
 
@@ -979,7 +991,15 @@ void Menu::Destroy() {
 }
 
 void Menu::Show(Point pt, Window &) {
+	int screenHeight = FXApp::instance()->getRoot()->getDefaultHeight();
+	int screenWidth = FXApp::instance()->getRoot()->getDefaultWidth();
 	id->create();
+	if ((pt.x + id->getWidth()) > screenWidth) {
+		pt.x = screenWidth - id->getWidth();
+	}
+	if ((pt.y + id->getHeight()) > screenHeight) {
+		pt.y = screenHeight - id->getHeight();
+	}
 	id->popup(NULL, pt.x - 4, pt.y);
   FXApp::instance()->runModalWhileShown(id);
 }

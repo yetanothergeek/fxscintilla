@@ -461,12 +461,14 @@ void ScintillaFOX::FullPaint() {
 	//Platform::DebugPrintf("ScintillaGTK::FullPaint %0d,%0d %0d,%0d\n",
 	//	rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 	paintingAllText = true;
-	Surface *sw = Surface::Allocate();
-	if (sw) {
-		sw->Init(wMain.GetID());
-		Paint(sw, rcPaint);
-		sw->Release();
-		delete sw;
+	if (wMain.GetID()) {
+		Surface *sw = Surface::Allocate();
+		if (sw) {
+			sw->Init(wMain.GetID());
+			Paint(sw, rcPaint);
+			sw->Release();
+			delete sw;
+		}
 	}
 	paintState = notPainting;
 }
