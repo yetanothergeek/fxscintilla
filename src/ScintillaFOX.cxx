@@ -88,8 +88,11 @@
 #endif
 
 #if HAVE_FOX_1_1
-#define SELID FXSELID
-#define SELTYPE FXSELTYPE
+# define SELID FXSELID
+# define SELTYPE FXSELTYPE
+# define addTimeout(delay,tgt,msg) addTimeout(tgt,msg,delay)
+#else
+# define startAutoScroll(ev,insideonly) startAutoScroll(ev->win_x, ev->win_y, insideonly)
 #endif
 
 #include "version.h"
@@ -957,7 +960,7 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   FXint pos;
 
   // Scroll into view
-  if(startAutoScroll(ev->win_x,ev->win_y,TRUE)) return 1;
+  if(startAutoScroll(ev, TRUE)) return 1;
 
   // Handled elsewhere
   if(FXScrollArea::onDNDMotion(sender,sel,ptr)) return 1;
