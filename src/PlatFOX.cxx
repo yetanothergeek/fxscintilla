@@ -858,7 +858,11 @@ FXIMPLEMENT(PopupListBox,FXPopup,PopupListBoxMap,ARRAYNUMBER(PopupListBoxMap))
 PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
 	FXPopup(parent), listBox(lb)
 {
-	list = new FXList(this, 0, this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
+	list = new FXList(this,
+#if !HAVE_FOX_1_1
+		0,
+#endif
+		this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
 	list->setSortFunc(sListSortFunction);
 }
 
