@@ -508,6 +508,7 @@ long Platform::SendScintillaPointer(WindowID w, unsigned int msg,
 FXDEFMAP(FXScintilla) FXScintillaMap[]={
   FXMAPFUNCS(SEL_COMMAND, FXScrollArea::ID_LAST, FXScintilla::idLast, FXScintilla::onScintillaCommand),
   FXMAPFUNC(SEL_COMMAND, 0, FXScintilla::onCommand),
+  FXMAPFUNC(SEL_CHANGED, 0, FXScintilla::onChanged),
   FXMAPFUNC(SEL_PAINT, 0, FXScintilla::onPaint),
   FXMAPFUNC(SEL_CONFIGURE,0,FXScintilla::onConfigure),
   FXMAPFUNC(SEL_TIMEOUT,FXScintilla::ID_TICK,FXScintilla::onTimeoutTicking),
