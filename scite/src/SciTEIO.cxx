@@ -1,7 +1,7 @@
 // SciTE - Scintilla based Text Editor
 /** @file SciTEIO.cxx
  ** Manage input and output with the system.
- **/
+ **/ 
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
@@ -31,7 +31,15 @@
 #if PLAT_WIN
 
 #define _WIN32_WINNT  0x0400
+#ifdef _MSC_VER
+// windows.h, et al, use a lot of nameless struct/unions - can't fix it, so allow it
+#pragma warning(disable: 4201)
+#endif
 #include <windows.h>
+#ifdef _MSC_VER
+// okay, that's done, don't allow it in our code
+#pragma warning(default: 4201)
+#endif
 #include <commctrl.h>
 
 // For chdir
@@ -57,25 +65,25 @@ const char pathSepString[] = "/";
 const char pathSepChar = '/';
 const char configFileVisibilityString[] = ".";
 const char propUserFileName[] = ".SciTEUser.properties";
-const char fileRead[]="rb";
-const char fileWrite[]="wb";
+const char fileRead[] = "rb";
+const char fileWrite[] = "wb";
 #endif
 #ifdef __vms
 const char pathSepString[] = "/";
 const char pathSepChar = '/';
 const char configFileVisibilityString[] = "";
 const char propUserFileName[] = "SciTEUser.properties";
-const char fileRead[]="r";
-const char fileWrite[]="w";
+const char fileRead[] = "r";
+const char fileWrite[] = "w";
 #endif
-#ifdef WIN32
+#ifdef WIN32 
 // Windows
 const char pathSepString[] = "\\";
 const char pathSepChar = '\\';
 const char configFileVisibilityString[] = "";
 const char propUserFileName[] = "SciTEUser.properties";
-const char fileRead[]="rb";
-const char fileWrite[]="wb";
+const char fileRead[] = "rb";
+const char fileWrite[] = "wb";
 #endif
 const char propGlobalFileName[] = "SciTEGlobal.properties";
 const char propAbbrevFileName[] = "abbrev.properties";
@@ -83,8 +91,8 @@ const char propAbbrevFileName[] = "abbrev.properties";
 #define PROPERTIES_EXTENSION	".properties"
 
 static bool IsPropertiesFile(char *filename) {
-	int nameLen = strlen(filename);
-	int propLen = strlen(PROPERTIES_EXTENSION);
+	size_t nameLen = strlen(filename);
+	size_t propLen = strlen(PROPERTIES_EXTENSION);
 	if (nameLen <= propLen)
 		return false;
 	if (EqualCaseInsensitive(filename + nameLen - propLen, PROPERTIES_EXTENSION))
@@ -96,17 +104,21 @@ bool SciTEBase::IsAbsolutePath(const char *path) {
 	if (!path || *path == '\0')
 		return false;
 #ifdef unix
+
 	if (path[0] == '/')
 		return true;
 #endif
 #ifdef __vms
+
 	if (path[0] == '/')
 		return true;
 #endif
 #ifdef WIN32
+
 	if (path[0] == '\\' || path[1] == ':')	// UNC path or drive separator
 		return true;
 #endif
+
 	return false;
 }
 
@@ -269,8 +281,8 @@ bool SciTEBase::Exists(const char *dir, const char *path, char *testPath) {
 	return true;
 }
 
-bool BuildPath(char *path, const char *dir, const char *fileName, 
-	unsigned int lenPath) {
+bool BuildPath(char *path, const char *dir, const char *fileName,
+               unsigned int lenPath) {
 	*path = '\0';
 	if ((strlen(dir) + strlen(pathSepString) + strlen(fileName)) < lenPath) {
 		strcpy(path, dir);
@@ -325,7 +337,7 @@ void SciTEBase::OpenFile(bool initialCmdLine) {
 			fileModLastAsk = fileModTime;
 			SendEditor(SCI_CLEARALL);
 			char data[blockSize];
-			int lenFile = fread(data, 1, sizeof(data), fp);
+			size_t lenFile = fread(data, 1, sizeof(data), fp);
 			while (lenFile > 0) {
 				SendEditorString(SCI_ADDTEXT, lenFile, data);
 				lenFile = fread(data, 1, sizeof(data), fp);
@@ -361,8 +373,8 @@ void SciTEBase::OpenFile(bool initialCmdLine) {
 	Redraw();
 }
 
-bool SciTEBase::Open(const char *file, bool initialCmdLine, 
-	bool forceLoad, bool maySaveIfDirty) {
+bool SciTEBase::Open(const char *file, bool initialCmdLine,
+                     bool forceLoad, bool maySaveIfDirty) {
 	InitialiseBuffers();
 
 	if (!file) {
@@ -377,7 +389,7 @@ bool SciTEBase::Open(const char *file, bool initialCmdLine,
 
 	char absPath[MAX_PATH];
 	AbsolutePath(absPath, file, MAX_PATH);
- 	int index = buffers.GetDocumentByName(absPath);
+	int index = buffers.GetDocumentByName(absPath);
 	if (index >= 0) {
 		SetDocumentAt(index);
 		DeleteFileStackMenu();
@@ -458,7 +470,7 @@ void SciTEBase::OpenSelected() {
 
 	SString selName = SelectionFilename();
 	strncpy(selectedFilename, selName.c_str(), MAX_PATH);
-	selectedFilename[MAX_PATH-1] = '\0';
+	selectedFilename[MAX_PATH - 1] = '\0';
 	if (selectedFilename[0] == '\0') {
 		WarnUser(warnWrongFile);
 		return;	// No selection
@@ -507,6 +519,7 @@ void SciTEBase::OpenSelected() {
 #endif
 
 		// Support the ctags format
+
 		if (lineNumber == 0) {
 			GetCTag(cTag, 200);
 		}
@@ -524,8 +537,12 @@ void SciTEBase::OpenSelected() {
 			if (lineNumber > 0) {
 				SendEditor(SCI_GOTOLINE, lineNumber - 1);
 			} else if (cTag[0] != '\0') {
-				findWhat = cTag;
-				FindNext(false);
+				if (atol(cTag) > 0) {
+					SendEditor(SCI_GOTOLINE, atol(cTag) - 1);
+				} else {
+					findWhat = cTag;
+					FindNext(false);
+				}
 			}
 		}
 	} else {
@@ -553,8 +570,8 @@ void SciTEBase::CheckReload() {
 				if (!entered && (0 == dialogsOnScreen) && (newModTime != fileModLastAsk)) {
 					entered = true;
 					SString msg = LocaliseMessage(
-						"The file '^0' has been modified. Should it be reloaded?", 
-						fullPathToCheck);
+					                  "The file '^0' has been modified. Should it be reloaded?",
+					                  fullPathToCheck);
 					dialogsOnScreen++;
 					int decision = WindowMessageBox(wSciTE, msg, MB_YESNO);
 					dialogsOnScreen--;
@@ -622,8 +639,14 @@ int SciTEBase::SaveIfUnsureAll(bool forceQuestion) {
 				return IDCANCEL;
 		}
 	}
-	if (props.GetInt("save.recent", 0))
+	if (props.GetInt("save.recent", 0)) {
+		for (int i = 0; i < buffers.length; ++i) {
+			Buffer buff = buffers.buffers[i];
+			AddFileToStack(buff.FullPath(),
+			               buff.selection, buff.scrollPosition);
+		}
 		SaveRecentStack();
+	}
 	if (props.GetInt("buffers") && props.GetInt("save.session", 0))
 		SaveSession("");
 
@@ -678,6 +701,28 @@ int StripTrailingSpaces(char *data, int ds, bool lastBlock) {
 	return w - data;
 }
 
+// Writes the buffer to the given filename
+bool SciTEBase::SaveBuffer(const char *saveName) {
+	FILE *fp = fopen(saveName, fileWrite);
+	if (fp) {
+		char data[blockSize + 1];
+		int lengthDoc = LengthDocument();
+		for (int i = 0; i < lengthDoc; i += blockSize) {
+			int grabSize = lengthDoc - i;
+			if (grabSize > blockSize)
+				grabSize = blockSize;
+			GetRange(wEditor, i, i + grabSize, data);
+			if (props.GetInt("strip.trailing.spaces"))
+				grabSize = StripTrailingSpaces(
+				               data, grabSize, grabSize != blockSize);
+			fwrite(data, grabSize, 1, fp);
+		}
+		fclose(fp);
+		return true;	  
+	}
+	return false;
+}
+
 // Returns false only if cancelled
 bool SciTEBase::Save() {
 	if (fileName[0]) {
@@ -685,21 +730,7 @@ bool SciTEBase::Save() {
 			unlink(fullPath);
 		}
 
-		FILE *fp = fopen(fullPath, fileWrite);
-		if (fp) {
-			char data[blockSize + 1];
-			int lengthDoc = LengthDocument();
-			for (int i = 0; i < lengthDoc; i += blockSize) {
-				int grabSize = lengthDoc - i;
-				if (grabSize > blockSize)
-					grabSize = blockSize;
-				GetRange(wEditor, i, i + grabSize, data);
-				if (props.GetInt("strip.trailing.spaces"))
-					grabSize = StripTrailingSpaces(
-					               data, grabSize, grabSize != blockSize);
-				fwrite(data, grabSize, 1, fp);
-			}
-			fclose(fp);
+		if (SaveBuffer(fullPath)) {
 
 			//MoveFile(fullPath, fullPath);
 
@@ -728,7 +759,7 @@ bool SciTEBase::Save() {
 	}
 }
 
-bool SciTEBase::SaveAs(char *file) {
+bool SciTEBase::SaveAs(const char *file) {
 	if (file && *file) {
 		SetFileName(file);
 		Save();

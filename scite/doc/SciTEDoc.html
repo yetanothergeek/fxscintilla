@@ -11,15 +11,15 @@
     </title>
 <style type="text/css">
         table {
-            border: 1px solid black;
+            border: 1px solid #1F1F1F;
             border-collapse: collapse;
         }
         td {
-            border: 1px solid black;
+            border: 1px solid #1F1F1F;
             padding: 1px 5px 1px 5px;
         }
         th {
-            border: 1px solid black;
+            border: 1px solid #1F1F1F;
             padding: 1px 5px 1px 5px;
         }
         .windowsonly {
@@ -241,10 +241,12 @@ NameError: mistake
        Buffers
     </h3>
     <p>
-       SciTE may be configured to use between 1 and 10 buffers each containing a
+       SciTE may be configured to use between 1 and 100 buffers each containing a
        file. The default is 1 and this effectively turns off buffers. With more than one buffer,
        the Buffers menu can be used to switch between buffers, either by selecting the
        file name or using the Previous (F6) and Next (Shift+F6) commands.
+       Setting more than 10 buffers may cause problems as some menus are fixed in length
+       and thus files beyond that length may not be accessible.
      </p>
      <p>
        When all the buffers contain files, then opening a new file causes a buffer to be reused
@@ -720,8 +722,8 @@ NameError: mistake
         </td>
         <td>
 	Setting this to a number makes SciTE start up with a column of line numbers displayed to
-	the left of the selection margin. The value is the number of pixels wide the line numbers
-	can be so make it something like 30, <b>do not make it 1</b>.
+	the left of the selection margin. The value is the number of numerals wide the line numbers
+	can be so make it something like 3 or 4, <b>do not make it 1</b>.
 	Setting line.numbers to 1 is the most frequent SciTE support request.
         </td>
       </tr>
@@ -1096,6 +1098,17 @@ NameError: mistake
       </tr>
       <tr>
         <td>
+          xml.auto.close.tags
+        </td>
+        <td>
+          For XML and HTML, setting this property to 1 will automatically insert the
+	corresponding end tag when '&gt;' is typed to end a start tag.
+	Type "&lt;td&gt;" and the result will be "&lt;td&gt;&lt;/td&gt;" with the caret 
+	placed between the tags.
+        </td>
+      </tr>
+      <tr>
+        <td>
           styling.within.preprocessor
         </td>
         <td>
@@ -1151,13 +1164,21 @@ NameError: mistake
       <tr>
         <td>
           horizontal.scrollbar<br />
+	horizontal.scroll.width<br />
 	output.horizontal.scrollbar<br />
-	output.scroll
+	output.horizontal.scroll.width<br />
+	output.scroll<br />
+	end.at.last.line
         </td>
         <td>
           If horizontal.scrollbar set to 0 then the edit pane's horizontal scrollbar is not displayed.<br />
-          Similarly, output.horizontal.scrollbar controls the scroll bar of the output pane.<br />
-	To stop the output pane from automatically scrolling, set output.scroll to 0.
+          horizontal.scroll.width is the document width assumed for scrolling.<br />
+          Similarly, output.horizontal.scrollbar and output.horizontal.scroll.width controls the 
+	horizontal scroll bar of the output pane.<br />
+	To stop the output pane from automatically scrolling, set output.scroll to 0.<br />
+	The vertical scroll range is normally set so that maximum scroll position has 
+	the last line at the bottom of the view. Set end.at.last.line to 0 to allow
+	scrolling one page below the last line.
         </td>
       </tr>
       <tr>
@@ -2002,7 +2023,7 @@ c:\cygwin\bin\xargs -0 fgrep -G -n "$(find.what)"
     </p>
     <p> 
 	For C/C++ headers, an API file can be generated using 
-	<a href="http://fly.hiwaay.net/~darren/ctags">ctags</a> 
+	<a href="http://ctags.sourceforge.net/">ctags</a> 
 	and then the <a href="tags2api.py">
 	tags2api Python script</a> (which assumes C/C++ source) on the tags file to grab complete
 	multiple line function prototypes. 
@@ -2012,6 +2033,10 @@ c:\cygwin\bin\xargs -0 fgrep -G -n "$(find.what)"
     <p> 
 	To generate an API file for Python modules, there is a 
 	<a href="http://stud4.tuwien.ac.at/~e9326522/gen_python_api.zip">gen_python script</a>.
+    </p>
+    <p> 
+	To generate an API file for Java classes, there is a 
+	<a href="ApiBuilder.java">ApiBuilder.java</a> program.
     </p>
     <h3>
        SciTE in other languages

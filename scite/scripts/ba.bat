@@ -7,8 +7,9 @@ del/q bin\*.a
 call delcvs
 call zipsrc
 cd win32
-make
+nmake -f scintilla.mak
 cd ..
+del/q bin\*.pdb
 cd ..
 cd scite
 del/q bin\*.properties
@@ -17,7 +18,7 @@ call delbin
 call delcvs
 call zipsrc
 cd win32
-make
+nmake -f scite.mak
 cd ..
 call upxsc1
 call zipwscite

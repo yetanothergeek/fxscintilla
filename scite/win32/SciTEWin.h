@@ -18,7 +18,15 @@
 #endif
 
 #define _WIN32_WINNT  0x0400
+#ifdef _MSC_VER
+// windows.h, et al, use a lot of nameless struct/unions - can't fix it, so allow it
+#pragma warning(disable: 4201)
+#endif
 #include <windows.h>
+#ifdef _MSC_VER
+// okay, that's done, don't allow it in our code
+#pragma warning(default: 4201)
+#endif
 #include <commctrl.h>
 #include <richedit.h>
 
@@ -67,6 +75,7 @@ protected:
 	bool staticBuild;
 
 	HANDLE hWriteSubProcess;
+	HACCEL hAccTable;
 
 	PRectangle pagesetupMargin;
 	HGLOBAL hDevMode;
@@ -92,6 +101,9 @@ protected:
 	virtual void CheckAMenuItem(int wIDCheckItem, bool val);
 	virtual void EnableAMenuItem(int wIDCheckItem, bool val);
 	virtual void CheckMenus();
+  
+	void LocaliseAccelerators();
+	SString LocaliseAccelerator(const char *Accelerator, int cmd);
 	void LocaliseMenu(HMENU hmenu);
 	void LocaliseMenus();
 	void LocaliseControl(HWND w);
@@ -103,9 +115,11 @@ protected:
 	virtual bool OpenDialog();
 	SString ChooseSaveName(const char *title, const char *filter=0, const char *ext=0);
 	virtual bool SaveAsDialog();
+	virtual void SaveACopy();
 	virtual void SaveAsHTML();
 	virtual void SaveAsRTF();
 	virtual void SaveAsPDF();
+	virtual void SaveAsTEX();
 	virtual void LoadSessionDialog();
 	virtual void SaveSessionDialog();
 
@@ -174,6 +188,8 @@ protected:
 	static BOOL CALLBACK AboutDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	void AboutDialogWithBuild(int staticBuild);
 	
+	void MakeAccelerator(SString sKey, ACCEL &Accel);
+
 public:
 
 	SciTEWin(Extension *ext = 0);
@@ -198,6 +214,10 @@ public:
 	LRESULT ContextMenuMessage(UINT iMessage, WPARAM wParam, LPARAM lParam);
 	LRESULT WndProc(UINT iMessage, WPARAM wParam, LPARAM lParam);
 	LRESULT WndProcI(UINT iMessage, WPARAM wParam, LPARAM lParam);
+
+	HACCEL GetAcceleratorTable() {
+		return hAccTable;
+	}
 
 	uptr_t GetInstance();
 	static void Register(HINSTANCE hInstance_);

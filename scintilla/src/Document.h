@@ -132,8 +132,8 @@ public:
 	int MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd=true);
 
 	// Gateways to modifying document
-	void DeleteChars(int pos, int len);
-	void InsertStyledString(int position, char *s, int insertLength);
+	bool DeleteChars(int pos, int len);
+	bool InsertStyledString(int position, char *s, int insertLength);
 	int Undo();
 	int Redo();
 	bool CanUndo() { return cb.CanUndo(); }
@@ -158,12 +158,12 @@ public:
 	void SetReadOnly(bool set) { cb.SetReadOnly(set); }
 	bool IsReadOnly() { return cb.IsReadOnly(); }
 
-	void InsertChar(int pos, char ch);
-	void InsertString(int position, const char *s);
-	void InsertString(int position, const char *s, int insertLength);
+	bool InsertChar(int pos, char ch);
+	bool InsertString(int position, const char *s);
+	bool InsertString(int position, const char *s, size_t insertLength);
 	void ChangeChar(int pos, char ch);
 	void DelChar(int pos);
-	int DelCharBack(int pos);
+	void DelCharBack(int pos);
 
 	char CharAt(int position) { return cb.CharAt(position); }
 	void GetCharRange(char *buffer, int position, int lengthRetrieve) {

@@ -72,15 +72,18 @@ static void ColouriseCppDoc(unsigned int startPos, int length, int initStyle, Wo
 
 	for (; sc.More(); sc.Forward()) {
 	
+		if (sc.atLineStart && (sc.state == SCE_C_STRING)) {
+			// Prevent SCE_C_STRINGEOL from leaking back to previous line
+			sc.SetState(SCE_C_STRING);
+		}
+
 		// Handle line continuation generically.
 		if (sc.ch == '\\') {
 			if (sc.Match("\\\n")) {
 				sc.Forward();
-				sc.Forward();
 				continue;
 			}
 			if (sc.Match("\\\r\n")) {
-				sc.Forward();
 				sc.Forward();
 				sc.Forward();
 				continue;
@@ -260,6 +263,13 @@ static void ColouriseCppDoc(unsigned int startPos, int length, int initStyle, Wo
 	sc.Complete();
 }
 
+static bool IsStreamCommentStyle(int style) {
+	return style == SCE_C_COMMENT || 
+		style == SCE_C_COMMENTDOC ||
+		style == SCE_C_COMMENTDOCKEYWORD ||
+		style == SCE_C_COMMENTDOCKEYWORDERROR;
+}
+
 static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordList *[],
                             Accessor &styler) {
 	bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
@@ -279,11 +289,10 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordLis
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		if (foldComment &&
-			(style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC)) {
-			if (style != stylePrev) {
+		if (foldComment && IsStreamCommentStyle(style)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelCurrent++;
-			} else if ((style != styleNext) && !atEOL) {
+			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
 				// Comments don't end at end of line and the next character may be unstyled.
 				levelCurrent--;
 			}
@@ -316,5 +325,12 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordLis
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
-LexerModule lmCPP(SCLEX_CPP, ColouriseCppDoc, "cpp", FoldCppDoc);
-LexerModule lmTCL(SCLEX_TCL, ColouriseCppDoc, "tcl", FoldCppDoc);
+static const char * const cppWordLists[] = {
+	"Primary keywords and identifiers",
+	"Secondary keywords and identifiers",
+	"Documentation comment keywords",
+	0,
+};
+
+LexerModule lmCPP(SCLEX_CPP, ColouriseCppDoc, "cpp", FoldCppDoc, cppWordLists);
+LexerModule lmTCL(SCLEX_TCL, ColouriseCppDoc, "tcl", FoldCppDoc, cppWordLists);

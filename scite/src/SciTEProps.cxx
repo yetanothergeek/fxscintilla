@@ -34,7 +34,15 @@ const char menuAccessIndicator[] = "_";
 #if PLAT_WIN
 
 #define _WIN32_WINNT  0x0400
+#ifdef _MSC_VER
+// windows.h, et al, use a lot of nameless struct/unions - can't fix it, so allow it
+#pragma warning(disable: 4201)
+#endif
 #include <windows.h>
+#ifdef _MSC_VER
+// okay, that's done, don't allow it in our code
+#pragma warning(default: 4201)
+#endif
 #include <commctrl.h>
 
 // For getcwd
@@ -228,7 +236,7 @@ void SciTEBase::ReadAbbrevPropFile() {
 }
 
 void ChopTerminalSlash(char *path) {
-	int endOfPath = strlen(path) - 1;
+	size_t endOfPath = strlen(path) - 1;
 	if (path[endOfPath] == pathSepChar) {
 		path[endOfPath] = '\0';
 	}
@@ -505,7 +513,7 @@ static int FileLength(const char *path) {
 void SciTEBase::ReadAPI(const SString &fileNameForExtension) {
 	SString apisFileNames = props.GetNewExpand("api.",
 	                        fileNameForExtension.c_str());
-	int nameLength = apisFileNames.length();
+	size_t nameLength = apisFileNames.length();
 	if (nameLength) {
 		apisFileNames.substitute(';', '\0');
 		const char *apiFileName = apisFileNames.c_str();
@@ -773,7 +781,7 @@ void SciTEBase::ReadProperties() {
 	SendOutput(SCI_SETMARGINRIGHT, 0, blankMarginRight);
 
 	SendEditor(SCI_SETMARGINWIDTHN, 1, margin ? marginWidth : 0);
-	SendEditor(SCI_SETMARGINWIDTHN, 0, lineNumbers ? lineNumbersWidth : 0);
+	SetLineNumberWidth();
 
 	bufferedDraw = props.GetInt("buffered.draw", 1);
 	SendEditor(SCI_SETBUFFEREDDRAW, bufferedDraw);
@@ -910,9 +918,14 @@ void SciTEBase::ReadProperties() {
 	           ColourOfProperty(props, "bookmark.back", ColourDesired(0x80, 0xff, 0xff)));
 	SendEditor(SCI_MARKERDEFINE, SciTE_MARKER_BOOKMARK, SC_MARK_CIRCLE);
 
+	SendEditor(SCI_SETSCROLLWIDTH, props.GetInt("horizontal.scroll.width", 2000));
+	SendOutput(SCI_SETSCROLLWIDTH, props.GetInt("output.horizontal.scroll.width", 2000));
+
 	// Do these last as they force a style refresh
 	SendEditor(SCI_SETHSCROLLBAR, props.GetInt("horizontal.scrollbar", 1));
 	SendOutput(SCI_SETHSCROLLBAR, props.GetInt("output.horizontal.scrollbar", 1));
+
+	SendEditor(SCI_SETENDATLASTLINE, props.GetInt("end.at.last.line", 1));
 
 	if (extender) {
 		extender->Clear();

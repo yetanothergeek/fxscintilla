@@ -174,7 +174,7 @@ class ScintillaWin :
 		    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam);
 
 	virtual void StartDrag();
-	sptr_t WndPaint(unsigned long wParam);
+	sptr_t WndPaint(uptr_t wParam);
 	sptr_t HandleComposition(uptr_t wParam, sptr_t lParam);
 	virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
@@ -356,14 +356,14 @@ static int KeyTranslate(int keyIn) {
 	}
 }
 
-LRESULT ScintillaWin::WndPaint(unsigned long wParam) {
+LRESULT ScintillaWin::WndPaint(uptr_t wParam) {
 	//ElapsedTime et;
 
 	// Redirect assertions to debug output and save current state
 	bool assertsPopup = Platform::ShowAssertionPopUps(false);
 	paintState = painting;
 	PAINTSTRUCT ps;
-	PAINTSTRUCT* pps;
+	PAINTSTRUCT *pps;
 
 	bool IsOcxCtrl = (wParam != 0); // if wParam != 0, it contains
 								   // a PAINSTRUCT* from the OCX
@@ -677,7 +677,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		break;
 
 	case WM_PALETTECHANGED:
-		if (wParam != reinterpret_cast<unsigned int>(MainHWND())) {
+		if (wParam != reinterpret_cast<uptr_t>(MainHWND())) {
 			//Platform::DebugPrintf("** Palette Changed\n");
 			RealizeWindowPalette(true);
 		}
@@ -838,7 +838,7 @@ void ScintillaWin::SetTicking(bool on) {
 		if (timer.ticking) {
 			timer.tickerID = reinterpret_cast<TickerID>(::SetTimer(MainHWND(), 1, timer.tickSize, NULL));
 		} else {
-			::KillTimer(MainHWND(), reinterpret_cast<UINT>(timer.tickerID));
+			::KillTimer(MainHWND(), reinterpret_cast<uptr_t>(timer.tickerID));
 			timer.tickerID = 0;
 		}
 	}
@@ -898,7 +898,7 @@ bool ScintillaWin::ModifyScrollBars(int nMax, int nPage) {
 	sci.fMask = SIF_PAGE | SIF_RANGE;
 	::GetScrollInfo(MainHWND(), SB_VERT, &sci);
 	if ((sci.nMin != 0) || 
-			(sci.nMax != nMax) ||
+		(sci.nMax != nMax) ||
 	        (sci.nPage != static_cast<unsigned int>(nPage)) ||
 	        (sci.nPos != 0)) {
 		//Platform::DebugPrintf("Scroll info changed %d %d %d %d %d\n",
@@ -912,16 +912,31 @@ bool ScintillaWin::ModifyScrollBars(int nMax, int nPage) {
 		::SetScrollInfo(MainHWND(), SB_VERT, &sci, TRUE);
 		modified = true;
 	}
-	int horizStart = 0;
-	int horizEnd = 2000;
-	int horizEndPreferred = 2000;
+
+	PRectangle rcText = GetTextRectangle();
+	int horizEndPreferred = scrollWidth;
+	if (horizEndPreferred < 0)
+		horizEndPreferred = 0;
 	if (!horizontalScrollBarVisible || (wrapState != eWrapNone))
 		horizEndPreferred = 0;
-	if (!::GetScrollRange(MainHWND(), SB_HORZ, &horizStart, &horizEnd) ||
-	        horizStart != 0 || horizEnd != horizEndPreferred) {
-		::SetScrollRange(MainHWND(), SB_HORZ, 0, horizEndPreferred, TRUE);
-		//Platform::DebugPrintf("Horiz Scroll info changed\n");
+	unsigned int pageWidth = rcText.Width();
+	sci.fMask = SIF_PAGE | SIF_RANGE;
+	::GetScrollInfo(MainHWND(), SB_HORZ, &sci);
+	if ((sci.nMin != 0) || 
+		(sci.nMax != horizEndPreferred) ||
+		(sci.nPage != pageWidth) ||
+	        (sci.nPos != 0)) {
+		sci.fMask = SIF_PAGE | SIF_RANGE;
+		sci.nMin = 0;
+		sci.nMax = horizEndPreferred;
+		sci.nPage = pageWidth;
+		sci.nPos = 0;
+		sci.nTrackPos = 1;
+		::SetScrollInfo(MainHWND(), SB_HORZ, &sci, TRUE);
 		modified = true;
+		if (scrollWidth < static_cast<int>(pageWidth)) {
+			HorizontalScrollTo(0);
+		}
 	}
 	return modified;
 }
@@ -1002,8 +1017,9 @@ void ScintillaWin::Paste() {
 					if (isRectangular) {
 						PasteRectangular(selStart, putf, len);
 					} else {
-						pdoc->InsertString(currentPos, putf, len);
-						SetEmptySelection(currentPos + len);
+						if (pdoc->InsertString(currentPos, putf, len)) {
+							SetEmptySelection(currentPos + len);
+						}
 					}
 					delete []putf;
 				}
@@ -1527,7 +1543,7 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 	case SB_LINEUP:
 		xPos -= 20;
 		break;
-	case SB_LINEDOWN:
+	case SB_LINEDOWN:	// May move past the logical end
 		xPos += 20;
 		break;
 	case SB_PAGEUP:
@@ -1535,12 +1551,15 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 		break;
 	case SB_PAGEDOWN:
 		xPos += pageWidth;
+		if (xPos > scrollWidth - rcText.Width()) {	// Hit the end exactly
+			xPos = scrollWidth - rcText.Width();
+		}
 		break;
 	case SB_TOP:
 		xPos = 0;
 		break;
 	case SB_BOTTOM:
-		xPos = 2000;
+		xPos = scrollWidth;
 		break;
 	case SB_THUMBPOSITION:
 		xPos = HiWord(wParam);
@@ -1639,7 +1658,7 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 }
 
 STDMETHODIMP ScintillaWin::DragOver(DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
-	if (!hasOKText) {
+	if (!hasOKText || pdoc->IsReadOnly()) {
 		*pdwEffect = DROPEFFECT_NONE;
 		return S_OK;
 	}
@@ -1936,6 +1955,7 @@ bool Scintilla_RegisterClasses(void *hInstance) {
 	Platform_Initialise(hInstance);
 	bool result = ScintillaWin::Register(reinterpret_cast<HINSTANCE>(hInstance));
 #ifdef SCI_LEXER
+	Scintilla_LinkLexers();
 	LexerManager *lexMan = LexerManager::GetInstance();
 	lexMan->Load();
 #endif

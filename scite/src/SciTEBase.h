@@ -271,7 +271,7 @@ protected:
 	RecentFile recentFileStack[fileStackMax];
 	enum { fileStackCmdID = IDM_MRUFILE, bufferCmdID = IDM_BUFFER };
 
-	enum { importMax = 20 };
+	enum { importMax = 30 };
 	SString importFiles[importMax];
 	enum { importCmdID = IDM_IMPORT };
 
@@ -392,7 +392,7 @@ protected:
 
 	bool lineNumbers;
 	int lineNumbersWidth;
-	enum { lineNumbersWidthDefault = 40};
+	enum { lineNumbersWidthDefault = 4};
 
 	bool usePalette;
 	bool clearBeforeExecute;
@@ -426,7 +426,7 @@ protected:
 
 	PropSet propsStatus;
 
-	enum { bufferMax = 10 };
+	enum { bufferMax = 100 };
 	BufferList buffers;
 
 	// Handle buffers
@@ -494,13 +494,17 @@ protected:
 	int SaveIfUnsureAll(bool forceQuestion = false);
 	int SaveIfUnsureForBuilt();
 	bool Save();
-	virtual bool SaveAs(char *file = 0);
+	virtual bool SaveAs(const char *file = 0);
+	virtual void SaveACopy() = 0;
 	void SaveToHTML(const char *saveName);
+	bool SaveBuffer(const char *saveName);
 	virtual void SaveAsHTML() = 0;
 	void SaveToRTF(const char *saveName, int start = 0, int end = -1);
 	virtual void SaveAsRTF() = 0;
 	void SaveToPDF(const char *saveName);
 	virtual void SaveAsPDF() = 0;
+	void SaveToTEX(const char *saveName);
+	virtual void SaveAsTEX() = 0;
 	virtual void GetDefaultDirectory(char *directory, size_t size) = 0;
 	virtual bool GetSciteDefaultHome(char *path, unsigned int lenPath) = 0;
 	virtual bool GetSciteUserHome(char *path, unsigned int lenPath) = 0;
@@ -537,6 +541,8 @@ protected:
 	virtual void TabSizeDialog() = 0;
 	virtual void ParamGrab() = 0;
 	virtual bool ParametersDialog(bool modal) = 0;
+	bool HandleXml(char ch);
+	SString FindOpenXmlTag(const char sel[], int nSize);
 	void GoMatchingBrace(bool select);
 	void GoMatchingPreprocCond(int direction, bool select);
 	virtual void FindReplace(bool replace) = 0;
@@ -576,6 +582,7 @@ protected:
 	virtual void QuitProgram() = 0;
 	void CloseAllBuffers();
 	virtual void CopyAsRTF() {};
+	void SetLineNumberWidth();
 	void MenuCommand(int cmdID);
 	void FoldChanged(int line, int levelNow, int levelPrev);
 	void FoldChanged(int position);

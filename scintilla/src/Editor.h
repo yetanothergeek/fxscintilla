@@ -200,6 +200,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int xOffset;		///< Horizontal scrolled amount in pixels
 	int xCaretMargin;	///< Ensure this many pixels visible on both sides of caret
 	bool horizontalScrollBarVisible;
+	int scrollWidth;
+	bool endAtLastLine;
 
 	Surface *pixmapLine;
 	Surface *pixmapSelMargin;
@@ -342,6 +344,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		PRectangle rcLine, LineLayout *ll, int subLine=0);
 	void Paint(Surface *surfaceWindow, PRectangle rcArea);
 	long FormatRange(bool draw, RangeToFormat *pfr);
+	int TextWidth(int style, const char *text);
 
 	virtual void SetVerticalScrollPos() = 0;
 	virtual void SetHorizontalScrollPos() = 0;
@@ -383,6 +386,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt);
 	void NotifyNeedShown(int pos, int len);
 	void NotifyDwelling(Point pt, bool state);
+	void NotifyZoom();
 
 	void NotifyModifyAttempt(Document *document, void *userData);
 	void NotifySavePoint(Document *document, void *userData, bool atSavePoint);
@@ -390,12 +394,14 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void NotifyModified(Document *document, DocModification mh, void *userData);
 	void NotifyDeleted(Document *document, void *userData);
 	void NotifyStyleNeeded(Document *doc, void *userData, int endPos);
-	void NotifyMacroRecord(unsigned int iMessage, unsigned long wParam, long lParam);
+	void NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 
 	void PageMove(int direction, bool extend=false);
 	void ChangeCaseOfSelection(bool makeUpperCase);
 	void LineTranspose();
     	virtual void CancelModes();
+	void NewLine();
+	void CursorUpOrDown(int direction, bool extend=false);
 	virtual int KeyCommand(unsigned int iMessage);
 	virtual int KeyDefault(int /* key */, int /*modifiers*/);
 	int KeyDown(int key, bool shift, bool ctrl, bool alt, bool *consumed=0);
@@ -405,9 +411,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void Indent(bool forwards);
 
-	long FindText(unsigned long wParam, long lParam);
+	long FindText(uptr_t wParam, sptr_t lParam);
 	void SearchAnchor();
-	long SearchText(unsigned int iMessage, unsigned long wParam, long lParam);
+	long SearchText(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	long SearchInTarget(const char *text, int length);
 	void GoToLine(int lineNo);
 
