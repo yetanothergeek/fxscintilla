@@ -24,9 +24,9 @@ cd snapshot
 rm -fr fxscintilla
 
 if [ ! -z $major ]; then
-		cvs -w export -r "FXSCINTILLA-${major}_${minor}" fxscintilla
+		cvs -w export -P -r "FXSCINTILLA-${major}_${minor}" fxscintilla
 else
-		cvs -w export -r HEAD fxscintilla
+		cvs -w export -P -r HEAD fxscintilla
 fi
 
 find fxscintilla -type f ! \( \
@@ -41,7 +41,6 @@ find fxscintilla -type f ! \( \
 cd fxscintilla
 
 if [ "$devel" = "false" ]; then
-		rm -fr scite
 		rm -fr scintilla/gtk scintilla/win32
 		rm -f scintilla/scintilla.dsp
 		rm -f scintilla/scintilla.dsw

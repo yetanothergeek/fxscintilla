@@ -58,7 +58,7 @@ CC=cl
 RC=rc
 LD=link
 
-FOX_TOP= D:\fox-0.99.181
+FOX_TOP= D:\fox-1.0.3
 FOX_INCLUDES= -I $(FOX_TOP)/include
 FOX_LIBS_NDEBUG=$(FOX_TOP)/lib/fox.lib
 FOX_LIBS_DEBUG=$(FOX_TOP)/lib/foxd.lib
