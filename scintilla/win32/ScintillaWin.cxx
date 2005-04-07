@@ -204,7 +204,7 @@ class ScintillaWin :
 	void ImeStartComposition();
 	void ImeEndComposition();
 
-	void AddCharBytes(char b0, char b1=0);
+	void AddCharBytes(char b0, char b1);
 
 	void GetIntelliMouseParameters();
 	virtual void CopyToClipboard(const SelectionText &selectedText);
@@ -212,6 +212,8 @@ class ScintillaWin :
 	void HorizontalScrollMessage(WPARAM wParam);
 	void RealizeWindowPalette(bool inBackGround);
 	void FullPaint();
+	void FullPaintDC(HDC dc);
+	bool IsCompatibleDC(HDC dc);
 
 	virtual int SetScrollInfo(int nBar, LPCSCROLLINFO lpsi, BOOL bRedraw);
 	virtual bool GetScrollInfo(int nBar, LPSCROLLINFO lpsi);
@@ -444,8 +446,7 @@ sptr_t ScintillaWin::HandleComposition(uptr_t wParam, sptr_t lParam) {
 	// Digital Mars compiler does not include Imm library
 	return 0;
 #else
-	sptr_t ret;
-	if ((lParam & GCS_RESULTSTR) && (IsNT())) {
+	if (lParam & GCS_RESULTSTR) {
 		HIMC hIMC = ::ImmGetContext(MainHWND());
 		if (hIMC) {
 			const int maxLenInputIME = 200;
@@ -467,24 +468,18 @@ sptr_t ScintillaWin::HandleComposition(uptr_t wParam, sptr_t lParam) {
 					AddChar(dbcsval[i]);
 				}
 			}
+			// Set new position after converted
+			Point pos = LocationFromPosition(currentPos);
+			COMPOSITIONFORM CompForm;
+			CompForm.dwStyle = CFS_POINT;
+			CompForm.ptCurrentPos.x = pos.x;
+			CompForm.ptCurrentPos.y = pos.y;
+			::ImmSetCompositionWindow(hIMC, &CompForm);
 			::ImmReleaseContext(MainHWND(), hIMC);
 		}
-		ret = 0;
-	} else {
-		ret = ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
-	}
-	if ((lParam & GCS_RESULTSTR) && (!IsNT())) {
-		HIMC hIMC = ::ImmGetContext(MainHWND());
-		Point pos = LocationFromPosition(currentPos);
-		COMPOSITIONFORM CompForm;
-		CompForm.dwStyle = CFS_POINT;
-		CompForm.ptCurrentPos.x = pos.x;
-		CompForm.ptCurrentPos.y = pos.y;
-		::ImmSetCompositionWindow(hIMC, &CompForm);
-		::ImmReleaseContext(MainHWND(), hIMC);
-		DropCaret();
-	}
-	return ret;
+		return 0;
+	} 
+	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 #endif
 }
 
@@ -532,21 +527,21 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 	case WM_COMMAND:
 #ifdef TOTAL_CONTROL
-		if (LoWord(wParam) == idAutoComplete) {
-			int cmd = HiWord(wParam);
-			if (cmd == LBN_DBLCLK) {
-				AutoCompleteCompleted();
-			} else {
-				if (cmd != LBN_SETFOCUS)
-					::SetFocus(MainHWND());
-			}
-		}
 		Command(LoWord(wParam));
 #endif
 		break;
 
 	case WM_PAINT:
 		return WndPaint(wParam);
+
+	case WM_PRINTCLIENT: {
+			HDC hdc = reinterpret_cast<HDC>(wParam);
+			if (!IsCompatibleDC(hdc)) {
+				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+			}
+			FullPaintDC(hdc);
+		}
+		break;
 
 	case WM_VSCROLL:
 		ScrollMessage(wParam);
@@ -638,7 +633,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case WM_GETMINMAXINFO:
 		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
-	case WM_LBUTTONDOWN:
+	case WM_LBUTTONDOWN: {
+		// For IME, set the composition string as the result string.
+		HIMC hIMC = ::ImmGetContext(MainHWND());
+		::ImmNotifyIME(hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
+		::ImmReleaseContext(MainHWND(), hIMC);
+		//
 		//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n",iMessage, wParam, lParam,
 		//	Platform::IsKeyDown(VK_SHIFT),
 		//	Platform::IsKeyDown(VK_CONTROL),
@@ -648,6 +648,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			(wParam & MK_CONTROL) != 0,
 			Platform::IsKeyDown(VK_MENU));
 		::SetFocus(MainHWND());
+		}
 		break;
 
 	case WM_MOUSEMOVE:
@@ -693,12 +694,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				//unsigned int len = UTF8Length(wcs, 1);
 				//UTF8FromUCS2(wcs, 1, utfval, len);
 				//AddCharUTF(utfval, len);
-				AddCharBytes(static_cast<char>(wParam & 0xff));
+				AddCharBytes('\0', LOBYTE(wParam));
 			} else {
-				AddChar(static_cast<char>(wParam & 0xff));
+				AddChar(LOBYTE(wParam));
 			}
 		}
-		return 1;
+		return 0;
 
 	case WM_UNICHAR:
 		if (wParam == UNICODE_NOCHAR) {
@@ -752,7 +753,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 	case WM_KILLFOCUS: {
 			HWND wOther = reinterpret_cast<HWND>(wParam);
-			HWND wThis = reinterpret_cast<HWND>(wMain.GetID());
+			HWND wThis = MainHWND();
 			HWND wCT = reinterpret_cast<HWND>(ct.wCallTip.GetID());
 			if (!wParam ||
 				!(::IsChild(wThis,wOther) || (wOther == wCT))) {
@@ -799,10 +800,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		return HandleComposition(wParam, lParam);
 
 	case WM_IME_CHAR: {
-			if (HIBYTE(wParam) == '\0')
-				AddChar(LOBYTE(wParam));
-			else
-				AddCharBytes(HIBYTE(wParam), LOBYTE(wParam));
+			AddCharBytes(HIBYTE(wParam), LOBYTE(wParam));
 			return 0;
 		}
 
@@ -1023,6 +1021,7 @@ void ScintillaWin::ChangeScrollPos(int barType, int pos) {
 	sci.fMask = SIF_POS;
 	GetScrollInfo(barType, &sci);
 	if (sci.nPos != pos) {
+		DwellEnd(true);
 		sci.nPos = pos;
 		SetScrollInfo(barType, &sci, TRUE);
 	}
@@ -1268,7 +1267,7 @@ void ScintillaWin::Paste() {
 void ScintillaWin::CreateCallTipWindow(PRectangle) {
 #ifdef TOTAL_CONTROL
 	if (!ct.wCallTip.Created()) {
-		ct.wCallTip = ::CreateWindow(callClassName, "ACallTip",
+		ct.wCallTip = ::CreateWindow(callClassName, TEXT("ACallTip"),
 					     WS_POPUP, 100, 100, 150, 20,
 					     MainHWND(), 0,
 					     GetWindowInstance(MainHWND()),
@@ -1621,7 +1620,7 @@ void ScintillaWin::ImeStartComposition() {
 			// Since the style creation code has been made platform independent,
 			// The logfont for the IME is recreated here.
 			int styleHere = (pdoc->StyleAt(currentPos)) & 31;
-			LOGFONT lf = {0,0,0,0,0,0,0,0,0,0,0,0,0,""};
+			LOGFONT lf = {0,0,0,0,0,0,0,0,0,0,0,0,0,TEXT("")};
 			int sizeZoomed = vs.styles[styleHere].size + vs.zoomLevel;
 			if (sizeZoomed <= 2)	// Hangs if sizeZoomed <= 1
 				sizeZoomed = 2;
@@ -1659,23 +1658,29 @@ void ScintillaWin::AddCharBytes(char b0, char b1) {
 	if (inputCodePage && IsUnicodeMode()) {
 		char utfval[4]="\0\0\0";
 		char ansiChars[3];
-		ansiChars[0] = b0;
-		ansiChars[1] = b1;
-		ansiChars[2] = '\0';
 		wchar_t wcs[2];
-		::MultiByteToWideChar(inputCodePage, 0, ansiChars, 2, wcs, 1);
+		if (b0) {	// Two bytes from IME
+			ansiChars[0] = b0;
+			ansiChars[1] = b1;
+			ansiChars[2] = '\0';
+			::MultiByteToWideChar(inputCodePage, 0, ansiChars, 2, wcs, 1);
+		} else {
+			ansiChars[0] = b1;
+			ansiChars[1] = '\0';
+			::MultiByteToWideChar(inputCodePage, 0, ansiChars, 1, wcs, 1);
+		}
 		unsigned int len = UTF8Length(wcs, 1);
 		UTF8FromUCS2(wcs, 1, utfval, len);
 		utfval[len] = '\0';
 		AddCharUTF(utfval,len);
-	} else if (b1) {
+	} else if (b0) {
 		char dbcsChars[3];
 		dbcsChars[0] = b0;
 		dbcsChars[1] = b1;
 		dbcsChars[2] = '\0';
 		AddCharUTF(dbcsChars, 2, true);
 	} else {
-		AddChar(b0);
+		AddChar(b1);
 	}
 }
 
@@ -1842,17 +1847,41 @@ void ScintillaWin::RealizeWindowPalette(bool inBackGround) {
  * This paint will not be abandoned.
  */
 void ScintillaWin::FullPaint() {
+	HDC hdc = ::GetDC(MainHWND());
+	FullPaintDC(hdc);
+	::ReleaseDC(MainHWND(), hdc);
+}
+
+/**
+ * Redraw all of text area on the specified DC.
+ * This paint will not be abandoned.
+ */
+void ScintillaWin::FullPaintDC(HDC hdc) {
 	paintState = painting;
 	rcPaint = GetClientRectangle();
 	paintingAllText = true;
-	HDC hdc = ::GetDC(MainHWND());
 	AutoSurface surfaceWindow(hdc, this);
 	if (surfaceWindow) {
 		Paint(surfaceWindow, rcPaint);
 		surfaceWindow->Release();
 	}
-	::ReleaseDC(MainHWND(), hdc);
 	paintState = notPainting;
+}
+
+static bool CompareDevCap(HDC hdc, HDC hOtherDC, int nIndex) {
+	return ::GetDeviceCaps(hdc, nIndex) == ::GetDeviceCaps(hOtherDC, nIndex);
+}
+
+bool ScintillaWin::IsCompatibleDC(HDC hOtherDC) {
+	HDC hdc = ::GetDC(MainHWND());
+	bool isCompatible = 
+		CompareDevCap(hdc, hOtherDC, TECHNOLOGY) &&
+		CompareDevCap(hdc, hOtherDC, LOGPIXELSY) &&
+		CompareDevCap(hdc, hOtherDC, LOGPIXELSX) &&
+		CompareDevCap(hdc, hOtherDC, BITSPIXEL) &&
+		CompareDevCap(hdc, hOtherDC, PLANES);
+	::ReleaseDC(MainHWND(), hdc);
+	return isCompatible;
 }
 
 /// Implement IUnknown

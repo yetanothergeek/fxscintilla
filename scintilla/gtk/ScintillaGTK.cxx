@@ -479,6 +479,7 @@ void ScintillaGTK::UnRealizeThis(GtkWidget *widget) {
 	gtk_widget_unrealize(PWidget(wPreedit));
 	gtk_widget_unrealize(PWidget(wPreeditDraw));
 	g_object_unref(im_context);
+	im_context = NULL;
 #endif
 #endif
 	if (GTK_WIDGET_CLASS(parentClass)->unrealize)
@@ -585,16 +586,21 @@ gint ScintillaGTK::FocusIn(GtkWidget *widget, GdkEventFocus * /*event*/) {
 	if (sciThis->ic)
 		gdk_im_begin(sciThis->ic, widget->window);
 #else
-	gchar *str;
-	gint cursor_pos;
-	gtk_im_context_get_preedit_string(sciThis->im_context, &str, NULL, &cursor_pos);
-	if (strlen(str) > 0){
-		gtk_widget_show(PWidget(sciThis->wPreedit));
-	} else{
-		gtk_widget_hide(PWidget(sciThis->wPreedit));
+	if (sciThis->im_context != NULL) {
+		gchar *str = NULL;
+		gint cursor_pos;
+
+		gtk_im_context_get_preedit_string(sciThis->im_context, &str, NULL, &cursor_pos);
+		if (PWidget(sciThis->wPreedit) != NULL) {
+			if (strlen(str) > 0) {
+				gtk_widget_show(PWidget(sciThis->wPreedit));
+			} else {
+				gtk_widget_hide(PWidget(sciThis->wPreedit));
+			}
+		}
+		g_free(str);
+		gtk_im_context_focus_in(sciThis->im_context);
 	}
-	g_free(str);
-	gtk_im_context_focus_in(sciThis->im_context);
 #endif
 #endif
 
@@ -611,8 +617,10 @@ gint ScintillaGTK::FocusOut(GtkWidget *widget, GdkEventFocus * /*event*/) {
 #if GTK_MAJOR_VERSION < 2
 	gdk_im_end();
 #else
-	gtk_widget_hide(PWidget(sciThis->wPreedit));
-	gtk_im_context_focus_out(sciThis->im_context);
+	if (PWidget(sciThis->wPreedit) != NULL)
+		gtk_widget_hide(PWidget(sciThis->wPreedit));
+	if (sciThis->im_context != NULL)
+		gtk_im_context_focus_out(sciThis->im_context);
 #endif
 #endif
 
@@ -621,7 +629,7 @@ gint ScintillaGTK::FocusOut(GtkWidget *widget, GdkEventFocus * /*event*/) {
 
 void ScintillaGTK::SizeRequest(GtkWidget *widget, GtkRequisition *requisition) {
 	requisition->width = 600;
-	requisition->height = 2000;
+	requisition->height = gdk_screen_height();
 	ScintillaGTK *sciThis = ScintillaFromWidget(widget);
 	GtkRequisition child_requisition;
 	gtk_widget_size_request(PWidget(sciThis->scrollbarh), &child_requisition);
@@ -881,7 +889,7 @@ sptr_t ScintillaGTK::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		return TargetAsUTF8(reinterpret_cast<char*>(lParam));
 
 	case SCI_ENCODEDFROMUTF8:
-		return EncodedFromUTF8(reinterpret_cast<char*>(wParam), 
+		return EncodedFromUTF8(reinterpret_cast<char*>(wParam),
 			reinterpret_cast<char*>(lParam));
 
 	default:
@@ -1051,10 +1059,12 @@ void ScintillaGTK::ScrollText(int linesToMove) {
 }
 
 void ScintillaGTK::SetVerticalScrollPos() {
+	DwellEnd(true);
 	gtk_adjustment_set_value(GTK_ADJUSTMENT(adjustmentv), topLine);
 }
 
 void ScintillaGTK::SetHorizontalScrollPos() {
+	DwellEnd(true);
 	gtk_adjustment_set_value(GTK_ADJUSTMENT(adjustmenth), xOffset / 2);
 }
 
@@ -1110,7 +1120,7 @@ void ScintillaGTK::NotifyParent(SCNotification scn) {
 }
 
 void ScintillaGTK::NotifyKey(int key, int modifiers) {
-	SCNotification scn;
+	SCNotification scn = {0};
 	scn.nmhdr.code = SCN_KEY;
 	scn.ch = key;
 	scn.modifiers = modifiers;
@@ -1119,7 +1129,7 @@ void ScintillaGTK::NotifyKey(int key, int modifiers) {
 }
 
 void ScintillaGTK::NotifyURIDropped(const char *list) {
-	SCNotification scn;
+	SCNotification scn = {0};
 	scn.nmhdr.code = SCN_URIDROPPED;
 	scn.text = list;
 
@@ -2405,8 +2415,8 @@ static void scintilla_init(ScintillaObject *sci);
 extern void Platform_Initialise();
 extern void Platform_Finalise();
 
-guint scintilla_get_type() {
-	static guint scintilla_type = 0;
+GtkType scintilla_get_type() {
+	static GtkType scintilla_type = 0;
 
 	if (!scintilla_type) {
 		Platform_Initialise();

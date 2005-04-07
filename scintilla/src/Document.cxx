@@ -266,7 +266,7 @@ int Document::LenChar(int pos) {
 		return 1;
 	}
 }
-#include <assert.h>
+
 // Normalise a position so that it is not halfway through a two byte character.
 // This can occur in two situations -
 // When lines are terminated with \r\n pairs which should be treated as one character.
@@ -280,7 +280,7 @@ int Document::MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd) {
 	if (pos >= Length())
 		return Length();
 
-	// assert pos > 0 && pos < Length()
+	// PLATFORM_ASSERT(pos > 0 && pos < Length());
 	if (checkLineEnd && IsCrLf(pos - 1)) {
 		if (moveDir > 0)
 			return pos + 1;
@@ -524,15 +524,17 @@ bool Document::InsertString(int position, const char *s) {
  */
 bool Document::InsertString(int position, const char *s, size_t insertLength) {
 	bool changed = false;
-	char *sWithStyle = new char[insertLength * 2];
-	if (sWithStyle) {
-		for (size_t i = 0; i < insertLength; i++) {
-			sWithStyle[i*2] = s[i];
-			sWithStyle[i*2 + 1] = 0;
+	if (insertLength > 0) {
+		char *sWithStyle = new char[insertLength * 2];
+		if (sWithStyle) {
+			for (size_t i = 0; i < insertLength; i++) {
+				sWithStyle[i*2] = s[i];
+				sWithStyle[i*2 + 1] = 0;
+			}
+			changed = InsertStyledString(position*2, sWithStyle,
+				static_cast<int>(insertLength*2));
+			delete []sWithStyle;
 		}
-		changed = InsertStyledString(position*2, sWithStyle,
-			static_cast<int>(insertLength*2));
-		delete []sWithStyle;
 	}
 	return changed;
 }
@@ -611,8 +613,10 @@ void Document::SetLineIndentation(int line, int indent) {
 		CreateIndentation(linebuf, sizeof(linebuf), indent, tabInChars, !useTabs);
 		int thisLineStart = LineStart(line);
 		int indentPos = GetLineIndentPosition(line);
+		BeginUndoAction();
 		DeleteChars(thisLineStart, indentPos - thisLineStart);
 		InsertString(thisLineStart, linebuf);
+		EndUndoAction();
 	}
 }
 
@@ -718,7 +722,7 @@ void Document::ConvertLineEnds(int eolModeSet) {
 
 	for (int pos = 0; pos < Length(); pos++) {
 		if (cb.CharAt(pos) == '\r') {
-			if (cb.CharAt(pos + 1) == '\n') { 
+			if (cb.CharAt(pos + 1) == '\n') {
 				// CRLF
 				if (eolModeSet == SC_EOL_CR) {
 					DeleteChars(pos + 1, 1); // Delete the LF
@@ -727,7 +731,7 @@ void Document::ConvertLineEnds(int eolModeSet) {
 				} else {
 					pos++;
 				}
-			} else { 
+			} else {
 				// CR
 				if (eolModeSet == SC_EOL_CRLF) {
 					InsertString(pos + 1, "\n", 1); // Insert LF
@@ -752,31 +756,43 @@ void Document::ConvertLineEnds(int eolModeSet) {
 	EndUndoAction();
 }
 
+bool Document::IsWhiteLine(int line) {
+	int currentChar = LineStart(line);
+	int endLine = LineEnd(line);
+	while (currentChar < endLine) {
+		if (cb.CharAt(currentChar) != ' ' && cb.CharAt(currentChar) != '\t') {
+			return false;
+		}
+		++currentChar;
+	}
+	return true;
+}
+
+int Document::ParaUp(int pos) {
+	int line = LineFromPosition(pos);
+	line--;
+	while (line >= 0 && IsWhiteLine(line)) { // skip empty lines
+		line--;
+	}
+	while (line >= 0 && !IsWhiteLine(line)) { // skip non-empty lines
+		line--;
+	}
+	line++;
+	return LineStart(line);
+}
+
 int Document::ParaDown(int pos) {
 	int line = LineFromPosition(pos);
-	while (line < LinesTotal() && LineStart(line) != LineEnd(line)) { // skip non-empty lines
+	while (line < LinesTotal() && !IsWhiteLine(line)) { // skip non-empty lines
 		line++;
 	}
-	while (line < LinesTotal() && LineStart(line) == LineEnd(line)) { // skip empty lines
+	while (line < LinesTotal() && IsWhiteLine(line)) { // skip empty lines
 		line++;
 	}
 	if (line < LinesTotal())
 		return LineStart(line);
 	else // end of a document
 		return LineEnd(line-1);
-}
-
-int Document::ParaUp(int pos) {
-	int line = LineFromPosition(pos);
-	line--;
-	while (line >= 0 && LineStart(line) == LineEnd(line)) { // skip empty lines
-		line--;
-	}
-	while (line >= 0 && LineStart(line) != LineEnd(line)) { // skip non-empty lines
-		line--;
-	}
-	line++;
-	return LineStart(line);
 }
 
 Document::charClassification Document::WordCharClass(unsigned char ch) {
@@ -1001,7 +1017,7 @@ long Document::FindText(int minPos, int maxPos, const char *s,
 				if (line == lineRangeStart) {
 					if ((startPos != endOfLine) && (searchEnd == '$'))
 						continue;	// Can't match end of line if start position before end of line
-					endOfLine = startPos+1;
+					endOfLine = startPos;
 				}
 			}
 
@@ -1013,10 +1029,10 @@ long Document::FindText(int minPos, int maxPos, const char *s,
 				if (increment == -1) {
 					// Check for the last match on this line.
 					int repetitions = 1000;	// Break out of infinite loop
-					while (success && (pre->eopat[0] <= (endOfLine+1)) && (repetitions--)) {
-						success = pre->Execute(di, pos+1, endOfLine+1);
+					while (success && (pre->eopat[0] <= endOfLine) && (repetitions--)) {
+						success = pre->Execute(di, pos+1, endOfLine);
 						if (success) {
-							if (pre->eopat[0] <= (minPos+1)) {
+							if (pre->eopat[0] <= minPos) {
 								pos = pre->bopat[0];
 								lenRet = pre->eopat[0] - pre->bopat[0];
 							} else {
@@ -1052,12 +1068,13 @@ long Document::FindText(int minPos, int maxPos, const char *s,
 		char firstChar = s[0];
 		if (!caseSensitive)
 			firstChar = static_cast<char>(MakeUpperCase(firstChar));
-		int pos = startPos;
+		int pos = forward ? startPos : (startPos - 1);
 		while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			char ch = CharAt(pos);
 			if (caseSensitive) {
 				if (ch == firstChar) {
 					bool found = true;
+					if (pos + lengthFind > Platform::Maximum(startPos, endPos)) found = false;
 					for (int posMatch = 1; posMatch < lengthFind && found; posMatch++) {
 						ch = CharAt(pos + posMatch);
 						if (ch != s[posMatch])
@@ -1073,6 +1090,7 @@ long Document::FindText(int minPos, int maxPos, const char *s,
 			} else {
 				if (MakeUpperCase(ch) == firstChar) {
 					bool found = true;
+					if (pos + lengthFind > Platform::Maximum(startPos, endPos)) found = false;
 					for (int posMatch = 1; posMatch < lengthFind && found; posMatch++) {
 						ch = CharAt(pos + posMatch);
 						if (MakeUpperCase(ch) != MakeUpperCase(s[posMatch]))

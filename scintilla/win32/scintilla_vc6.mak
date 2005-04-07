@@ -119,7 +119,9 @@ LEXOBJS=\
 	$(DIR_O)\LexAVE.obj \
 	$(DIR_O)\LexBaan.obj \
 	$(DIR_O)\LexBash.obj \
+	$(DIR_O)\LexBasic.obj \
 	$(DIR_O)\LexBullant.obj \
+	$(DIR_O)\LexCaml.obj \
 	$(DIR_O)\LexCLW.obj \
 	$(DIR_O)\LexConf.obj \
 	$(DIR_O)\LexCPP.obj \
@@ -131,6 +133,7 @@ LEXOBJS=\
 	$(DIR_O)\LexForth.obj \
 	$(DIR_O)\LexFortran.obj \
 	$(DIR_O)\LexGui4Cli.obj \
+	$(DIR_O)\LexHaskell.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexKix.obj \
 	$(DIR_O)\LexLisp.obj \
@@ -283,7 +286,11 @@ $(DIR_O)\LexBaan.obj: ..\src\LexBaan.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexBash.obj: ..\src\LexBash.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexBasic.obj: ..\src\LexBasic.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexBullant.obj: ..\src\LexBullant.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexCaml.obj: ..\src\LexCaml.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexCLW.obj: ..\src\LexCLW.cxx $(LEX_HEADERS)
 
@@ -306,6 +313,8 @@ $(DIR_O)\LexForth.obj: ..\src\LexForth.cxx $(LEX_HEADERS)
 $(DIR_O)\LexFortran.obj: ..\src\LexFortran.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexGui4Cli.obj: ..\src\LexGui4Cli.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexHaskell.obj: ..\src\LexHaskell.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
 
