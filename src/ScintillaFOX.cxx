@@ -350,7 +350,8 @@ void ScintillaFOX::SetVerticalScrollPos()
   // moveContents (to prevent an infinite loop becaude setPosition
   // triggers moveContents).
   // BTW scrollbar should be up to date when in movecontents.
-	_fxsc.setPosition(_fxsc.getXPosition(), -topLine * vs.lineHeight);
+  DwellEnd(true);
+  _fxsc.setPosition(_fxsc.getXPosition(), -topLine * vs.lineHeight);
 }
 
 void ScintillaFOX::SetHorizontalScrollPos()
@@ -360,7 +361,8 @@ void ScintillaFOX::SetHorizontalScrollPos()
   // moveContents (to prevent an infinite loop becaude setPosition
   // triggers moveContents).
   // BTW scrollbar should be up to date when in movecontents.
-	_fxsc.setPosition(-xOffset, _fxsc.getYPosition());
+  DwellEnd(true);
+  _fxsc.setPosition(-xOffset, _fxsc.getYPosition());
 }
 
 void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {

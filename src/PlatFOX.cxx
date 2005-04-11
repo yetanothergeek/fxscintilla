@@ -824,9 +824,10 @@ public:
 	}
 	virtual void Show(bool show=true);
 	virtual void SetFont(Font &font);
-	virtual void Create(Window &parent, int ctrlID, int lineHeight_, bool unicodeMode_);
+	virtual void Create(Window &parent, int ctrlID, Point location_, int lineHeight_, bool unicodeMode_);
 	virtual void SetAverageCharWidth(int width);
 	virtual void SetVisibleRows(int rows);
+	virtual int GetVisibleRows() const;
 	virtual PRectangle GetDesiredRect();
 	virtual int CaretFromEdge();
 	virtual void Clear();
@@ -842,6 +843,7 @@ public:
 		doubleClickAction = action;
 		doubleClickActionData = data;
 	}
+	virtual void SetList(const char* list, char separator, char typesep);
 };
 
 
@@ -940,7 +942,7 @@ long PopupListBox::onDoubleClicked(FXObject *, FXSelector, void *)
 
 // ====================================================================
 
-void ListBoxFox::Create(Window & parent, int, int, bool) {
+void ListBoxFox::Create(Window & parent, int, Point, int, bool) {
 	id = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
 	id->create();
 	list = (static_cast<PopupListBox *>(id))->getList();
@@ -956,6 +958,10 @@ void ListBoxFox::SetAverageCharWidth(int width) {
 
 void ListBoxFox::SetVisibleRows(int rows) {
 	list->setNumVisible(rows);
+}
+
+int ListBoxFox::GetVisibleRows() const {
+	return list->getNumVisible();
 }
 
 PRectangle ListBoxFox::GetDesiredRect() {
@@ -1010,9 +1016,8 @@ PRectangle ListBoxFox::GetDesiredRect() {
 
 void ListBoxFox::Show(bool show) {
 	if (show) {
-		(static_cast<FXPopup *>(id))->popup(NULL,
-																				id->getX(), id->getY(),
-																				id->getWidth(), id->getHeight());
+		(static_cast<FXPopup *>(id))->popup(NULL, id->getX(), id->getY(),
+											id->getWidth(), id->getHeight());
 		list->selectItem(0);
 	}
 }
@@ -1102,6 +1107,36 @@ void ListBoxFox::ClearRegisteredImages()
 		}
 		delete pixhash;
 	}	
+}
+
+void ListBoxFox::SetList(const char* list, char separator, char typesep) {
+	Clear();
+	int count = strlen(list) + 1;
+	char *words = new char[count];
+	if (words) {
+		memcpy(words, list, count);
+		char *startword = words;
+		char *numword = NULL;
+		int i = 0;
+		for (; words[i]; i++) {
+			if (words[i] == separator) {
+				words[i] = '\0';
+				if (numword)
+					*numword = '\0';
+				Append(startword, numword?atoi(numword + 1):-1);
+				startword = words + i + 1;
+				numword = NULL;
+			} else if (words[i] == typesep) {
+				numword = words + i;
+			}
+		}
+		if (startword) {
+			if (numword)
+				*numword = '\0';
+			Append(startword, numword?atoi(numword + 1):-1);
+		}
+		delete []words;
+	}
 }
 
 // ====================================================================

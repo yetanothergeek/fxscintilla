@@ -44,7 +44,9 @@ libscintilla_la_SOURCES = \
 	LexAVE.cxx \
 	LexBaan.cxx \
 	LexBash.cxx \
+	LexBasic.cxx \
 	LexBullant.cxx \
+	LexCaml.cxx \
 	LexCLW.cxx \
 	LexConf.cxx \
 	LexCPP.cxx \
@@ -56,6 +58,7 @@ libscintilla_la_SOURCES = \
 	LexForth.cxx \
 	LexFortran.cxx \
 	LexGui4Cli.cxx \
+	LexHaskell.cxx \
 	LexHTML.cxx \
 	LexKix.cxx \
 	LexLisp.cxx \
