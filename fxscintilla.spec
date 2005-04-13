@@ -1,5 +1,5 @@
 %define name    fxscintilla
-%define version 1.62.0
+%define version 1.63.0
 %define release 1
 
 Summary: FXScintilla - Scintilla Editor Widget for FOX
@@ -70,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/lib*.a
 
 %changelog
+* Wed Apr 13 2005 Gilles Filippini (pini AT free DOT fr) 1.63-1
+- upgraded to 1.63
+
 * Thu Nov 16 2004 Gilles Filippini (pini AT free DOT fr) 1.62-1
 - upgraded to 1.62
 
