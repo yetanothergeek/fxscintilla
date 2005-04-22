@@ -166,7 +166,15 @@ SOURCE=..\..\..\scintilla\src\LexBash.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexBasic.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexBullant.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexCaml.cxx
 # End Source File
 # Begin Source File
 
@@ -211,6 +219,10 @@ SOURCE=..\..\..\scintilla\src\LexFortran.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexGui4Cli.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexHaskell.cxx
 # End Source File
 # Begin Source File
 
