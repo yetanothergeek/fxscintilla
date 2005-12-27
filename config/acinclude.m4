@@ -86,36 +86,47 @@ AC_ARG_WITH(fox-1-2, [  --with-fox-1-2          force Fox 1.2 usage],
         WITH_FOX_1_2=$withval,)
 AC_ARG_WITH(fox-1-4, [  --with-fox-1-4          force Fox 1.4 usage],
         WITH_FOX_1_4=$withval,)
+AC_ARG_WITH(fox-1-6, [  --with-fox-1-6          force Fox 1.6 usage],
+        WITH_FOX_1_6=$withval,)
 AC_ARG_WITH(foxinclude, [  --with-foxinclude=DIR   use Fox includes from DIR],
         FOX_INCLUDE_DIR=$withval, FOX_INCLUDE_DIR=/usr/local/include)
 AC_ARG_WITH(foxlib,     [  --with-foxlib=DIR       use Fox libs from DIR],
         FOX_LIB_DIR=$withval, FOX_LIB_DIR=/usr/local/lib)
 
-if test x"$WITH_FOX_1_2" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_4" != xyes; then
+if test x"$WITH_FOX_1_6" = xyes; then
+	CHECK_LIBFOX__(-1.6)
+	if test x"$have_FOX" = xyes; then
+		AC_DEFINE(HAVE_FOX_1_6,1,[Define FOX version 1.6.])
+	fi
+    have_FOX_1_6=$have_FOX
+fi
+AM_CONDITIONAL(HAVE_FOX_1_6, test x"$have_FOX" = xyes)
+
+if test x"$WITH_FOX_1_2" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_4" != xyes -a x"$WITH_FOX_1_6" != xyes; then
 	CHECK_LIBFOX__(-1.2)
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_2,1,[Define FOX version 1.2.])
 	fi
+    have_FOX_1_2=$have_FOX
 fi
-AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX" = xyes)
-have_FOX_1_2=$have_FOX
+AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX_1_6" != xyes -a x"$have_FOX" = xyes)
 
-if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_4" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_2" != xyes; then
+if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_4" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_6" != xyes; then
 	CHECK_LIBFOX__(-1.4)
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_4,1,[Define FOX version 1.4.])
 	fi
+    have_FOX_1_4=$have_FOX
 fi
-AM_CONDITIONAL(HAVE_FOX_1_4, test x"$have_FOX_1_2" != xyes -a x"$have_FOX" = xyes)
-have_FOX_1_4=$have_FOX
+AM_CONDITIONAL(HAVE_FOX_1_4, test x"$have_FOX_1_6" != xyes -a x"$have_FOX_1_2" != xyes -a x"$have_FOX" = xyes)
 
-if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_0" != xno -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_4" != xyes; then
+if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_0" != xno -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_4" != xyes -a x"$WITH_FOX_1_6" != xyes; then
 	CHECK_LIBFOX__()
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
 	fi
 fi
-AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX_1_2" != xyes -a x"$have_FOX_1_4" != xyes -a x"$have_FOX" = xyes)
+AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX_1_6" != xyes -a x"$have_FOX_1_2" != xyes -a x"$have_FOX_1_4" != xyes -a x"$have_FOX" = xyes)
 
 #
 # Abort if no FOX lib or multiple --with-fox-1.x
@@ -128,6 +139,9 @@ if test x"$WITH_FOX_1_2" == xyes; then
 	count_WITH_FOX=$(($count_WITH_FOX+1))
 fi
 if test x"$WITH_FOX_1_4" == xyes; then
+	count_WITH_FOX=$(($count_WITH_FOX+1))
+fi
+if test x"$WITH_FOX_1_6" == xyes; then
 	count_WITH_FOX=$(($count_WITH_FOX+1))
 fi
 if test $count_WITH_FOX -gt 1; then

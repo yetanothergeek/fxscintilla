@@ -3,6 +3,8 @@
 #  include <fox-1.2/fx.h>
 # elif HAVE_FOX_1_4
 #  include <fox-1.4/fx.h>
+# elif HAVE_FOX_1_6
+#  include <fox-1.6/fx.h>
 # else
 #  include <fox/fx.h>
 # endif
@@ -86,8 +88,18 @@ public:
 	{
 		FXMainWindow::create();
 		// Feeding the widget with some initial text
-		scint->sendMessage(SCI_INSERTTEXT, 0, reinterpret_cast<long>(sInitialText));
+		FXFile file("/home/pini/UTF-8-demo.txt");
+		char buffer[256];
+		FXival read;
+		unsigned int pos = 0;
+		do {
+			read = file.readBlock(buffer, 255);
+			buffer[read] = '\0';
+			scint->sendMessage(SCI_INSERTTEXT, pos, reinterpret_cast<long>(buffer));
+			pos += read;
+		} while (read == 255);
 		scint->setFocus();
+		file.close();
 	}
 	void setFont(const FXString & font, int size)
 	{
@@ -120,7 +132,7 @@ public:
 	}
 	long onCmdFont(FXObject *, FXSelector, void *)
 	{
-		FXFontDialog diag(this, 0);
+		FXFontDialog diag(this, "Toto", 0);
 		if (diag.execute()) {
 			FXFontDesc desc;
 			diag.getFontSelection(desc);

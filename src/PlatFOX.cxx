@@ -52,6 +52,9 @@ extern "C" {
 # if HAVE_FOX_1_4
 #  include <fox-1.4/fx.h>
 #  include <fox-1.4/fxkeys.h>
+# elif HAVE_FOX_1_6
+#  include <fox-1.6/fx.h>
+#  include <fox-1.6/fxkeys.h>
 # elif HAVE_FOX_1_2
 #  include <fox-1.2/fx.h>
 #  include <fox-1.2/fxkeys.h>
@@ -195,8 +198,8 @@ void Font::Create(const char *faceName, int characterSet,
 	}
 	else {
         id = new FXFont(FXApp::instance(), faceName, size,
-        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
-			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
+        	bold ? FXFont::Bold : FXFont::Normal ,
+			italic ? FXFont::Italic : FXFont::Straight,
 			characterSet);
 	}
 	if (!id) {
@@ -1277,6 +1280,8 @@ double ElapsedTime::Duration(bool reset) {
 #   include <fox-1.2/FXDLL.h>
 #  elif HAVE_FOX_1_4
 #   include <fox-1.4/FXDLL.h>
+#  elif HAVE_FOX_1_6
+#   include <fox-1.6/FXDLL.h>
 #  endif
 # else
 #  include <FXDLL.h>
