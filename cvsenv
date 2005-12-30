@@ -1,4 +1,4 @@
 unset CVSREAD
 export CVS_RSH=ssh
-export CVSROOT=pini@subversions.gnu.org:/cvsroot/fxscintilla
+export CVSROOT=pini@cvs.savannah.gnu.org:/cvsroot/fxscintilla
 alias cvs='cvs -z3'
