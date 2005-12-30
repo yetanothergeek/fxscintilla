@@ -167,6 +167,8 @@ static const char *CharacterSetName(int characterSet) {
 		return "*-*";
 	case SC_CHARSET_RUSSIAN:
 		return "*-r";
+	case SC_CHARSET_CYRILLIC:
+		return "*-cp1251";
 	case SC_CHARSET_SHIFTJIS:
 		return "jisx0208.1983-*";
 	case SC_CHARSET_SYMBOL:
@@ -183,6 +185,8 @@ static const char *CharacterSetName(int characterSet) {
 		return "*-*";
 	case SC_CHARSET_THAI:
 		return "*-1";
+	case SC_CHARSET_8859_15:
+		return "iso8859-15";
 	default:
 		return "*-*";
 	}
@@ -236,6 +240,8 @@ static int CharacterSetCode(int characterSet) {
 		return FONTENCODING_DEFAULT;
 	case SC_CHARSET_RUSSIAN:
 		return FONTENCODING_RUSSIAN;
+	case SC_CHARSET_CYRILLIC:
+		return FONTENCODING_CYRILLIC;
 	case SC_CHARSET_SHIFTJIS:
 		return FONTENCODING_DEFAULT;
 	case SC_CHARSET_SYMBOL:
@@ -249,9 +255,11 @@ static int CharacterSetCode(int characterSet) {
 	case SC_CHARSET_ARABIC:
 		return FONTENCODING_ARABIC;
 	case SC_CHARSET_VIETNAMESE:
-		return FONTENCODING_DEFAULT;
+		return FONTENCODING_CP1258;     /// Windows Vietnam
 	case SC_CHARSET_THAI:
 		return FONTENCODING_THAI;
+	case SC_CHARSET_8859_15:
+		return FONTENCODING_ISO_8859_15;
 	default:
 		return FONTENCODING_DEFAULT;
 	}

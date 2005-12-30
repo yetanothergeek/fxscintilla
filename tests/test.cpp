@@ -88,7 +88,7 @@ public:
 	{
 		FXMainWindow::create();
 		// Feeding the widget with some initial text
-		FXFile file("/home/pini/UTF-8-demo.txt");
+/*		FXFile file("/home/pini/UTF-8-demo.txt");
 		char buffer[256];
 		FXival read;
 		unsigned int pos = 0;
@@ -99,7 +99,8 @@ public:
 			pos += read;
 		} while (read == 255);
 		scint->setFocus();
-		file.close();
+		file.close();*/
+		scint->sendMessage(SCI_INSERTTEXT, 0, reinterpret_cast<long>(sInitialText));
 	}
 	void setFont(const FXString & font, int size)
 	{

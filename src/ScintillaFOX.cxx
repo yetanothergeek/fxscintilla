@@ -154,6 +154,7 @@ private:
 	virtual bool SetIdle(bool on);
 	virtual void SetMouseCapture(bool on);
 	virtual bool HaveMouseCapture();
+	virtual bool PaintContains(PRectangle rc);
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	virtual void CreateCallTipWindow(PRectangle rc);
 	virtual void AddToPopUp(const char * label, int cmd = 0, bool enabled = true);
@@ -463,6 +464,16 @@ void ScintillaFOX::SetMouseCapture(bool on)
 bool ScintillaFOX::HaveMouseCapture()
 {
 	return _fxsc.grabbed();
+}
+
+bool ScintillaFOX::PaintContains(PRectangle rc) {
+	bool contains = true;
+	if (paintState == painting) {
+		if (!rcPaint.Contains(rc)) {
+			contains = false;
+		}
+	}
+	return contains;
 }
 
 void ScintillaFOX::StartDrag()
