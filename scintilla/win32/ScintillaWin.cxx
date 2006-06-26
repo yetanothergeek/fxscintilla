@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <limits.h>
 
-#define _WIN32_WINNT  0x0400
+#define _WIN32_WINNT  0x0500
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
@@ -39,6 +39,7 @@
 #include "Style.h"
 #include "AutoComplete.h"
 #include "ViewStyle.h"
+#include "CharClassify.h"
 #include "Document.h"
 #include "Editor.h"
 #include "ScintillaBase.h"
@@ -180,6 +181,7 @@ class ScintillaWin :
 	virtual void StartDrag();
 	sptr_t WndPaint(uptr_t wParam);
 	sptr_t HandleComposition(uptr_t wParam, sptr_t lParam);
+	virtual bool ValidCodePage(int codePage) const;
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	virtual bool SetIdle(bool on);
 	virtual void SetTicking(bool on);
@@ -366,11 +368,11 @@ static int InputCodePage() {
 }
 
 #ifndef VK_OEM_2
-static const VK_OEM_2=0xbf;
-static const VK_OEM_3=0xc0;
-static const VK_OEM_4=0xdb;
-static const VK_OEM_5=0xdc;
-static const VK_OEM_6=0xdd;
+static const int VK_OEM_2=0xbf;
+static const int VK_OEM_3=0xc0;
+static const int VK_OEM_4=0xdb;
+static const int VK_OEM_5=0xdc;
+static const int VK_OEM_6=0xdd;
 #endif
 
 /** Map the key codes to their equivalent SCK_ form. */
@@ -493,7 +495,7 @@ sptr_t ScintillaWin::HandleComposition(uptr_t wParam, sptr_t lParam) {
 			::ImmReleaseContext(MainHWND(), hIMC);
 		}
 		return 0;
-	} 
+	}
 	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 #endif
 }
@@ -649,10 +651,13 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 	case WM_LBUTTONDOWN: {
+#ifndef __DMC__
+		// Digital Mars compiler does not include Imm library
 		// For IME, set the composition string as the result string.
 		HIMC hIMC = ::ImmGetContext(MainHWND());
 		::ImmNotifyIME(hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
 		::ImmReleaseContext(MainHWND(), hIMC);
+#endif
 		//
 		//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n",iMessage, wParam, lParam,
 		//	Platform::IsKeyDown(VK_SHIFT),
@@ -948,6 +953,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		return ScintillaBase::WndProc(iMessage, wParam, lParam);
 	}
 	return 0l;
+}
+
+bool ScintillaWin::ValidCodePage(int codePage) const {
+	return codePage == 0 || codePage == SC_CP_UTF8 ||
+	       codePage == 932 || codePage == 936 || codePage == 949 ||
+	       codePage == 950 || codePage == 1361;
 }
 
 sptr_t ScintillaWin::DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
@@ -1791,7 +1802,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 					selectedText.characterSet, selectedText.codePage);
 		uniText.Allocate(2 * selectedText.len);
 		if (uniText) {
-			::MultiByteToWideChar(cpSrc, 0, selectedText.s, selectedText.len, 
+			::MultiByteToWideChar(cpSrc, 0, selectedText.s, selectedText.len,
 				static_cast<wchar_t *>(uniText.ptr), selectedText.len);
 		}
 	}
@@ -1805,7 +1816,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 			GlobalMemory ansiText;
 			ansiText.Allocate(selectedText.len);
 			if (ansiText) {
-				::WideCharToMultiByte(CP_ACP, 0, static_cast<wchar_t *>(uniText.ptr), -1, 
+				::WideCharToMultiByte(CP_ACP, 0, static_cast<wchar_t *>(uniText.ptr), -1,
 					static_cast<char *>(ansiText.ptr), selectedText.len, NULL, NULL);
 				ansiText.SetClip(CF_TEXT);
 			}
@@ -1944,7 +1955,7 @@ static bool CompareDevCap(HDC hdc, HDC hOtherDC, int nIndex) {
 
 bool ScintillaWin::IsCompatibleDC(HDC hOtherDC) {
 	HDC hdc = ::GetDC(MainHWND());
-	bool isCompatible = 
+	bool isCompatible =
 		CompareDevCap(hdc, hOtherDC, TECHNOLOGY) &&
 		CompareDevCap(hdc, hOtherDC, LOGPIXELSY) &&
 		CompareDevCap(hdc, hOtherDC, LOGPIXELSX) &&
@@ -2255,7 +2266,7 @@ BOOL ScintillaWin::DestroySystemCaret() {
 	}
 	return retval;
 }
- 
+
 // Take care of 32/64 bit pointers
 #ifdef GetWindowLongPtr
 static void *PointerFromWindow(HWND hWnd) {
@@ -2332,6 +2343,7 @@ sptr_t PASCAL ScintillaWin::CTWndProc(
 
 sptr_t ScintillaWin::DirectFunction(
     ScintillaWin *sci, UINT iMessage, uptr_t wParam, sptr_t lParam) {
+	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(sci->MainHWND(), NULL));
 	return sci->WndProc(iMessage, wParam, lParam);
 }
 

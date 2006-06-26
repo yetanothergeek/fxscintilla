@@ -92,6 +92,7 @@ SOBJS=\
 	$(DIR_O)\AutoComplete.obj \
 	$(DIR_O)\CallTip.obj \
 	$(DIR_O)\CellBuffer.obj \
+	$(DIR_O)\CharClassify.obj \
 	$(DIR_O)\ContractionState.obj \
 	$(DIR_O)\Document.obj \
 	$(DIR_O)\Editor.obj \
@@ -137,6 +138,7 @@ LEXOBJS=\
 	$(DIR_O)\LexGui4Cli.obj \
 	$(DIR_O)\LexHaskell.obj \
 	$(DIR_O)\LexHTML.obj \
+	$(DIR_O)\LexInno.obj \
 	$(DIR_O)\LexKix.obj \
 	$(DIR_O)\LexLisp.obj \
 	$(DIR_O)\LexLout.obj \
@@ -147,6 +149,7 @@ LEXOBJS=\
 	$(DIR_O)\LexMPT.obj \
 	$(DIR_O)\LexMSSQL.obj \
 	$(DIR_O)\LexNsis.obj \
+	$(DIR_O)\LexOpal.obj \
 	$(DIR_O)\LexOthers.obj \
 	$(DIR_O)\LexPascal.obj \
 	$(DIR_O)\LexPB.obj \
@@ -159,8 +162,10 @@ LEXOBJS=\
 	$(DIR_O)\LexScriptol.obj \
 	$(DIR_O)\LexSmalltalk.obj \
 	$(DIR_O)\LexSpecman.obj \
+	$(DIR_O)\LexSpice.obj \
 	$(DIR_O)\LexSQL.obj \
 	$(DIR_O)\LexTADS3.obj \
+	$(DIR_O)\LexTCL.obj \
 	$(DIR_O)\LexTeX.obj \
 	$(DIR_O)\LexVB.obj \
 	$(DIR_O)\LexVerilog.obj \
@@ -173,6 +178,7 @@ LOBJS=\
 	$(DIR_O)\AutoComplete.obj \
 	$(DIR_O)\CallTip.obj \
 	$(DIR_O)\CellBuffer.obj \
+	$(DIR_O)\CharClassify.obj \
 	$(DIR_O)\ContractionState.obj \
 	$(DIR_O)\Document.obj \
 	$(DIR_O)\DocumentAccessor.obj \
@@ -246,6 +252,7 @@ $(DIR_O)\CallTip.obj: ../src/CallTip.cxx ../include/Platform.h \
  ../include/Scintilla.h ../src/CallTip.h
 $(DIR_O)\CellBuffer.obj: ../src/CellBuffer.cxx ../include/Platform.h \
  ../include/Scintilla.h ../src/SVector.h ../src/CellBuffer.h
+$(DIR_O)\CharClassify.obj: ../src/CharClassify.cxx ../src/CharClassify.h
 $(DIR_O)\ContractionState.obj: ../src/ContractionState.cxx ../include/Platform.h \
  ../src/ContractionState.h
 $(DIR_O)\Document.obj: ../src/Document.cxx ../include/Platform.h \
@@ -327,6 +334,8 @@ $(DIR_O)\LexHaskell.obj: ..\src\LexHaskell.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexHTML.obj: ..\src\LexHTML.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexInno.obj: ..\src\LexInno.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexKix.obj: ..\src\LexKix.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexLisp.obj: ..\src\LexLisp.cxx $(LEX_HEADERS)
@@ -346,6 +355,8 @@ $(DIR_O)\LexMPT.obj: ..\src\LexMPT.cxx $(LEX_HEADERS)
 $(DIR_O)\LexMSSQL.obj: ..\src\LexMSSQL.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexNsis.obj: ..\src\LexNsis.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexOpal.obj: ..\src\LexOpal.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexOthers.obj: ..\src\LexOthers.cxx $(LEX_HEADERS)
 
@@ -371,9 +382,13 @@ $(DIR_O)\LexSmalltalk.obj: ..\src\LexSmalltalk.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexSpecman.obj: ..\src\LexSpecman.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexSpice.obj: ..\src\LexSpice.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexSQL.obj: ..\src\LexSQL.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexTADS3.obj: ..\src\LexTADS3.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexTCL.obj: ..\src\LexTCL.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexTeX.obj: ..\src\LexTeX.cxx $(LEX_HEADERS)
 
