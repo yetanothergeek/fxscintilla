@@ -18,6 +18,7 @@ libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
 	StyleContext.cxx \
+	CharClassify.o \
 	Document.cxx \
 	CallTip.cxx \
 	ScintillaBase.cxx \
@@ -62,6 +63,7 @@ libscintilla_la_SOURCES = \
     LexGui4Cli.cxx \
     LexHaskell.cxx \
     LexHTML.cxx \
+    LexInno.cxx \
     LexKix.cxx \
     LexLisp.cxx \
     LexLout.cxx \
@@ -72,6 +74,7 @@ libscintilla_la_SOURCES = \
     LexMPT.cxx \
     LexMSSQL.cxx \
     LexNsis.cxx \
+    LexOpal.cxx \
     LexOthers.cxx \
     LexPascal.cxx \
     LexPB.cxx \
@@ -84,8 +87,10 @@ libscintilla_la_SOURCES = \
     LexScriptol.cxx \
     LexSmalltalk.cxx \
     LexSpecman.cxx \
+    LexSpice.cxx \
     LexSQL.cxx \
     LexTADS3.cxx \
+    LexTCL.cxx \
     LexTeX.cxx \
     LexVB.cxx \
     LexVerilog.cxx \
