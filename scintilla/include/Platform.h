@@ -272,14 +272,17 @@ class Window;	// Forward declaration for Palette
  */
 class Palette {
 	int used;
-	enum {numEntries = 100};
-	ColourPair entries[numEntries];
+	int size;
+	ColourPair *entries;
 #if PLAT_GTK
 	void *allocatedPalette; // GdkColor *
 	int allocatedLen;
 #elif PLAT_FOX
 	void * visual;
 #endif
+	// Private so Palette objects can not be copied
+	Palette(const Palette &) {}
+	Palette &operator=(const Palette &) { return *this; }
 public:
 #if PLAT_WIN
 	void *hpal;
@@ -357,6 +360,8 @@ public:
 	virtual void FillRectangle(PRectangle rc, ColourAllocated back)=0;
 	virtual void FillRectangle(PRectangle rc, Surface &surfacePattern)=0;
 	virtual void RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAllocated back)=0;
+	virtual void AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
+		ColourAllocated outline, int alphaOutline, int flags)=0;
 	virtual void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back)=0;
 	virtual void Copy(PRectangle rc, Point from, Surface &surfaceSource)=0;
 
