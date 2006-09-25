@@ -97,14 +97,21 @@ Palette::Palette() {
 	used = 0;
 	allowRealization = false;
 	visual = 0;
+	size = 100;
+	entries = new ColourPair[size];
 }
 
 Palette::~Palette() {
 	Release();
+	delete []entries;
+	entries = 0;
 }
 
 void Palette::Release() {
 	used = 0;
+	delete []entries;
+	size = 100;
+	entries = new ColourPair[size];
 }
 
 // This method either adds a colour to the list of wanted colours (want==true)
@@ -117,11 +124,19 @@ void Palette::WantFind(ColourPair &cp, bool want) {
 				return;
 		}
 	
-		if (used < numEntries) {
-			entries[used].desired = cp.desired;
-			entries[used].allocated.Set(cp.desired.AsLong());
-			used++;
+		if (used >= size) {
+			int sizeNew = size * 2;
+			ColourPair *entriesNew = new ColourPair[sizeNew];
+			for (int j=0; j<size; j++) {
+				entriesNew[j] = entries[j];
+			}
+			delete []entries;
+			entries = entriesNew;
+			size = sizeNew;
 		}
+		entries[used].desired = cp.desired;
+		entries[used].allocated.Set(cp.desired.AsLong());
+		used++;
 	} else {
 		for (int i=0; i < used; i++) {
 			if (entries[i].desired == cp.desired) {
@@ -324,6 +339,8 @@ public:
 	void FillRectangle(PRectangle rc, ColourAllocated back);
 	void FillRectangle(PRectangle rc, Surface &surfacePattern);
 	void RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAllocated back);
+	void AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
+		ColourAllocated outline, int alphaOutline, int flags);
 	void Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back);
 	void Copy(PRectangle rc, Point from, Surface &surfaceSource);
 
@@ -539,6 +556,64 @@ void SurfaceImpl::RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAl
 		RectangleDraw(rc, fore, back);
 	}
 }
+
+// Plot a point into a guint32 buffer symetrically to all 4 qudrants
+static void AllFour(FXImage *image, int stride, int width, int height, int x, int y, FXColor color) {
+	image->setPixel(x, y, color);
+	image->setPixel(width-1-x, y, color);
+	image->setPixel(x, height-1-y, color);
+	image->setPixel(width-1-x, height-1-y, color);
+}
+
+static unsigned int GetRValue(unsigned int co) {
+	return (co >> 16) & 0xff;
+}
+
+static unsigned int GetGValue(unsigned int co) {
+	return (co >> 8) & 0xff;
+}
+
+static unsigned int GetBValue(unsigned int co) {
+	return co & 0xff;
+}
+
+void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated fill, int alphaFill,
+		ColourAllocated outline, int alphaOutline, int flags) {
+	if (dc()) {
+		int width = rc.Width();
+		int height = rc.Height();
+		// Ensure not distorted too much by corners when small
+		cornerSize = Platform::Minimum(cornerSize, (Platform::Minimum(width, height) / 2) - 2);
+		// Make a 32 bit deep image
+		FXImage * image = new FXImage(getApp(), NULL, IMAGE_OWNED, width, height);
+
+		FXColor valEmpty = 0;
+		FXColor valFill = FXRGBA(GetRValue(fill.AsLong()), GetGValue(fill.AsLong()), GetBValue(fill.AsLong()), alphaFill);
+		FXColor valOutline = FXRGBA(GetRValue(outline.AsLong()), GetGValue(outline.AsLong()), GetBValue(outline.AsLong()), alphaOutline);
+		for (int y=0; y<height; y++) {
+			for (int x=0; x<width; x++) {
+				if ((x==0) || (x==width-1) || (y == 0) || (y == height-1)) {
+					image->setPixel(x, y, valOutline);
+				} else {
+					image->setPixel(x, y, valFill);
+				}
+			}
+		}
+		for (int c=0;c<cornerSize; c++) {
+			for (int x=0;x<c+1; x++) {
+				AllFour(pixels, stride, width, height, x, c-x, valEmpty);
+			}
+		}
+		for (int x=1;x<cornerSize; x++) {
+			AllFour(pixels, stride, width, height, x, cornerSize-x, valOutline);
+		}
+
+		// Draw with alpha
+		image->create();
+		_dc->drawImage(image, rc.left, rc.top);
+	}
+}
+
 
 void SurfaceImpl::Ellipse(PRectangle rc, ColourAllocated fore, ColourAllocated back) {
 	if (dc()) {
