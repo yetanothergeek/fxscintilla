@@ -83,6 +83,7 @@
 #include "Style.h"
 #include "AutoComplete.h"
 #include "ViewStyle.h"
+#include "CharClassify.h"
 #include "Document.h"
 #include "Editor.h"
 #include "SString.h"
@@ -159,6 +160,7 @@ private:
 	virtual void CreateCallTipWindow(PRectangle rc);
 	virtual void AddToPopUp(const char * label, int cmd = 0, bool enabled = true);
 	virtual void StartDrag();
+	virtual bool ValidCodePage(int codePage) const;
 	//
 	static sptr_t DirectFunction(ScintillaFOX *sciThis, 
 		unsigned int iMessage, uptr_t wParam, sptr_t lParam);
@@ -207,6 +209,10 @@ int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
 	// TODO
 	// Fail
 	return 0;
+}
+
+bool ScintillaFOX::ValidCodePage(int codePage) const {
+	return codePage == 0 || codePage == SC_CP_UTF8 || codePage == SC_CP_DBCS;
 }
 
 sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
@@ -293,7 +299,8 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin)
 				SetEmptySelection(currentPos + len);
 			}
 			pdoc->EndUndoAction();
-      FXFREE(&data);
+			EnsureCaretVisible();
+		    FXFREE(&data);
 		}
 	}
 }
@@ -317,8 +324,10 @@ void ScintillaFOX::NotifyURIDropped(const char *list) {
 
 int ScintillaFOX::KeyDefault(int key, int modifiers) {
 	if (!(modifiers & SCI_CTRL) && !(modifiers & SCI_ALT) && (key < 256)) {
-		AddChar(key);
-		return 1;
+		NotifyKey(key, modifiers);
+		return 0;
+		//~ AddChar(key);
+		//~ return 1;
 	} else {
 		// Pass up to container in case it is an accelerator
 		NotifyKey(key, modifiers);
