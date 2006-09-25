@@ -37,10 +37,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @HAVE_CYGWIN_TRUE@am__append_1 = -DWIN32
-@HAVE_FOX_1_0_TRUE@am__append_2 = \
-@HAVE_FOX_1_0_TRUE@	$(top_builddir)/ltdl/libltdl.la
-
-@NOLEXER_TRUE@am__append_3 = libfxscintillanolexer.la
+@NOLEXER_TRUE@am__append_2 = libfxscintillanolexer.la
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/version.h.in
@@ -60,11 +57,8 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-@HAVE_FOX_1_0_TRUE@am__DEPENDENCIES_1 =  \
-@HAVE_FOX_1_0_TRUE@	$(top_builddir)/ltdl/libltdl.la
 libfxscintilla_la_DEPENDENCIES =  \
-	$(top_builddir)/scintilla/src/libscintilla.la \
-	$(am__DEPENDENCIES_1)
+	$(top_builddir)/scintilla/src/libscintilla.la
 am_libfxscintilla_la_OBJECTS = libfxscintilla_la-PlatFOX.lo \
 	libfxscintilla_la-ScintillaFOX.lo
 libfxscintilla_la_OBJECTS = $(am_libfxscintilla_la_OBJECTS)
@@ -130,8 +124,6 @@ FOX_LIB_DIR = @FOX_LIB_DIR@
 GREP = @GREP@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
-HAVE_FOX_1_0_FALSE = @HAVE_FOX_1_0_FALSE@
-HAVE_FOX_1_0_TRUE = @HAVE_FOX_1_0_TRUE@
 HAVE_FOX_1_2_FALSE = @HAVE_FOX_1_2_FALSE@
 HAVE_FOX_1_2_TRUE = @HAVE_FOX_1_2_TRUE@
 HAVE_FOX_1_4_FALSE = @HAVE_FOX_1_4_FALSE@
@@ -237,13 +229,14 @@ INCLUDES = \
 AM_CXXFLAGS = -W -Wall -DFOX $(am__append_1)
 @HAVE_CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 @HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
-lib_LTLIBRARIES = libfxscintilla.la $(am__append_3)
+lib_LTLIBRARIES = libfxscintilla.la $(am__append_2)
 libfxscintilla_la_SOURCES = \
 	PlatFOX.cxx \
 	ScintillaFOX.cxx
 
-libfxscintilla_la_LIBADD =  \
-	$(top_builddir)/scintilla/src/libscintilla.la $(am__append_2)
+libfxscintilla_la_LIBADD = \
+	$(top_builddir)/scintilla/src/libscintilla.la
+
 libfxscintilla_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
 

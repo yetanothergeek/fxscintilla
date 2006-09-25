@@ -102,13 +102,6 @@
 #pragma warning(disable: 4127)
 #endif
 
-#if HAVE_FOX_1_0
-# define FXSELID SELID
-# define FXSELTYPE SELTYPE
-# define addTimeout(tgt,msg,delay) addTimeout(delay,tgt,msg)
-# define startAutoScroll(ev,insideonly) startAutoScroll(ev->win_x, ev->win_y, insideonly)
-#endif
-
 #include "version.h"
 
 // ====================================================================

@@ -49,14 +49,7 @@
 
 #if PLAT_FOX
 
-# if HAVE_FOX_1_0
-#  define horizontalScrollBar horizontalScrollbar
-#  define verticalScrollBar verticalScrollbar
-# endif
-
-# if HAVE_FOX_1_2 || HAVE_FOX_1_4 || HAVE_FOX_1_6
 namespace FX {
-# endif
 
 class FXFont;
 class FXDrawable;
@@ -70,10 +63,8 @@ class FXTimer;
 struct FXTimer;
 # endif	// WIN32
 
-# if HAVE_FOX_1_2 || HAVE_FOX_1_4 || HAVE_FOX_1_6
 };
 using namespace FX;
-# endif
 
 typedef FXFont * FontID;
 typedef FXDrawable * SurfaceID;

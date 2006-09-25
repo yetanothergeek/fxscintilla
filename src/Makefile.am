@@ -26,12 +26,6 @@ libfxscintilla_la_SOURCES = \
 libfxscintilla_la_LIBADD = \
 	$(top_builddir)/scintilla/src/libscintilla.la
 
-## No need for ltdl with Fox >= 1.2
-if HAVE_FOX_1_0
-libfxscintilla_la_LIBADD += \
-	$(top_builddir)/ltdl/libltdl.la
-endif # HAVE_FOX_1_0
-
 libfxscintilla_la_LDFLAGS = \
 	-version-info $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
 

@@ -36,11 +36,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@HAVE_FOX_1_0_TRUE@am__append_1 = -lFOX
-@HAVE_FOX_1_2_TRUE@am__append_2 = -lFOX-1.2
-@HAVE_FOX_1_4_TRUE@am__append_3 = -lFOX-1.4
-@HAVE_FOX_1_6_TRUE@am__append_4 = -lFOX-1.6
-@HAVE_CYGWIN_TRUE@am__append_5 = -DWIN32
+@HAVE_FOX_1_2_TRUE@am__append_1 = -lFOX-1.2
+@HAVE_FOX_1_4_TRUE@am__append_2 = -lFOX-1.4
+@HAVE_FOX_1_6_TRUE@am__append_3 = -lFOX-1.6
+@HAVE_CYGWIN_TRUE@am__append_4 = -DWIN32
 noinst_PROGRAMS = test$(EXEEXT)
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -58,7 +57,7 @@ test_LDADD = $(LDADD)
 am__DEPENDENCIES_1 =
 test_DEPENDENCIES = $(top_builddir)/src/libfxscintilla.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -111,8 +110,6 @@ FOX_LIB_DIR = @FOX_LIB_DIR@
 GREP = @GREP@
 HAVE_CYGWIN_FALSE = @HAVE_CYGWIN_FALSE@
 HAVE_CYGWIN_TRUE = @HAVE_CYGWIN_TRUE@
-HAVE_FOX_1_0_FALSE = @HAVE_FOX_1_0_FALSE@
-HAVE_FOX_1_0_TRUE = @HAVE_FOX_1_0_TRUE@
 HAVE_FOX_1_2_FALSE = @HAVE_FOX_1_2_FALSE@
 HAVE_FOX_1_2_TRUE = @HAVE_FOX_1_2_TRUE@
 HAVE_FOX_1_4_FALSE = @HAVE_FOX_1_4_FALSE@
@@ -211,10 +208,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/include -I$(FOX_INCLUDE_DIR)
 LDADD = -L$(FOX_LIB_DIR) $(top_builddir)/src/libfxscintilla.la \
-	$(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4)
+	$(am__append_1) $(am__append_2) $(am__append_3)
 AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER \
-	$(am__append_5)
+	$(am__append_4)
 @HAVE_CYGWIN_TRUE@AM_LDFLAGS = -mwindows
 @HAVE_MINGW32_TRUE@AM_LDFLAGS = -mwindows
 test_SOURCES = test.cpp

@@ -80,8 +80,6 @@ esac
 #
 # Handle user hints
 #
-AC_ARG_WITH(fox-1-0, [  --with-fox-1-0          force Fox 1.0 usage],
-        WITH_FOX_1_0=$withval,)
 AC_ARG_WITH(fox-1-2, [  --with-fox-1-2          force Fox 1.2 usage],
         WITH_FOX_1_2=$withval,)
 AC_ARG_WITH(fox-1-4, [  --with-fox-1-4          force Fox 1.4 usage],
@@ -102,7 +100,7 @@ if test x"$WITH_FOX_1_6" = xyes; then
 fi
 AM_CONDITIONAL(HAVE_FOX_1_6, test x"$have_FOX" = xyes)
 
-if test x"$WITH_FOX_1_2" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_4" != xyes -a x"$WITH_FOX_1_6" != xyes; then
+if test x"$WITH_FOX_1_2" != xno -a x"$WITH_FOX_1_4" != xyes -a x"$WITH_FOX_1_6" != xyes; then
 	CHECK_LIBFOX__(-1.2)
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_2,1,[Define FOX version 1.2.])
@@ -111,7 +109,7 @@ if test x"$WITH_FOX_1_2" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_4" 
 fi
 AM_CONDITIONAL(HAVE_FOX_1_2, test x"$have_FOX_1_6" != xyes -a x"$have_FOX" = xyes)
 
-if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_4" != xno -a x"$WITH_FOX_1_0" != xyes -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_6" != xyes; then
+if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_4" != xno -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_6" != xyes; then
 	CHECK_LIBFOX__(-1.4)
 	if test x"$have_FOX" = xyes; then
 		AC_DEFINE(HAVE_FOX_1_4,1,[Define FOX version 1.4.])
@@ -120,21 +118,10 @@ if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_4" != xno -a x"$WITH_FOX_1_0" != x
 fi
 AM_CONDITIONAL(HAVE_FOX_1_4, test x"$have_FOX_1_6" != xyes -a x"$have_FOX_1_2" != xyes -a x"$have_FOX" = xyes)
 
-if test x"$have_FOX" != xyes -a x"$WITH_FOX_1_0" != xno -a x"$WITH_FOX_1_2" != xyes -a x"$WITH_FOX_1_4" != xyes -a x"$WITH_FOX_1_6" != xyes; then
-	CHECK_LIBFOX__()
-	if test x"$have_FOX" = xyes; then
-		AC_DEFINE(HAVE_FOX_1_0,1,[Define FOX version 1.0.])
-	fi
-fi
-AM_CONDITIONAL(HAVE_FOX_1_0, test x"$have_FOX_1_6" != xyes -a x"$have_FOX_1_2" != xyes -a x"$have_FOX_1_4" != xyes -a x"$have_FOX" = xyes)
-
 #
 # Abort if no FOX lib or multiple --with-fox-1.x
 #
 count_WITH_FOX=$((0))
-if test x"$WITH_FOX_1_0" == xyes; then
-	count_WITH_FOX=$(($count_WITH_FOX+1))
-fi
 if test x"$WITH_FOX_1_2" == xyes; then
 	count_WITH_FOX=$(($count_WITH_FOX+1))
 fi

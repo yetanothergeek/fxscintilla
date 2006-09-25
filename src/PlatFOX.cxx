@@ -30,17 +30,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// for some weird reason ltdl.h doesn't compile correctly when not included
-// first
-#if HAVE_FOX_1_0
-# if !defined(WIN32) || defined(__CYGWIN__)
-extern "C" {
-#  include "../ltdl/ltdl.h"
-}
-# endif
-#endif
-
-
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if defined(__CYGWIN__)
 #  include <windows.h>
@@ -76,10 +65,6 @@ extern "C" {
 
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
-
-#if HAVE_FOX_1_0
-#define getRootWindow getRoot
-#endif
 
 #include <map>
 using namespace std;
@@ -646,12 +631,7 @@ void SurfaceImpl::DrawTextBase(PRectangle rc, Font &font_, int ybase, const char
                        ColourAllocated fore) {
 	if (dc()) {
 		PenColour(fore);
-#if HAVE_FOX_1_0
-		_dc->setTextFont(font_.GetID());
-#else
 		_dc->setFont(font_.GetID());
-#endif
-
 		const int segmentLength = 1000;
 		int x = rc.left;
 		while ((len > 0) && (x < maxCoordinate)) {
@@ -984,9 +964,6 @@ PopupListBox::PopupListBox(FXComposite * parent, ListBoxFox * lb) :
 	FXPopup(parent), listBox(lb)
 {
 	list = new FXList(this,
-#if HAVE_FOX_1_0
-		0,
-#endif
 		this, ID_LIST, LIST_BROWSESELECT|LAYOUT_FILL_X|LAYOUT_FILL_Y|SCROLLERS_TRACK|HSCROLLER_NEVER);
 	list->setSortFunc(sListSortFunction);
 }
@@ -1354,26 +1331,23 @@ double ElapsedTime::Duration(bool reset) {
 #endif	// WIN32
 
 // ====================================================================
-// Dynamic library handling. Three ways:
-// - fxdllXxx API with Fox 1.2
-// - libltdl with Fox 1.0 under autotools platforms
-// - Win32 API with Fox 1.0 and Win32 platforms without autotools (VC++)
+// Dynamic library handling.
+// - fxdllXxx API with Fox >= 1.2
 // ====================================================================
 
 // Fox >= 1.2 has dynamic librarie handling
-#if !HAVE_FOX_1_0
 
-# if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-#  if HAVE_FOX_1_2
-#   include <fox-1.2/FXDLL.h>
-#  elif HAVE_FOX_1_4
-#   include <fox-1.4/FXDLL.h>
-#  elif HAVE_FOX_1_6
-#   include <fox-1.6/FXDLL.h>
-#  endif
-# else
-#  include <FXDLL.h>
-# endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+# if HAVE_FOX_1_2
+#  include <fox-1.2/FXDLL.h>
+# elif HAVE_FOX_1_4
+#  include <fox-1.4/FXDLL.h>
+# elif HAVE_FOX_1_6
+#  include <fox-1.6/FXDLL.h>
+# endif
+#else
+# include <FXDLL.h>
+#endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 
 class DynamicLibraryImpl : public DynamicLibrary {
 protected:
@@ -1405,76 +1379,6 @@ DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
 }
 
-// For Fox 1.0, I'd like to use libltdl for both Unix and Win32 but I haven't
-// succeded yet using it under Win32
-#elif !defined(WIN32) || defined(__CYGWIN__)
-
-class DynamicLibraryImpl : public DynamicLibrary {
-protected:
-	lt_dlhandle m;
-public:
-	DynamicLibraryImpl(const char *modulePath) {
-		lt_dlinit();
-		m = lt_dlopen(modulePath);
-	}
-
-	virtual ~DynamicLibraryImpl() {
-		if (m != NULL)
-			lt_dlclose(m);
-		lt_dlexit();
-	}
-
-	// Use lt_dlsym to get a pointer to the relevant function.
-	virtual Function FindFunction(const char *name) {
-		if (m != NULL) {
-			return lt_dlsym(m, name);
-		} else
-			return NULL;
-	}
-
-	virtual bool IsValid() {
-		return m != NULL;
-	}
-};
-
-DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
-	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
-}
-
-#else // !defined(WIN32) || defined(__CYGWIN__)
-
-class DynamicLibraryImpl : public DynamicLibrary {
-protected:
-	HMODULE h;
-public:
-	DynamicLibraryImpl(const char *modulePath) {
-		h = ::LoadLibrary(modulePath);
-	}
-
-	virtual ~DynamicLibraryImpl() {
-		if (h != NULL)
-			::FreeLibrary(h);
-	}
-
-	// Use GetProcAddress to get a pointer to the relevant function.
-	virtual Function FindFunction(const char *name) {
-		if (h != NULL) {
-			return static_cast<Function>(
-				(void *)(::GetProcAddress(h, name)));
-		} else
-			return NULL;
-	}
-
-	virtual bool IsValid() {
-		return h != NULL;
-	}
-};
-
-DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
-	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );
-}
-
-#endif // !defined(WIN32) || defined(__CYGWIN__)
 
 // ====================================================================
 // Platform
