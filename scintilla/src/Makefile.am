@@ -18,7 +18,7 @@ libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
 	StyleContext.cxx \
-	CharClassify.o \
+	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
 	ScintillaBase.cxx \
@@ -108,6 +108,7 @@ libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
 	StyleContext.cxx \
+	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
 	ScintillaBase.cxx \

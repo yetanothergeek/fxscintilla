@@ -324,10 +324,10 @@ void ScintillaFOX::NotifyURIDropped(const char *list) {
 
 int ScintillaFOX::KeyDefault(int key, int modifiers) {
 	if (!(modifiers & SCI_CTRL) && !(modifiers & SCI_ALT) && (key < 256)) {
-		NotifyKey(key, modifiers);
-		return 0;
-		//~ AddChar(key);
-		//~ return 1;
+		//NotifyKey(key, modifiers);
+		//return 0;
+		AddChar(key);
+		return 1;
 	} else {
 		// Pass up to container in case it is an accelerator
 		NotifyKey(key, modifiers);
@@ -695,7 +695,11 @@ void FXScintilla::create()
 	dropEnable();
 }
 
+#if HAVE_FOX_1_6
 bool FXScintilla::canFocus() const
+#else
+FXbool FXScintilla::canFocus() const
+#endif
 {
 	return true;
 }

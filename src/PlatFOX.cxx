@@ -217,8 +217,13 @@ void Font::Create(const char *faceName, int characterSet,
 	}
 	else {
         id = new FXFont(FXApp::instance(), faceName, size,
+#if HAVE_FOX_1_6
         	bold ? FXFont::Bold : FXFont::Normal ,
 			italic ? FXFont::Italic : FXFont::Straight,
+#else
+        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
+			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
+#endif
 			characterSet);
 	}
 	if (!id) {
@@ -558,7 +563,7 @@ void SurfaceImpl::RoundedRectangle(PRectangle rc, ColourAllocated fore, ColourAl
 }
 
 // Plot a point into a guint32 buffer symetrically to all 4 qudrants
-static void AllFour(FXImage *image, int stride, int width, int height, int x, int y, FXColor color) {
+static void AllFour(FXImage *image, int width, int height, int x, int y, FXColor color) {
 	image->setPixel(x, y, color);
 	image->setPixel(width-1-x, y, color);
 	image->setPixel(x, height-1-y, color);
@@ -585,7 +590,7 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated 
 		// Ensure not distorted too much by corners when small
 		cornerSize = Platform::Minimum(cornerSize, (Platform::Minimum(width, height) / 2) - 2);
 		// Make a 32 bit deep image
-		FXImage * image = new FXImage(getApp(), NULL, IMAGE_OWNED, width, height);
+		FXImage * image = new FXImage(FXApp::instance(), NULL, IMAGE_OWNED, width, height);
 
 		FXColor valEmpty = 0;
 		FXColor valFill = FXRGBA(GetRValue(fill.AsLong()), GetGValue(fill.AsLong()), GetBValue(fill.AsLong()), alphaFill);
@@ -601,11 +606,11 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated 
 		}
 		for (int c=0;c<cornerSize; c++) {
 			for (int x=0;x<c+1; x++) {
-				AllFour(pixels, stride, width, height, x, c-x, valEmpty);
+				AllFour(image, width, height, x, c-x, valEmpty);
 			}
 		}
 		for (int x=1;x<cornerSize; x++) {
-			AllFour(pixels, stride, width, height, x, cornerSize-x, valOutline);
+			AllFour(image, width, height, x, cornerSize-x, valOutline);
 		}
 
 		// Draw with alpha

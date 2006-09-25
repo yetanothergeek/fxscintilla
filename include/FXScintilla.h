@@ -81,7 +81,11 @@ public:
 
 	// From FXScrollArea
 	virtual void create();
-  virtual bool canFocus() const;
+#if HAVE_FOX_1_6
+	virtual bool canFocus() const;
+#else
+	virtual FXbool canFocus() const;
+#endif
 	virtual FXint getViewportWidth();
 	virtual FXint getViewportHeight();
 	virtual FXint getContentWidth();
