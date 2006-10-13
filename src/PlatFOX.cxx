@@ -55,6 +55,7 @@
 # if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
 #   define FOXDLL
 # endif
+# pragma warning (disable : 4786)
 # include <time.h>
 # include <windows.h>
 # include <fx.h>
@@ -274,9 +275,14 @@ void Font::Create(const char *faceName, int characterSet,
 	int size, bool bold, bool italic, bool) {
 	Release();
 	id = new FXFont(FXApp::instance(), faceName, size,
-									bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
-									italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
-									CharacterSetCode(characterSet));
+#if HAVE_FOX_1_6
+        	bold ? FXFont::Bold : FXFont::Normal ,
+			italic ? FXFont::Italic : FXFont::Straight,
+#else
+        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
+			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
+#endif
+			CharacterSetCode(characterSet));
 	if (!id) {
 		// Font not available so substitute with the app default font.
 		id = FXApp::instance()->getNormalFont();
@@ -555,15 +561,15 @@ static void AllFour(FXImage *image, int width, int height, int x, int y, FXColor
 	image->setPixel(width-1-x, height-1-y, color);
 }
 
-static unsigned int GetRValue(unsigned int co) {
+static unsigned int GetRed(unsigned int co) {
 	return (co >> 16) & 0xff;
 }
 
-static unsigned int GetGValue(unsigned int co) {
+static unsigned int GetGreen(unsigned int co) {
 	return (co >> 8) & 0xff;
 }
 
-static unsigned int GetBValue(unsigned int co) {
+static unsigned int GetBlue(unsigned int co) {
 	return co & 0xff;
 }
 
@@ -578,8 +584,8 @@ void SurfaceImpl::AlphaRectangle(PRectangle rc, int cornerSize, ColourAllocated 
 		FXImage * image = new FXImage(FXApp::instance(), NULL, IMAGE_OWNED, width, height);
 
 		FXColor valEmpty = 0;
-		FXColor valFill = FXRGBA(GetRValue(fill.AsLong()), GetGValue(fill.AsLong()), GetBValue(fill.AsLong()), alphaFill);
-		FXColor valOutline = FXRGBA(GetRValue(outline.AsLong()), GetGValue(outline.AsLong()), GetBValue(outline.AsLong()), alphaOutline);
+		FXColor valFill = FXRGBA(GetRed(fill.AsLong()), GetGreen(fill.AsLong()), GetBlue(fill.AsLong()), alphaFill);
+		FXColor valOutline = FXRGBA(GetRed(outline.AsLong()), GetGreen(outline.AsLong()), GetBlue(outline.AsLong()), alphaOutline);
 		for (int y=0; y<height; y++) {
 			for (int x=0; x<width; x++) {
 				if ((x==0) || (x==width-1) || (y == 0) || (y == height-1)) {

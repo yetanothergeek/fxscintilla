@@ -26,7 +26,6 @@ CFG=fxscintilla - Win32 Debug
 # PROP Scc_ProjName ""
 # PROP Scc_LocalPath ""
 CPP=cl.exe
-F90=df.exe
 RSC=rc.exe
 
 !IF  "$(CFG)" == "fxscintilla - Win32 Release"
@@ -41,10 +40,11 @@ RSC=rc.exe
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /compile_only /include:"Release/" /nologo /warn:nofileopt
 # ADD F90 /compile_only /include:"Release/" /nologo /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "d:/fox-1.2.11/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /D "HAVE_FOX_1_2" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "f:/fox-1.6.16/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "NDEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /D "HAVE_FOX_1_6" /YX /FD /c
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
 # ADD RSC /l 0x40c /d "NDEBUG"
 BSC32=bscmake.exe
@@ -66,10 +66,11 @@ LIB32=link.exe -lib
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
+F90=df.exe
 # ADD BASE F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD F90 /check:bounds /compile_only /debug:full /include:"Debug/" /nologo /traceback /warn:argument_checking /warn:nofileopt
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "d:/fox-1.2.11/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /D "HAVE_FOX_1_2" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "f:/fox-1.6.16/include" /I "../../../include" /I "../../../scintilla/include" /I "../../../scintilla/src" /D "_DEBUG" /D "WIN32" /D "_MBCS" /D "_LIB" /D "FOX" /D "SCI_LEXER" /D "HAVE_FOX_1_6" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
 # ADD RSC /l 0x40c /d "_DEBUG"
 BSC32=bscmake.exe
@@ -99,6 +100,10 @@ SOURCE=..\..\..\scintilla\src\CallTip.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\CellBuffer.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\CharClassify.cxx
 # End Source File
 # Begin Source File
 
@@ -194,6 +199,10 @@ SOURCE=..\..\..\scintilla\src\LexCrontab.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexCsound.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexCSS.cxx
 # End Source File
 # Begin Source File
@@ -207,6 +216,10 @@ SOURCE=..\..\..\scintilla\src\LexErlang.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexEScript.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexFlagship.cxx
 # End Source File
 # Begin Source File
 
@@ -227,6 +240,10 @@ SOURCE=..\..\..\scintilla\src\LexHaskell.cxx
 # Begin Source File
 
 SOURCE=..\..\..\scintilla\src\LexHTML.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexInno.cxx
 # End Source File
 # Begin Source File
 
@@ -270,6 +287,10 @@ SOURCE=..\..\..\scintilla\src\LexNsis.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexOpal.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexOthers.cxx
 # End Source File
 # Begin Source File
@@ -298,6 +319,10 @@ SOURCE=..\..\..\scintilla\src\LexPython.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexRebol.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexRuby.cxx
 # End Source File
 # Begin Source File
@@ -306,11 +331,27 @@ SOURCE=..\..\..\scintilla\src\LexScriptol.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexSmalltalk.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexSpecman.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\scintilla\src\LexSpice.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\scintilla\src\LexSQL.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexTADS3.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\scintilla\src\LexTCL.cxx
 # End Source File
 # Begin Source File
 
