@@ -38,19 +38,9 @@
 #  endif
 # endif
 # include <sys/time.h>
-# if HAVE_FOX_1_4
-#  include <fox-1.4/fx.h>
-#  include <fox-1.4/fxkeys.h>
-# elif HAVE_FOX_1_6
-#  include <fox-1.6/fx.h>
-#  include <fox-1.6/fxkeys.h>
-# elif HAVE_FOX_1_2
-#  include <fox-1.2/fx.h>
-#  include <fox-1.2/fxkeys.h>
-# else
-#  include <fox/fx.h>
-#  include <fox/fxkeys.h>
-# endif
+#  include <fx.h>
+#  include <fxkeys.h>
+#  include <FXRootWindow.h>
 #else
 # if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
 #   define FOXDLL
@@ -61,6 +51,7 @@
 # include <fx.h>
 # include <fxkeys.h>
 #endif	// !defined(WIN32) || defined(__CYGWIN__)
+
 
 #include "Platform.h"
 
@@ -203,13 +194,8 @@ void Font::Create(const char *faceName, int characterSet,
 	}
 	else {
         id = new FXFont(FXApp::instance(), faceName, size,
-#if HAVE_FOX_1_6
         	bold ? FXFont::Bold : FXFont::Normal ,
 			italic ? FXFont::Italic : FXFont::Straight,
-#else
-        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
-			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
-#endif
 			characterSet);
 	}
 	if (!id) {
@@ -275,13 +261,8 @@ void Font::Create(const char *faceName, int characterSet,
 	int size, bool bold, bool italic, bool) {
 	Release();
 	id = new FXFont(FXApp::instance(), faceName, size,
-#if HAVE_FOX_1_6
         	bold ? FXFont::Bold : FXFont::Normal ,
 			italic ? FXFont::Italic : FXFont::Straight,
-#else
-        	bold ? FONTWEIGHT_BOLD : FONTWEIGHT_NORMAL,
-			italic ? FONTSLANT_ITALIC : FONTSLANT_REGULAR,
-#endif
 			CharacterSetCode(characterSet));
 	if (!id) {
 		// Font not available so substitute with the app default font.
@@ -797,8 +778,8 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 	/* do some corrections to fit into screen */
 	int sizex = rc.right - rc.left;
 	int sizey = rc.bottom - rc.top;
-	int screenWidth = FXApp::instance()->getRootWindow()->getDefaultWidth();;
-	int screenHeight = FXApp::instance()->getRootWindow()->getDefaultHeight();;
+	int screenWidth = FXApp::instance()->getRootWindow()->getDefaultWidth();
+	int screenHeight = FXApp::instance()->getRootWindow()->getDefaultHeight();
 	if (sizex > screenWidth)
 		ox = 0; /* the best we can do */
 	else if (ox + sizex > screenWidth)
@@ -861,7 +842,8 @@ void Window::SetCursor(Cursor curs) {
 		break;
 	case cursorHand:
 		// <FIXME/> Should be a hand cursor...
-		cursorID = DEF_CROSSHAIR_CURSOR;
+        cursorID = DEF_HAND_CURSOR; //JKP
+//		cursorID = DEF_CROSSHAIR_CURSOR;
 		break;
 	case cursorReverseArrow:
 		cursorID = DEF_RARROW_CURSOR;
@@ -876,6 +858,16 @@ void Window::SetCursor(Cursor curs) {
 
 void Window::SetTitle(const char *s) {
 	static_cast<FXTopWindow *>(id)->setTitle(s);
+}
+
+
+/*** JKP: FIXME: Ugly and not tested !!! ***/
+PRectangle Window::GetMonitorRect(Point pt) {
+  FXRootWindow *rootwin=id->getApp()->getRootWindow(); //(id->getApp(),id->getVisual());
+  FXint xpos=id->getX();
+  FXint ypos=id->getY();
+  return PRectangle(-xpos, -ypos, (-xpos) + rootwin->getDefaultWidth(),
+	                  (-ypos) + rootwin->getDefaultHeight());
 }
 
 // ====================================================================
@@ -1343,18 +1335,10 @@ double ElapsedTime::Duration(bool reset) {
 
 // Fox >= 1.2 has dynamic librarie handling
 
-#if !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
-# if HAVE_FOX_1_2
-#  include <fox-1.2/FXDLL.h>
-# elif HAVE_FOX_1_4
-#  include <fox-1.4/FXDLL.h>
-# elif HAVE_FOX_1_6
-#  include <fox-1.6/FXDLL.h>
-# endif
-#else
-# include <FXDLL.h>
-#endif	// !defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 
+#include <FXDLL.h>
+
+#ifdef FOX_1_6
 class DynamicLibraryImpl : public DynamicLibrary {
 protected:
 	void * m;
@@ -1380,6 +1364,36 @@ public:
 		return m != NULL;
 	}
 };
+#else
+class DynamicLibraryImpl : public DynamicLibrary {
+protected:
+	FXDLL*dll;
+public:
+	DynamicLibraryImpl(const char *modulePath) {
+    	dll=new FXDLL();
+		dll->load(modulePath);
+	}
+
+	virtual ~DynamicLibraryImpl() {
+		dll->unload();
+		delete dll;
+	}
+
+
+	// Use lt_dlsym to get a pointer to the relevant function.
+	virtual Function FindFunction(const char *name) {
+		if (dll->loaded()) {
+			return dll->address(name);
+		} else
+			return NULL;
+	}
+
+	virtual bool IsValid() {
+		return dll->loaded();
+	}
+};
+#endif
+
 
 DynamicLibrary *DynamicLibrary::Load(const char *modulePath) {
 	return static_cast<DynamicLibrary *>( new DynamicLibraryImpl(modulePath) );

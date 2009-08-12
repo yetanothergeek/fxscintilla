@@ -8,6 +8,10 @@
 #ifndef KEYTOCOMMAND_H
 #define KEYTOCOMMAND_H
 
+#ifdef SCI_NAMESPACE
+namespace Scintilla {
+#endif
+
 #define SCI_NORM 0
 #define SCI_SHIFT SCMOD_SHIFT
 #define SCI_CTRL SCMOD_CTRL
@@ -30,7 +34,7 @@ class KeyMap {
 	KeyToCommand *kmap;
 	int len;
 	int alloc;
-	static KeyToCommand MapDefault[];
+	static const KeyToCommand MapDefault[];
 
 public:
 	KeyMap();
@@ -39,5 +43,9 @@ public:
 	void AssignCmdKey(int key, int modifiers, unsigned int msg);
 	unsigned int Find(int key, int modifiers);	// 0 returned on failure
 };
+
+#ifdef SCI_NAMESPACE
+}
+#endif
 
 #endif

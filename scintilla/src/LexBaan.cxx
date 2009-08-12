@@ -21,11 +21,15 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-inline bool IsAWordChar(const int  ch) {
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
+static inline bool IsAWordChar(const int  ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '$' || ch == ':');
 }
 
-inline bool IsAWordStart(const int ch) {
+static inline bool IsAWordStart(const int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 

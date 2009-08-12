@@ -1,0 +1,71 @@
+--- Platform.h.orig	2009-01-21 20:08:09.000000000 -0600
++++ Platform.h	2009-01-21 02:26:29.000000000 -0600
+@@ -55,13 +55,40 @@
+ // Underlying the implementation of the platform classes are platform specific types.
+ // Sometimes these need to be passed around by client code so they are defined here
+ 
++#if PLAT_FOX
++
++namespace FX {
++
++class FXFont;
++class FXDrawable;
++class FXWindow;
++class FXMenuPane;
++class FXList;
++class FXChore;
++# ifndef WIN32
++class FXTimer;
++# else
++struct FXTimer;
++# endif	// WIN32
++
++};
++using namespace FX;
++
++typedef FXFont * FontID;
++typedef FXDrawable * SurfaceID;
++typedef FXWindow * WindowID;
++typedef FXMenuPane * MenuID;
++typedef FXTimer * TickerID;
++typedef FXChore * IdlerID;
++#else
+ typedef void *FontID;
+ typedef void *SurfaceID;
+ typedef void *WindowID;
+ typedef void *MenuID;
+ typedef void *TickerID;
+-typedef void *Function;
+ typedef void *IdlerID;
++#endif
++typedef void *Function;
+ 
+ /**
+  * A geometric point class.
+@@ -252,6 +279,8 @@
+ #if PLAT_GTK
+ 	void *allocatedPalette; // GdkColor *
+ 	int allocatedLen;
++#elif PLAT_FOX
++	void * visual;
+ #endif
+ 	// Private so Palette objects can not be copied
+ 	Palette(const Palette &) {}
+@@ -401,6 +430,9 @@
+ 	void SetPosition(PRectangle rc);
+ 	void SetPositionRelative(PRectangle rc, Window relativeTo);
+ 	PRectangle GetClientPosition();
++#if PLAT_FOX
++	virtual
++#endif
+ 	void Show(bool show=true);
+ 	void InvalidateAll();
+ 	void InvalidateRectangle(PRectangle rc);
+@@ -420,7 +452,6 @@
+ /**
+  * Listbox management.
+  */
+-
+ class ListBox : public Window {
+ public:
+ 	ListBox();

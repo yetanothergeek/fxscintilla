@@ -74,6 +74,8 @@ public:
 	long onClipboardLost(FXObject *, FXSelector, void *);
 	long onClipboardRequest(FXObject *, FXSelector, void *);
 	long onKeyPress(FXObject *, FXSelector, void *);
+//	long onSelectionGained(FXObject *, FXSelector, void *); // JKP
+//	long onClipboardGained(FXObject *, FXSelector, void *); // JKP
 public:
   /// Constructor
   FXScintilla(FXComposite * p, FXObject * tgt = NULL, FXSelector sel = 0,
@@ -81,11 +83,8 @@ public:
 
 	// From FXScrollArea
 	virtual void create();
-#if HAVE_FOX_1_6
 	virtual bool canFocus() const;
-#else
-	virtual FXbool canFocus() const;
-#endif
+
 	virtual FXint getViewportWidth();
 	virtual FXint getViewportHeight();
 	virtual FXint getContentWidth();

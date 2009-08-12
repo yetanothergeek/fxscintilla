@@ -8,6 +8,10 @@
 #ifndef SCINTILLABASE_H
 #define SCINTILLABASE_H
 
+#ifdef SCI_NAMESPACE
+namespace Scintilla {
+#endif
+
 /**
  */
 class ScintillaBase : public Editor {
@@ -37,13 +41,16 @@ protected:
 	CallTip ct;
 
 	int listType;			///< 0 is an autocomplete list
-	SString userListSelected;	///< Receives listbox selected string
+	SString listSelected;	///< Receives listbox selected string
+	int maxListWidth;		/// Maximum width of list, in average character widths
+
+	bool performingStyle;	///< Prevent reentrance
 
 #ifdef SCI_LEXER
 	int lexLanguage;
-	LexerModule *lexCurrent;
+	const LexerModule *lexCurrent;
 	PropSet props;
-	enum {numWordLists=6};
+	enum {numWordLists=KEYWORDSET_MAX+1};
 	WordList *keyWordLists[numWordLists+1];
 	void SetLexer(uptr_t wParam);
 	void SetLexerLanguage(const char *languageName);
@@ -65,11 +72,15 @@ protected:
 	void AutoCompleteStart(int lenEntered, const char *list);
 	void AutoCompleteCancel();
 	void AutoCompleteMove(int delta);
-	void AutoCompleteChanged(char ch=0);
-	void AutoCompleteCompleted(char fillUp='\0');
+	int AutoCompleteGetCurrent();
+	void AutoCompleteCharacterAdded(char ch);
+	void AutoCompleteCharacterDeleted();
+	void AutoCompleteCompleted();
 	void AutoCompleteMoveToCurrentWord();
 	static void AutoCompleteDoubleClick(void* p);
 
+	void CallTipClick();
+	void CallTipShow(Point pt, const char *defn);
 	virtual void CreateCallTipWindow(PRectangle rc) = 0;
 
 	virtual void AddToPopUp(const char *label, int cmd=0, bool enabled=true) = 0;
@@ -82,5 +93,9 @@ public:
 	// Public so scintilla_send_message can use it
 	virtual sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 };
+
+#ifdef SCI_NAMESPACE
+}
+#endif
 
 #endif

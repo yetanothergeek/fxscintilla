@@ -12,12 +12,18 @@
 
 #include "Platform.h"
 
+#include "Scintilla.h"
+
 #include "SciLexer.h"
 #include "PropSet.h"
 #include "Accessor.h"
 #include "DocumentAccessor.h"
 #include "KeyWords.h"
 #include "ExternalLexer.h"
+
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
 
 LexerManager *LexerManager::theInstance = NULL;
 
@@ -116,16 +122,16 @@ LexerLibrary::LexerLibrary(const char* ModuleName) {
 	if (lib->IsValid()) {
 		m_sModuleName = ModuleName;
 		//Cannot use reinterpret_cast because: ANSI C++ forbids casting between pointers to functions and objects
-		GetLexerCountFn GetLexerCount = (GetLexerCountFn)lib->FindFunction("GetLexerCount");
+		GetLexerCountFn GetLexerCount = (GetLexerCountFn)(sptr_t)lib->FindFunction("GetLexerCount");
 
 		if (GetLexerCount) {
 			ExternalLexerModule *lex;
 			LexerMinder *lm;
 
 			// Find functions in the DLL
-			GetLexerNameFn GetLexerName = (GetLexerNameFn)lib->FindFunction("GetLexerName");
-			ExtLexerFunction Lexer = (ExtLexerFunction)lib->FindFunction("Lex");
-			ExtFoldFunction Folder = (ExtFoldFunction)lib->FindFunction("Fold");
+			GetLexerNameFn GetLexerName = (GetLexerNameFn)(sptr_t)lib->FindFunction("GetLexerName");
+			ExtLexerFunction Lexer = (ExtLexerFunction)(sptr_t)lib->FindFunction("Lex");
+			ExtFoldFunction Folder = (ExtFoldFunction)(sptr_t)lib->FindFunction("Fold");
 
 			// Assign a buffer for the lexer name.
 			char lexname[100];
@@ -166,13 +172,13 @@ LexerLibrary::~LexerLibrary() {
 void LexerLibrary::Release() {
 	//TODO maintain a list of lexers created, and delete them!
 	LexerMinder *lm;
-	LexerMinder *next;
+	LexerMinder *lmNext;
 	lm = first;
 	while (NULL != lm) {
-		next = lm->next;
+		lmNext = lm->next;
 		delete lm->self;
 		delete lm;
-		lm = next;
+		lm = lmNext;
 	}
 
 	first = NULL;
@@ -232,8 +238,9 @@ void LexerManager::Clear()
 {
 	if (NULL != first) {
 		LexerLibrary *cur = first;
-		LexerLibrary *next = first->next;
+		LexerLibrary *next;
 		while (cur) {
+			next = cur->next;
 			delete cur;
 			cur = next;
 		}

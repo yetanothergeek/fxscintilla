@@ -39,19 +39,8 @@
 #   define FOXDLL
 #  endif
 # endif
-# if HAVE_FOX_1_2
-#  include <fox-1.2/fx.h>
-#  include <fox-1.2/fxkeys.h>
-# elif HAVE_FOX_1_4
-#  include <fox-1.4/fx.h>
-#  include <fox-1.4/fxkeys.h>
-# elif HAVE_FOX_1_6
-#  include <fox-1.6/fx.h>
-#  include <fox-1.6/fxkeys.h>
-# else
-#  include <fox/fx.h>
-#  include <fox/fxkeys.h>
-# endif
+# include <fx.h>
+# include <fxkeys.h>
 #else
 # if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
 #   define FOXDLL
@@ -73,6 +62,9 @@
 # include "KeyWords.h"
 # include "ExternalLexer.h"
 #endif
+#include "SplitVector.h"
+#include "Partitioning.h"
+#include "RunStyles.h"
 #include "ContractionState.h"
 #include "SVector.h"
 #include "CellBuffer.h"
@@ -84,7 +76,9 @@
 #include "AutoComplete.h"
 #include "ViewStyle.h"
 #include "CharClassify.h"
+#include "Decoration.h"
 #include "Document.h"
+#include "PositionCache.h"
 #include "Editor.h"
 #include "SString.h"
 #include "ScintillaBase.h"
@@ -161,7 +155,7 @@ private:
 	void SyncPaint(PRectangle rc);
 	void FullPaint();
 	void UnclaimSelection();
-	void ReceivedSelection(FXDNDOrigin origin);
+	void ReceivedSelection(FXDNDOrigin origin, int atPos);
 	void NotifyKey(int key, int modifiers);
 	void NotifyURIDropped(const char *list);
 	
@@ -262,41 +256,33 @@ void ScintillaFOX::UnclaimSelection()
 	}
 }
 
-void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin)
+// JKP: Heavily reworked to fix middle-click-paste when current document has the X-selection.
+// JKP: FIXME - Rectangular paste in the middle of a line gives a strange "selection artifact"
+void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 {
   FXuchar *data; FXuint len;
-	if (!pdoc->IsReadOnly()) {
-    if(_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) {
-      FXRESIZE(&data,FXuchar,len+1); data[len]='\0';
-			pdoc->BeginUndoAction();
-			// Check for "\n\0" ending to string indicating that selection is rectangular
-			int selStart = SelectionStart();
-	    if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) {
-				ClearSelection();
-			}
-// <FIXME/>
-/*			bool isRectangular = ((len > 0) &&
-				(data[len] == 0 && data[len - 1] == '\n'));
-			if (isRectangular) {
-				cout << data << flush;
-				PasteRectangular(selStart, (const char *)data, len);
-			} else */{
+  if (pdoc->IsReadOnly()) { return; }
+  if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
+  FXRESIZE(&data,FXuchar,len+1); data[len]='\0';
 #ifdef WIN32
-				// len--;
-				// Fix from Rafael AT enq DOT ufrgs DOT br
-				len=0;
-				while(data[len])
-					len++;
+    len=0;
+	while(data[len]) { len++; }
 #endif	// WIN32
-				pdoc->InsertString(currentPos, (const char *)data, len);
-				SetEmptySelection(currentPos + len);
-			}
-			pdoc->EndUndoAction();
-			EnsureCaretVisible();
-		    FXFREE(&data);
-		}
-	}
+  pdoc->BeginUndoAction();
+  if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
+  pdoc->InsertString(atPos>0?atPos:currentPos, (const char*)data, len);
+  if (atPos<0) {
+    SetEmptySelection( currentPos + len );
+  } else {
+    currentPos=atPos+len;
+    anchor=currentPos;	  
+    FullPaint();
+  }
+  pdoc->EndUndoAction();
+  EnsureCaretVisible();
+  FXFREE(&data);
 }
+
 
 void ScintillaFOX::NotifyKey(int key, int modifiers) {
 	SCNotification scn;
@@ -357,7 +343,13 @@ void ScintillaFOX::SetVerticalScrollPos()
   // triggers moveContents).
   // BTW scrollbar should be up to date when in movecontents.
   DwellEnd(true);
-  _fxsc.setPosition(_fxsc.getXPosition(), -topLine * vs.lineHeight);
+#ifdef FOX_1_6
+    _fxsc.setPosition(_fxsc.getXPosition(), -topLine * vs.lineHeight);
+#else
+    FXint gpx,gpy;
+    _fxsc.getPosition(gpx,gpy);
+    _fxsc.setPosition(gpx, -topLine * vs.lineHeight);
+#endif
 }
 
 void ScintillaFOX::SetHorizontalScrollPos()
@@ -368,7 +360,13 @@ void ScintillaFOX::SetHorizontalScrollPos()
   // triggers moveContents).
   // BTW scrollbar should be up to date when in movecontents.
   DwellEnd(true);
+#ifdef FOX_1_6
   _fxsc.setPosition(-xOffset, _fxsc.getYPosition());
+#else
+  FXint gpx,gpy;
+  _fxsc.getPosition(gpx,gpy);
+  _fxsc.setPosition(-xOffset, gpy);
+#endif
 }
 
 void ScintillaFOX::CopyToClipboard(const SelectionText &selectedText) {
@@ -391,7 +389,7 @@ void ScintillaFOX::Copy()
 
 void ScintillaFOX::Paste()
 {
-	ReceivedSelection(FROM_CLIPBOARD);
+	ReceivedSelection(FROM_CLIPBOARD, -1);
 }
 
 void ScintillaFOX::NotifyChange()
@@ -411,17 +409,9 @@ void ScintillaFOX::SetTicking(bool on)
 	if (timer.ticking != on) {
 		timer.ticking = on;
 		if (timer.ticking) {
-#if HAVE_FOX_1_4 || HAVE_FOX_1_6
 			FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
-#else
-			timer.tickerID = FXApp::instance()->addTimeout(&_fxsc, _fxsc.ID_TICK, timer.tickSize);
-#endif
 		} else {
-#if HAVE_FOX_1_4 || HAVE_FOX_1_6
 			FXApp::instance()->removeTimeout(&_fxsc, _fxsc.ID_TICK);
-#else
-			FXApp::instance()->removeTimeout(static_cast<FXTimer *>(timer.tickerID));
-#endif
 		}
 	}
 	timer.ticksToWait = caret.period;
@@ -432,21 +422,13 @@ bool ScintillaFOX::SetIdle(bool on) {
 		// Start idler, if it's not running.
 		if (idler.state == false) {
 			idler.state = true;
-#if HAVE_FOX_1_4 || HAVE_FOX_1_6
 			FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
-#else
-			idler.idlerID = FXApp::instance()->addChore(&_fxsc, FXScintilla::ID_IDLE);
-#endif
 		}
 	} else {
 		// Stop idler, if it's running
 		if (idler.state == true) {
 			idler.state = false;
-#if HAVE_FOX_1_4 || HAVE_FOX_1_6
 			FXApp::instance()->removeChore(&_fxsc, FXScintilla::ID_IDLE);
-#else
-			FXApp::instance()->removeChore(idler.idlerID);
-#endif
 		}
 	}
 	return true;
@@ -489,9 +471,53 @@ sptr_t ScintillaFOX::DefWndProc(unsigned int, uptr_t, sptr_t)
 	return 0;
 }
 
-void ScintillaFOX::CreateCallTipWindow(PRectangle /* rc */)
+
+// JKP: A new class, overrides the onPaint() method to 
+// let a CallTip object take over the painting.
+class CallTipWindow:public FXFrame {
+	FXDECLARE(CallTipWindow)
+	CallTipWindow(){}
+protected:
+	CallTip*ct;
+public:
+	long onPaint(FXObject*o, FXSelector sel, void*p);
+	CallTipWindow( FXComposite *p, CallTip*_ct):FXFrame(p,FRAME_NONE|LAYOUT_FILL),ct(_ct) {}
+};
+
+FXDEFMAP(CallTipWindow) CallTipWindowMap[] = {
+	FXMAPFUNC(SEL_PAINT,0,CallTipWindow::onPaint)
+};
+
+FXIMPLEMENT(CallTipWindow,FXFrame,CallTipWindowMap,ARRAYNUMBER(CallTipWindowMap));
+
+long CallTipWindow::onPaint(FXObject*o, FXSelector sel, void*p)
 {
-	// <FIXME/>
+	long rv=FXFrame::onPaint(o,sel,p);	
+	Surface *surfaceWindow = Surface::Allocate();
+	if (surfaceWindow) {
+		surfaceWindow->Init(this, this);
+		surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == ct->codePage);
+		surfaceWindow->SetDBCSMode(ct->codePage);
+		ct->PaintCT(surfaceWindow);
+		surfaceWindow->Release();
+		delete surfaceWindow;
+	}
+	return rv;
+}
+
+
+void ScintillaFOX::CreateCallTipWindow(PRectangle  rc )
+{
+	// Gilles says: <FIXME/>
+	// JKP says: OK, I'll try....
+	if (!ct.wCallTip.GetID()) {
+		FXHorizontalFrame*w=new FXHorizontalFrame(&_fxsc,FRAME_NONE,rc.left, rc.top, 
+			(rc.right-rc.left), (rc.bottom-rc.top),0,0,0,0,0,0);
+		CallTipWindow*c=new CallTipWindow(w, &ct);
+		w->create();
+		ct.wCallTip=w;
+		ct.wDraw=c;
+	}
 }
 
 void ScintillaFOX::AddToPopUp(const char * label, int cmd, bool enabled)
@@ -513,11 +539,15 @@ sptr_t ScintillaFOX::DirectFunction(
 PRectangle ScintillaFOX::GetClientRectangle() {
 	// Have to call FXScrollArea::getViewportXxxx instead of getViewportXxxx
 	// to prevent infinite loop
+#ifdef FOX_1_6
 	PRectangle rc(0, 0, _fxsc.FXScrollArea::getViewportWidth(), _fxsc.FXScrollArea::getViewportHeight());
 	if (_fxsc.horizontalScrollBar()->shown())
 		rc.bottom -= _fxsc.horizontalScrollBar()->getDefaultHeight();
 	if (_fxsc.verticalScrollBar()->shown())
 		rc.right -= _fxsc.verticalScrollBar()->getDefaultWidth();
+#else
+	PRectangle rc(0, 0, _fxsc.FXScrollArea::getVisibleWidth(), _fxsc.FXScrollArea::getVisibleHeight());
+#endif
 	return rc;
 }
 
@@ -649,10 +679,10 @@ FXDEFMAP(FXScintilla) FXScintillaMap[]={
   FXMAPFUNC(SEL_DND_MOTION,0,FXScintilla::onDNDMotion),
   FXMAPFUNC(SEL_DND_REQUEST,0,FXScintilla::onDNDRequest),
   FXMAPFUNC(SEL_SELECTION_LOST,0,FXScintilla::onSelectionLost),
-//  FXMAPFUNC(SEL_SELECTION_GAINED,0,FXScintilla::onSelectionGained),
+  FXMAPFUNC(SEL_SELECTION_GAINED,0,FXScintilla::onSelectionGained), // JKP
   FXMAPFUNC(SEL_SELECTION_REQUEST,0,FXScintilla::onSelectionRequest),
   FXMAPFUNC(SEL_CLIPBOARD_LOST,0,FXScintilla::onClipboardLost),
-//  FXMAPFUNC(SEL_CLIPBOARD_GAINED,0,FXScintilla::onClipboardGained),
+  FXMAPFUNC(SEL_CLIPBOARD_GAINED,0,FXScintilla::onClipboardGained), // JKP
   FXMAPFUNC(SEL_CLIPBOARD_REQUEST,0,FXScintilla::onClipboardRequest),
   FXMAPFUNC(SEL_KEYPRESS,0,FXScintilla::onKeyPress),
   FXMAPFUNC(SEL_CHORE,FXScintilla::ID_IDLE,FXScintilla::onChoreIdle),
@@ -688,11 +718,8 @@ void FXScintilla::create()
 	dropEnable();
 }
 
-#if HAVE_FOX_1_6
+
 bool FXScintilla::canFocus() const
-#else
-FXbool FXScintilla::canFocus() const
-#endif
 {
 	return true;
 }
@@ -727,10 +754,10 @@ long FXScintilla::onPaint(FXObject *, FXSelector, void * ptr)
 
 long FXScintilla::onTimeoutTicking(FXObject *, FXSelector, void *)
 {
-#if HAVE_FOX_1_4 || HAVE_FOX_1_6
+#ifdef FOX_1_6
 	FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
 #else
-	_scint->timer.tickerID = FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize);
+	FXApp::instance()->addTimeout(this, ID_TICK, _scint->timer.tickSize*1000000);
 #endif
 	_scint->Tick();
 	return 1;
@@ -836,12 +863,14 @@ long FXScintilla::onMiddleBtnPress(FXObject *, FXSelector, void * ptr)
 {
 //	if (FXScrollArea::onMiddleBtnPress(sender, sel, ptr))
 //		return 1;
-
+    int pos;
 	Point pt;
 	pt.x = ((FXEvent *)ptr)->win_x;
 	pt.y = ((FXEvent *)ptr)->win_y;
-	_scint->currentPos = _scint->PositionFromLocation(pt);
-	_scint->ReceivedSelection(FROM_SELECTION);
+    pos=_scint->PositionFromLocation(pt);
+	_scint->ReceivedSelection(FROM_SELECTION, pos); 
+//	_scint->currentPos = pos; // JKP: Delay asignment of currentPos until AFTER ReceivedSelection()
+//	_scint->anchor = pos; // JKP
   return 1;
 }
 
@@ -954,7 +983,7 @@ long FXScintilla::onKeyPress(FXObject* sender,FXSelector sel,void* ptr)
 	//Platform::DebugPrintf("SK-key: %d %x %x\n",event->code, event->state, consumed);
 	if (event->code == 0xffffff && event->text.length() > 0) {
 		_scint->ClearSelection();
-		if (_scint->pdoc->InsertString(_scint->CurrentPosition(), event->text.text())) {
+		if (_scint->pdoc->InsertCString(_scint->CurrentPosition(), (const char*)event->text.text())) {
 			_scint->MovePositionTo(_scint->CurrentPosition() + event->text.length());
 		}
 		consumed = true;
@@ -1092,7 +1121,7 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 				Point npt(ev->win_x, ev->win_y);
 				pos = _scint->PositionFromLocation(npt);
 				if (!_scint->inDragDrop) {
-					_scint->inDragDrop = true;
+					_scint->inDragDrop = _scint->ddDragging; /*** or ddInitial ??? ***/
 					_scint->ptMouseLastBeforeDND = _scint->ptMouseLast;
 				}
 				_scint->ptMouseLast = npt;
@@ -1164,8 +1193,9 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 			_scint->CopySelectionRange(&_scint->primary);
 
 		}
-
-    setDNDData(FROM_DRAGNDROP,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+        if (_scint->primary.s) { /* JKP: This will crash if _scint->primary.s is NULL, so we test it first !!! */
+          setDNDData(FROM_DRAGNDROP,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+        } else { setDNDData(FROM_DRAGNDROP,stringType,NULL,0); }
     return 1;
     }
 
@@ -1197,7 +1227,7 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 // We lost the selection somehow
 long FXScintilla::onSelectionLost(FXObject* sender,FXSelector sel,void* ptr){
-  FXbool hadselection=hasSelection();
+  FXbool hadselection=hasSelection();  
   FXScrollArea::onSelectionLost(sender,sel,ptr);
   if (hadselection) {
 		_scint->UnclaimSelection();
@@ -1239,7 +1269,11 @@ FXint FXScintilla::getViewportWidth()
 FXint FXScintilla::getViewportHeight()
 {
 	//return (_scint) ? _scint->GetTextRectangle().Height() : FXScrollArea::getViewportHeight();
+#ifdef FOX_1_6
 	return FXScrollArea::getViewportHeight();
+#else
+	return FXScrollArea::getVisibleHeight();
+#endif
 }
 
 FXint FXScintilla::getContentWidth()
@@ -1261,18 +1295,39 @@ void FXScintilla::moveContents(FXint x,FXint y)
   _scint->inMoveContents = true;
 	bool moved = false;
 	int line = (-y + _scint->vs.lineHeight / 2) / _scint->vs.lineHeight;
-	if (line != getYPosition()/_scint->vs.lineHeight) {
+
+#ifdef FOX_1_6
+    if (line != getYPosition()/_scint->vs.lineHeight)
+    {
 		moved = true;
 		_scint->ScrollTo(line);
 	}
-	if (x != getXPosition()) {
+    if (x != getXPosition())
+    {
 		moved = true;
 		_scint->HorizontalScrollTo(-x);
 	}
+#else
+	FXint gpx,gpy;
+	getPosition(gpx,gpy);
+	if (line != gpy/_scint->vs.lineHeight) 
+    {
+		moved = true;
+		_scint->ScrollTo(line);
+	}
+	getPosition(gpx,gpy);
+	if (x != gpx) 
+    {
+		moved = true;
+		_scint->HorizontalScrollTo(-x);
+	}
+
+#endif
+
 	if (moved) {
 		FXScrollArea::moveContents(x, -line * _scint->vs.lineHeight);
 	}
-  _scint->inMoveContents = false;
+	_scint->inMoveContents = false;
 }
 
 long FXScintilla::onConfigure(FXObject *sender, FXSelector sel, void * ptr)
@@ -1294,3 +1349,5 @@ void FXScintilla::setScintillaID(int id)
 sptr_t FXScintilla::sendMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	return _scint->WndProc(iMessage, wParam, lParam);
 }
+
+

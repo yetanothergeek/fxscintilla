@@ -13,12 +13,20 @@
 #include "Platform.h"
 
 #include "PropSet.h"
-#include "SVector.h"
 #include "Accessor.h"
 #include "DocumentAccessor.h"
+#include "SplitVector.h"
+#include "Partitioning.h"
+#include "RunStyles.h"
 #include "CellBuffer.h"
 #include "Scintilla.h"
+#include "CharClassify.h"
+#include "Decoration.h"
 #include "Document.h"
+
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
 
 DocumentAccessor::~DocumentAccessor() {
 }
@@ -48,8 +56,18 @@ void DocumentAccessor::Fill(int position) {
 	buf[endPos-startPos] = '\0';
 }
 
+bool DocumentAccessor::Match(int pos, const char *s) {
+	for (int i=0; *s; i++) {
+		if (*s != SafeGetCharAt(pos+i))
+			return false;
+		s++;
+	}
+	return true;
+}
+
 char DocumentAccessor::StyleAt(int position) {
-	return pdoc->StyleAt(position);
+	// Mask off all bits which aren't in the 'mask'.
+	return static_cast<char>(pdoc->StyleAt(position) & mask);
 }
 
 int DocumentAccessor::GetLine(int position) {
@@ -79,7 +97,10 @@ int DocumentAccessor::SetLineState(int line, int state) {
 }
 
 void DocumentAccessor::StartAt(unsigned int start, char chMask) {
+	// Store the mask specified for use with StyleAt.
+	mask = chMask;
 	pdoc->StartStyling(start, chMask);
+	startPosStyling = start;
 }
 
 void DocumentAccessor::StartSegment(unsigned int pos) {
@@ -89,8 +110,9 @@ void DocumentAccessor::StartSegment(unsigned int pos) {
 void DocumentAccessor::ColourTo(unsigned int pos, int chAttr) {
 	// Only perform styling if non empty range
 	if (pos != startSeg - 1) {
+		PLATFORM_ASSERT(pos >= startSeg);
 		if (pos < startSeg) {
-			Platform::DebugPrintf("Bad colour positions %d - %d\n", startSeg, pos);
+			return;
 		}
 
 		if (validLen + (pos - startSeg + 1) >= bufferSize)
@@ -103,6 +125,7 @@ void DocumentAccessor::ColourTo(unsigned int pos, int chAttr) {
 				chFlags = 0;
 			chAttr |= chFlags;
 			for (unsigned int i = startSeg; i <= pos; i++) {
+				PLATFORM_ASSERT((startPosStyling + validLen) < Length());
 				styleBuf[validLen++] = static_cast<char>(chAttr);
 			}
 		}
@@ -119,6 +142,7 @@ void DocumentAccessor::Flush() {
 	lenDoc = -1;
 	if (validLen > 0) {
 		pdoc->SetStyles(validLen, styleBuf);
+		startPosStyling += validLen;
 		validLen = 0;
 	}
 }
@@ -162,10 +186,14 @@ int DocumentAccessor::IndentAmount(int line, int *flags, PFNIsCommentLeader pfnI
 	*flags = spaceFlags;
 	indent += SC_FOLDLEVELBASE;
 	// if completely empty line or the start of a comment...
-	if ((ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') || 
+	if ((ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
 		(pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end-pos)) )
 		return indent | SC_FOLDLEVELWHITEFLAG;
 	else
 		return indent;
 }
 
+void DocumentAccessor::IndicatorFill(int start, int end, int indicator, int value) {
+	pdoc->decorations.SetCurrentIndicator(indicator);
+	pdoc->DecorationFillRange(start, value, end - start);
+}

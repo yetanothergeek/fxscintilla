@@ -1,5 +1,7 @@
 AC_INIT(src/ScintillaFOX.cxx)
-AC_CONFIG_AUX_DIR(config)
+dnl AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_MACRO_DIR([m4])
+
 
 dnl Check Cygwin and MinGW32
 AC_CANONICAL_HOST
@@ -24,7 +26,7 @@ AC_PROG_CXX
 dnl Versioning
 dnl - FXScintilla versioning scheme
 MAJOR_VERSION=1
-MINOR_VERSION=71
+MINOR_VERSION=78
 PATCH_LEVEL=0
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
@@ -39,9 +41,9 @@ dnl   . if any interface has been added, removed or changed, increment
 dnl     current and set revision to 0
 dnl   . if backward compatibility has been preserved, then increment age
 dnl   . if backward compatibility has been broken, then set age to 0
-LT_FXSCINTILLA_CURRENT=19
-LT_FXSCINTILLA_REVISION=1
-LT_FXSCINTILLA_AGE=1
+LT_FXSCINTILLA_CURRENT=20
+LT_FXSCINTILLA_REVISION=0
+LT_FXSCINTILLA_AGE=0
 AC_SUBST(LT_FXSCINTILLA_CURRENT)
 AC_SUBST(LT_FXSCINTILLA_REVISION)
 AC_SUBST(LT_FXSCINTILLA_AGE)
@@ -61,7 +63,11 @@ AC_MSG_RESULT([$enable_nolexer])
 AM_CONDITIONAL(NOLEXER, test x"$enable_nolexer" = xyes)
 
 dnl Check FOX library
-CHECK_LIBFOX(:)
+PKG_CHECK_MODULES([FOX], [fox >= 1.7], [AC_DEFINE(FOX_1_7)], [AC_DEFINE(FOX_1_6)])
+PKG_CHECK_MODULES([FOX], [fox >= 1.6])
+AC_SUBST(FOX_CFLAGS)
+AC_SUBST(FOX_LIBS)
+
 
 dnl Generated makefiles
 AC_OUTPUT( \
@@ -71,4 +77,5 @@ AC_OUTPUT( \
 	src/Makefile \
 	src/version.h \
 	tests/Makefile \
-	Makefile)
+	Makefile \
+    fxscintilla.pc)

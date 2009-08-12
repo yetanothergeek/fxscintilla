@@ -1,9 +1,15 @@
 Install FOX
 ===========
 
-FXScintilla depends on the FOX GUI toolkit version 1.0.x, 1.2.x or 1.4.x:
+This version of FXScintilla depends on the FOX GUI toolkit version 1.6.x:
 
-	http://fox-toolkit.org
+  http://fox-toolkit.org
+    
+If for some reason you need to use an older version of Fox, you will also need
+an earlier version of FXScintilla, this version requires at least Fox-1.6.0.
+
+Newer versions of Fox (1.7 or later) are not currently supported.
+
 
 The instructions below assume you have FOX installed on your box.
 
@@ -34,15 +40,12 @@ To build using Visual C++ 6.0 everything you need is in the VC++ workspace:
 IMPORTANT:
 * Before building anything you have to adapt each project's
   compilation and link settings with the correct FOX install path.
-* Depending on the FOX version you use, you have to:
+* Depending on the FOX version you use, you may have to:
   - add the following define to the compiler's settings:
-    HAVE_FOX_1_2=1 for Fox 1.2.x
-    HAVE_FOX_1_4=1 for Fox 1.4.x
-    HAVE_FOX_1_6=1 for Fox 1.6.x
+    HAVE_FOX_1_?=1 for Fox 1.?.x
   - adapt the Fox lib name in the linker settings:
-    fox-1.2.lib (release) and foxd-1.2.lib (debug) for Fox 1.2.x
-    fox-1.4.lib (release) and foxd-1.4.lib (debug) for Fox 1.4.x
-    fox-1.6.lib (release) and foxd-1.6.lib (debug) for Fox 1.6.x
+    fox-1.?.lib (release) and foxd-1.?.lib (debug) for Fox 1.?.x
+(Substitute ? for the Fox minor version number)
 
 The library files are built into the lib directory:
 

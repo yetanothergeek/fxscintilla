@@ -36,6 +36,10 @@ val SCE_GC_OPERATOR=9
 #include "Scintilla.h"
 #include "SciLexer.h"
 
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
 #define debug Platform::DebugPrintf
 
 static inline bool IsAWordChar(const int ch) {
@@ -236,7 +240,7 @@ ColouriseGui4CliDoc(unsigned int startPos, int length, int initStyle,
 		if (!noforward) sc.Forward();
 
 	}
-	styler.ColourTo(sc.currentPos, sc.state);
+	sc.Complete();
 }
 
 // Main folding function called by Scintilla - (based on props (.ini) files function)

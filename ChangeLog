@@ -1,3 +1,18 @@
+2009-06-10 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+	* Migrated my local copy into Savannah CVS, see FXSCINTILLA-1_78 branch.
+	* Removed many non-essential and/or unmaintained files from source tree.
+
+2009-05-15 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+	* Updated to Scintilla 1.78
+	* Install also headers from ./scintilla/include/*.h
+	* Implemented calltips, see ScintillaFOX::CreateCallTipWindow()
+	* Added support for Fox 1.7
+	* Dropped support for Fox 1.5.x and earlier.
+	* Removed custom m4 macros, use pkg-config instead.
+	* Reworked  ReceivedSelection() for better middle-click pasting.
+	* Fixed a null-pointer crash in onDNDRequest()
+	* Added GetMonitorRect() function for newer Scintilla. (not tested!)
+
 2006-10-19  Gilles Filippini <pini@free.fr>
 
 	* Updated to Scintilla 1.71

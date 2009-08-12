@@ -55,6 +55,7 @@ public:
 	}
 	void SetCodePage(int codePage_) { codePage = codePage_; }
 
+	virtual bool Match(int pos, const char *s)=0;
 	virtual char StyleAt(int position)=0;
 	virtual int GetLine(int position)=0;
 	virtual int LineStart(int line)=0;
@@ -74,4 +75,5 @@ public:
 	virtual void ColourTo(unsigned int pos, int chAttr)=0;
 	virtual void SetLevel(int line, int level)=0;
 	virtual int IndentAmount(int line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = 0)=0;
+	virtual void IndicatorFill(int start, int end, int indicator, int value)=0;
 };

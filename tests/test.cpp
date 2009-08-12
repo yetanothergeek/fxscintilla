@@ -1,16 +1,4 @@
-#if !defined(WIN32) || defined(__CYGWIN__)
-# if HAVE_FOX_1_2
-#  include <fox-1.2/fx.h>
-# elif HAVE_FOX_1_4
-#  include <fox-1.4/fx.h>
-# elif HAVE_FOX_1_6
-#  include <fox-1.6/fx.h>
-# else
-#  include <fox/fx.h>
-# endif
-#else
-# include <fx.h>
-#endif // !defined(WIN32) || defined(__CYGWIN__)
+#include <fx.h>
 #include <Scintilla.h>
 #include <SciLexer.h>
 #include <FXScintilla.h>
@@ -135,8 +123,12 @@ public:
 	{
 		FXFontDialog diag(this, "Toto", 0);
 		if (diag.execute()) {
+#ifdef FOX_1_6
 			FXFontDesc desc;
 			diag.getFontSelection(desc);
+#else
+			FXFontDesc desc=diag.getFontDesc();
+#endif
 			setFont(desc.face, desc.size / 10);
 		}
 		return 1;

@@ -31,6 +31,10 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
 /* Bits:
  * 1  - whitespace
  * 2  - operator
@@ -83,7 +87,7 @@ static int LowerCase(int c)
 }
 
 static void ColouriseBasicDoc(unsigned int startPos, int length, int initStyle,
-                           WordList *keywordlists[], Accessor &styler) {
+                           WordList *keywordlists[], Accessor &styler, char comment_char) {
 	bool wasfirst = true, isfirst = true; // true if first token in a line
 	styler.StartAt(startPos);
 
@@ -147,7 +151,7 @@ static void ColouriseBasicDoc(unsigned int startPos, int length, int initStyle,
 				sc.ChangeState(SCE_B_ERROR);
 				sc.SetState(SCE_B_DEFAULT);
 			}
-		} else if (sc.state == SCE_B_COMMENT) {
+		} else if (sc.state == SCE_B_COMMENT || sc.state == SCE_B_PREPROCESSOR) {
 			if (sc.atLineEnd) {
 				sc.SetState(SCE_B_DEFAULT);
 			}
@@ -159,8 +163,16 @@ static void ColouriseBasicDoc(unsigned int startPos, int length, int initStyle,
 		if (sc.state == SCE_B_DEFAULT || sc.state == SCE_B_ERROR) {
 			if (isfirst && sc.Match('.')) {
 				sc.SetState(SCE_B_LABEL);
-			} else if (sc.Match(';')) {
-				sc.SetState(SCE_B_COMMENT);
+			} else if (isfirst && sc.Match('#')) {
+				wasfirst = isfirst;
+				sc.SetState(SCE_B_IDENTIFIER);
+			} else if (sc.Match(comment_char)) {
+				// Hack to make deprecated QBASIC '$Include show
+				// up in freebasic with SCE_B_PREPROCESSOR.
+				if (comment_char == '\'' && sc.Match(comment_char, '$'))
+					sc.SetState(SCE_B_PREPROCESSOR);
+				else
+					sc.SetState(SCE_B_COMMENT);
 			} else if (sc.Match('"')) {
 				sc.SetState(SCE_B_STRING);
 			} else if (IsDigit(sc.ch)) {
@@ -215,6 +227,21 @@ static int CheckPureFoldPoint(char const *token, int &level) {
 		!strcmp(token, "endenumeration") ||
 		!strcmp(token, "endinterface") ||
 		!strcmp(token, "endstructure")) {
+		return -1;
+	}
+	return 0;
+}
+
+static int CheckFreeFoldPoint(char const *token, int &level) {
+	if (!strcmp(token, "function") ||
+		!strcmp(token, "sub") ||
+		!strcmp(token, "type")) {
+		level |= SC_FOLDLEVELHEADERFLAG;
+		return 1;
+	}
+	if (!strcmp(token, "end function") ||
+		!strcmp(token, "end sub") ||
+		!strcmp(token, "end type")) {
 		return -1;
 	}
 	return 0;
@@ -283,12 +310,17 @@ static void FoldBasicDoc(unsigned int startPos, int length,
 
 static void ColouriseBlitzBasicDoc(unsigned int startPos, int length, int initStyle,
                            WordList *keywordlists[], Accessor &styler) {
-	ColouriseBasicDoc(startPos, length, initStyle, keywordlists, styler);
+	ColouriseBasicDoc(startPos, length, initStyle, keywordlists, styler, ';');
 }
 
 static void ColourisePureBasicDoc(unsigned int startPos, int length, int initStyle,
                            WordList *keywordlists[], Accessor &styler) {
-	ColouriseBasicDoc(startPos, length, initStyle, keywordlists, styler);
+	ColouriseBasicDoc(startPos, length, initStyle, keywordlists, styler, ';');
+}
+
+static void ColouriseFreeBasicDoc(unsigned int startPos, int length, int initStyle,
+                           WordList *keywordlists[], Accessor &styler) {
+	ColouriseBasicDoc(startPos, length, initStyle, keywordlists, styler, '\'');
 }
 
 static void FoldBlitzBasicDoc(unsigned int startPos, int length, int,
@@ -299,6 +331,11 @@ static void FoldBlitzBasicDoc(unsigned int startPos, int length, int,
 static void FoldPureBasicDoc(unsigned int startPos, int length, int,
 	WordList *[], Accessor &styler) {
 	FoldBasicDoc(startPos, length, styler, CheckPureFoldPoint);
+}
+
+static void FoldFreeBasicDoc(unsigned int startPos, int length, int,
+	WordList *[], Accessor &styler) {
+	FoldBasicDoc(startPos, length, styler, CheckFreeFoldPoint);
 }
 
 static const char * const blitzbasicWordListDesc[] = {
@@ -317,9 +354,20 @@ static const char * const purebasicWordListDesc[] = {
 	0
 };
 
+static const char * const freebasicWordListDesc[] = {
+	"FreeBasic Keywords",
+	"FreeBasic PreProcessor Keywords",
+	"user defined 1",
+	"user defined 2",
+	0
+};
+
 LexerModule lmBlitzBasic(SCLEX_BLITZBASIC, ColouriseBlitzBasicDoc, "blitzbasic",
 	FoldBlitzBasicDoc, blitzbasicWordListDesc);
 
 LexerModule lmPureBasic(SCLEX_PUREBASIC, ColourisePureBasicDoc, "purebasic",
 	FoldPureBasicDoc, purebasicWordListDesc);
+
+LexerModule lmFreeBasic(SCLEX_FREEBASIC, ColouriseFreeBasicDoc, "freebasic",
+	FoldFreeBasicDoc, freebasicWordListDesc);
 

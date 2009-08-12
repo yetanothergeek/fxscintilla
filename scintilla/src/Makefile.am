@@ -34,67 +34,90 @@ libscintilla_la_SOURCES = \
 	Indicator.cxx \
 	AutoComplete.cxx \
 	XPM.cxx \
-  \
+    Decoration.cxx \
+    PositionCache.cxx \
+    RunStyles.cxx \
+    UniConversion.cxx \
 	ExternalLexer.cxx \
 	KeyWords.cxx \
-    LexAda.cxx \
+    PerLine.cxx \
+    \
     LexAPDL.cxx \
-    LexAsm.cxx \
-    LexAsn1.cxx \
+    LexASY.cxx \
     LexAU3.cxx \
     LexAVE.cxx \
+    LexAbaqus.cxx \
+    LexAda.cxx \
+    LexAsm.cxx \
+    LexAsn1.cxx \
     LexBaan.cxx \
     LexBash.cxx \
     LexBasic.cxx \
     LexBullant.cxx \
-    LexCaml.cxx \
     LexCLW.cxx \
-    LexConf.cxx \
+    LexCOBOL.cxx \
     LexCPP.cxx \
+    LexCSS.cxx \
+    LexCaml.cxx \
+    LexCmake.cxx \
+    LexConf.cxx \
     LexCrontab.cxx \
     LexCsound.cxx \
-    LexCSS.cxx \
+    LexD.cxx \
+    LexEScript.cxx \
     LexEiffel.cxx \
     LexErlang.cxx \
-    LexEScript.cxx \
     LexFlagship.cxx \
     LexForth.cxx \
     LexFortran.cxx \
+    LexGAP.cxx \
     LexGui4Cli.cxx \
-    LexHaskell.cxx \
     LexHTML.cxx \
+    LexHaskell.cxx \
     LexInno.cxx \
     LexKix.cxx \
     LexLisp.cxx \
     LexLout.cxx \
     LexLua.cxx \
-    LexMatlab.cxx \
-    LexMetapost.cxx \
     LexMMIXAL.cxx \
     LexMPT.cxx \
     LexMSSQL.cxx \
+    LexMagik.cxx \
+    LexMatlab.cxx \
+    LexMetapost.cxx \
+    LexMySQL.cxx \
+    LexNimrod.cxx \
     LexNsis.cxx \
     LexOpal.cxx \
     LexOthers.cxx \
-    LexPascal.cxx \
     LexPB.cxx \
-    LexPerl.cxx \
+    LexPLM.cxx \
     LexPOV.cxx \
     LexPS.cxx \
+    LexPascal.cxx \
+    LexPerl.cxx \
+    LexPowerPro.cxx \
+    LexPowerShell.cxx \
+    LexProgress.cxx \
     LexPython.cxx \
+    LexR.cxx \
     LexRebol.cxx \
     LexRuby.cxx \
+    LexSML.cxx \
+    LexSQL.cxx \
     LexScriptol.cxx \
     LexSmalltalk.cxx \
+    LexSorcus.cxx \
     LexSpecman.cxx \
     LexSpice.cxx \
-    LexSQL.cxx \
+    LexTACL.cxx \
     LexTADS3.cxx \
+    LexTAL.cxx \
     LexTCL.cxx \
     LexTeX.cxx \
     LexVB.cxx \
-    LexVerilog.cxx \
     LexVHDL.cxx \
+    LexVerilog.cxx \
     LexYAML.cxx
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER

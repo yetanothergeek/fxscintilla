@@ -10,7 +10,6 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <fcntl.h>
 
 #include "Platform.h"
 
@@ -21,22 +20,26 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-inline bool isEiffelOperator(unsigned int ch) {
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
+static inline bool isEiffelOperator(unsigned int ch) {
 	// '.' left out as it is used to make up numbers
 	return ch == '*' || ch == '/' || ch == '\\' || ch == '-' || ch == '+' ||
 	        ch == '(' || ch == ')' || ch == '=' ||
 	        ch == '{' || ch == '}' || ch == '~' ||
 	        ch == '[' || ch == ']' || ch == ';' ||
 	        ch == '<' || ch == '>' || ch == ',' ||
-	        ch == '.' || ch == '^' || ch == '%' || ch == ':' || 
+	        ch == '.' || ch == '^' || ch == '%' || ch == ':' ||
 		ch == '!' || ch == '@' || ch == '?';
 }
 
-inline bool IsAWordChar(unsigned int  ch) {
-	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_');
+static inline bool IsAWordChar(unsigned int  ch) {
+	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 
-inline bool IsAWordStart(unsigned int ch) {
+static inline bool IsAWordStart(unsigned int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 
@@ -187,19 +190,19 @@ static void FoldEiffelDocKeyWords(unsigned int startPos, int length, int /* init
 			s[j] = '\0';
 
 			if (
-				(strcmp(s, "check") == 0) || 
-				(strcmp(s, "debug") == 0) || 
-				(strcmp(s, "deferred") == 0) || 
-				(strcmp(s, "do") == 0) || 
+				(strcmp(s, "check") == 0) ||
+				(strcmp(s, "debug") == 0) ||
+				(strcmp(s, "deferred") == 0) ||
+				(strcmp(s, "do") == 0) ||
 				(strcmp(s, "from") == 0) ||
 				(strcmp(s, "if") == 0) ||
-				(strcmp(s, "inspect") == 0) || 
+				(strcmp(s, "inspect") == 0) ||
 				(strcmp(s, "once") == 0)
 			)
 				levelCurrent++;
 			if (!lastDeferred && (strcmp(s, "class") == 0))
 				levelCurrent++;
-			if (strcmp(s, "end") == 0) 
+			if (strcmp(s, "end") == 0)
 				levelCurrent--;
 			lastDeferred = strcmp(s, "deferred") == 0;
 		}
@@ -226,5 +229,10 @@ static void FoldEiffelDocKeyWords(unsigned int startPos, int length, int /* init
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
-LexerModule lmEiffel(SCLEX_EIFFEL, ColouriseEiffelDoc, "eiffel", FoldEiffelDocIndent);
-LexerModule lmEiffelkw(SCLEX_EIFFELKW, ColouriseEiffelDoc, "eiffelkw", FoldEiffelDocKeyWords);
+static const char * const eiffelWordListDesc[] = {
+	"Keywords",
+	0
+};
+
+LexerModule lmEiffel(SCLEX_EIFFEL, ColouriseEiffelDoc, "eiffel", FoldEiffelDocIndent, eiffelWordListDesc);
+LexerModule lmEiffelkw(SCLEX_EIFFELKW, ColouriseEiffelDoc, "eiffelkw", FoldEiffelDocKeyWords, eiffelWordListDesc);

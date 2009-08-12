@@ -2,11 +2,15 @@
 /** @file Document.h
  ** Text document that handles notifications, DBCS, styling, words and end of line.
  **/
-// Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+// Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
+
+#ifdef SCI_NAMESPACE
+namespace Scintilla {
+#endif
 
 /**
  * A Position is a position within a document between two characters or at the beginning or end.
@@ -26,10 +30,10 @@ public:
 	Position start;
 	Position end;
 
-	Range(Position pos=0) : 
+	Range(Position pos=0) :
 		start(pos), end(pos) {
 	};
-	Range(Position start_, Position end_) : 
+	Range(Position start_, Position end_) :
 		start(start_), end(end_) {
 	};
 
@@ -37,6 +41,7 @@ public:
 		return (start != invalidPosition) && (end != invalidPosition);
 	}
 
+	// Is the position within the range?
 	bool Contains(Position pos) const {
 		if (start < end) {
 			return (pos >= start && pos <= end);
@@ -45,12 +50,21 @@ public:
 		}
 	}
 
+	// Is the character after pos within the range?
+	bool ContainsCharacter(Position pos) const {
+		if (start < end) {
+			return (pos >= start && pos < end);
+		} else {
+			return (pos < start && pos >= end);
+		}
+	}
+
 	bool Contains(Range other) const {
 		return Contains(other.start) && Contains(other.end);
 	}
 
 	bool Overlaps(Range other) const {
-		return 
+		return
 		Contains(other.start) ||
 		Contains(other.end) ||
 		other.Contains(start) ||
@@ -60,11 +74,50 @@ public:
 
 class DocWatcher;
 class DocModification;
-class RESearch;
+class Document;
+
+/**
+ * Interface class for regular expression searching
+ */
+class RegexSearchBase {
+public:
+	virtual ~RegexSearchBase(){}
+
+	virtual long FindText(Document* doc, int minPos, int maxPos, const char *s,
+                        bool caseSensitive, bool word, bool wordStart, int flags, int *length) = 0;
+
+	///@return String with the substitutions, must remain valid until the next call or destruction
+	virtual const char *SubstituteByPosition(Document* doc, const char *text, int *length) = 0;
+};
+
+/// Factory function for RegexSearchBase
+extern RegexSearchBase* CreateRegexSearch(CharClassify *charClassTable);
+
+struct StyledText {
+	size_t length;
+	const char *text;
+	bool multipleStyles;
+	size_t style;
+	const unsigned char *styles;
+	StyledText(	size_t length_, const char *text_, bool multipleStyles_, int style_, const unsigned char *styles_) : 
+		length(length_), text(text_), multipleStyles(multipleStyles_), style(style_), styles(styles_) {
+	}
+	// Return number of bytes from start to before '\n' or end of text.
+	// Return 1 when start is outside text
+	size_t LineLength(size_t start) const {
+		size_t cur = start;
+		while ((cur < length) && (text[cur] != '\n'))
+			cur++;
+		return cur-start;
+	}
+	size_t StyleAt(size_t i) const {
+		return multipleStyles ? styles[i] : style;
+	}
+};
 
 /**
  */
-class Document {
+class Document : PerLine {
 
 public:
 	/** Used to pair watcher pointer with user data. */
@@ -78,22 +131,27 @@ public:
 		}
 	};
 
-private:	
+	enum charClassification { ccSpace, ccNewLine, ccWord, ccPunctuation };
+private:
 	int refCount;
 	CellBuffer cb;
-	enum charClassification { ccSpace, ccNewLine, ccWord, ccPunctuation };
-	charClassification charClass[256];
+	CharClassify charClass;
 	char stylingMask;
 	int endStyled;
-	int enteredCount;
+	int styleClock;
+	int enteredModification;
+	int enteredStyling;
 	int enteredReadOnlyCount;
 
 	WatcherWithUserData *watchers;
 	int lenWatchers;
 
+	// ldSize is not real data - it is for dimensions and loops
+	enum lineData { ldMarkers, ldLevels, ldState, ldMargin, ldAnnotation, ldSize };	
+	PerLine *perLineData[ldSize];
+
 	bool matchesValid;
-	RESearch *pre;
-	char *substituted;
+	RegexSearchBase* regex;
 
 public:
 	int stylingBits;
@@ -104,9 +162,12 @@ public:
 	int dbcsCodePage;
 	int tabInChars;
 	int indentInChars;
+	int actualIndentInChars;
 	bool useTabs;
 	bool tabIndents;
 	bool backspaceUnindents;
+
+	DecorationList decorations;
 
 	Document();
 	virtual ~Document();
@@ -114,15 +175,21 @@ public:
 	int AddRef();
 	int Release();
 
+	virtual void InsertLine(int line);
+	virtual void RemoveLine(int line);
+
 	int LineFromPosition(int pos);
 	int ClampPositionIntoDocument(int pos);
 	bool IsCrLf(int pos);
 	int LenChar(int pos);
+	bool InGoodUTF8(int pos, int &start, int &end);
 	int MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd=true);
 
 	// Gateways to modifying document
-	void DeleteChars(int pos, int len);
-	void InsertStyledString(int position, char *s, int insertLength);
+	void ModifiedAt(int pos);
+	void CheckReadOnly();
+	bool DeleteChars(int pos, int len);
+	bool InsertString(int position, const char *s, int insertLength);
 	int Undo();
 	int Redo();
 	bool CanUndo() { return cb.CanUndo(); }
@@ -134,71 +201,96 @@ public:
 	bool IsCollectingUndo() { return cb.IsCollectingUndo(); }
 	void BeginUndoAction() { cb.BeginUndoAction(); }
 	void EndUndoAction() { cb.EndUndoAction(); }
+	void AddUndoAction(int token, bool mayCoalesce) { cb.AddUndoAction(token, mayCoalesce); }
 	void SetSavePoint();
 	bool IsSavePoint() { return cb.IsSavePoint(); }
+	const char *BufferPointer() { return cb.BufferPointer(); }
 
 	int GetLineIndentation(int line);
 	void SetLineIndentation(int line, int indent);
-	int GetLineIndentPosition(int line);
+	int GetLineIndentPosition(int line) const;
 	int GetColumn(int position);
 	int FindColumn(int line, int column);
 	void Indent(bool forwards, int lineBottom, int lineTop);
+	static char *TransformLineEnds(int *pLenOut, const char *s, size_t len, int eolMode);
 	void ConvertLineEnds(int eolModeSet);
 	void SetReadOnly(bool set) { cb.SetReadOnly(set); }
 	bool IsReadOnly() { return cb.IsReadOnly(); }
 
-	void InsertChar(int pos, char ch);
-	void InsertString(int position, const char *s);
-	void InsertString(int position, const char *s, int insertLength);
+	bool InsertChar(int pos, char ch);
+	bool InsertCString(int position, const char *s);
 	void ChangeChar(int pos, char ch);
 	void DelChar(int pos);
-	int DelCharBack(int pos);
+	void DelCharBack(int pos);
 
 	char CharAt(int position) { return cb.CharAt(position); }
 	void GetCharRange(char *buffer, int position, int lengthRetrieve) {
 		cb.GetCharRange(buffer, position, lengthRetrieve);
 	}
 	char StyleAt(int position) { return cb.StyleAt(position); }
-	int GetMark(int line) { return cb.GetMark(line); }
+	int GetMark(int line);
 	int AddMark(int line, int markerNum);
+	void AddMarkSet(int line, int valueSet);
 	void DeleteMark(int line, int markerNum);
 	void DeleteMarkFromHandle(int markerHandle);
 	void DeleteAllMarks(int markerNum);
-	int LineFromHandle(int markerHandle) { return cb.LineFromHandle(markerHandle); }
-	int LineStart(int line);
-	int LineEnd(int line);
+	int LineFromHandle(int markerHandle);
+	int LineStart(int line) const;
+	int LineEnd(int line) const;
 	int LineEndPosition(int position);
 	int VCHomePosition(int position);
 
 	int SetLevel(int line, int level);
-	int GetLevel(int line) { return cb.GetLevel(line); }
-	void ClearLevels() { cb.ClearLevels(); }
+	int GetLevel(int line);
+	void ClearLevels();
 	int GetLastChild(int lineParent, int level=-1);
 	int GetFoldParent(int line);
 
 	void Indent(bool forwards);
 	int ExtendWordSelect(int pos, int delta, bool onlyWordCharacters=false);
 	int NextWordStart(int pos, int delta);
-	int Length() { return cb.Length(); }
-	long FindText(int minPos, int maxPos, const char *s, 
-		bool caseSensitive, bool word, bool wordStart, bool regExp, int *length);
+	int NextWordEnd(int pos, int delta);
+	int Length() const { return cb.Length(); }
+	void Allocate(int newSize) { cb.Allocate(newSize); }
+	long FindText(int minPos, int maxPos, const char *s,
+		bool caseSensitive, bool word, bool wordStart, bool regExp, int flags, int *length);
 	long FindText(int iMessage, unsigned long wParam, long lParam);
 	const char *SubstituteByPosition(const char *text, int *length);
-	int LinesTotal();
+	int LinesTotal() const;
 
 	void ChangeCase(Range r, bool makeUpperCase);
 
-	void SetWordChars(unsigned char *chars);
+	void SetDefaultCharClasses(bool includeWordClass);
+	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass);
 	void SetStylingBits(int bits);
 	void StartStyling(int position, char mask);
-	void SetStyleFor(int length, char style);
-	void SetStyles(int length, char *styles);
+	bool SetStyleFor(int length, char style);
+	bool SetStyles(int length, const char *styles);
 	int GetEndStyled() { return endStyled; }
-	bool EnsureStyledTo(int pos);
+	void EnsureStyledTo(int pos);
+	int GetStyleClock() { return styleClock; }
+	void IncrementStyleClock();
+	void DecorationFillRange(int position, int value, int fillLength);
 
-	int SetLineState(int line, int state) { return cb.SetLineState(line, state); }
-	int GetLineState(int line) { return cb.GetLineState(line); }
-	int GetMaxLineState() { return cb.GetMaxLineState(); }
+	int SetLineState(int line, int state);
+	int GetLineState(int line);
+	int GetMaxLineState();
+
+	StyledText MarginStyledText(int line);
+	void MarginSetStyle(int line, int style);
+	void MarginSetStyles(int line, const unsigned char *styles);
+	void MarginSetText(int line, const char *text);
+	int MarginLength(int line) const;
+	void MarginClearAll();
+
+	bool AnnotationAny() const;
+	StyledText AnnotationStyledText(int line);
+	void AnnotationSetText(int line, const char *text);
+	void AnnotationSetStyle(int line, int style);
+	void AnnotationSetStyles(int line, const unsigned char *styles);
+	int AnnotationLength(int line) const;
+	int AnnotationLines(int line) const;
+	void AnnotationClearAll();
 
 	bool AddWatcher(DocWatcher *watcher, void *userData);
 	bool RemoveWatcher(DocWatcher *watcher, void *userData);
@@ -208,20 +300,22 @@ public:
 	bool IsWordPartSeparator(char ch);
 	int WordPartLeft(int pos);
 	int WordPartRight(int pos);
+	int ExtendStyleRange(int pos, int delta, bool singleLine = false);
+	bool IsWhiteLine(int line) const;
+	int ParaUp(int pos);
+	int ParaDown(int pos);
+	int IndentSize() { return actualIndentInChars; }
+	int BraceMatch(int position, int maxReStyle);
 
 private:
-	bool IsDBCS(int pos);
-	charClassification WordCharClass(unsigned char ch);
+	CharClassify::cc WordCharClass(unsigned char ch);
 	bool IsWordStartAt(int pos);
 	bool IsWordEndAt(int pos);
 	bool IsWordAt(int start, int end);
-	void ModifiedAt(int pos);
 
 	void NotifyModifyAttempt();
 	void NotifySavePoint(bool atSavePoint);
 	void NotifyModified(DocModification mh);
-
-	int IndentSize() { return indentInChars ? indentInChars : tabInChars; }
 };
 
 /**
@@ -239,27 +333,33 @@ public:
  	int line;
 	int foldLevelNow;
 	int foldLevelPrev;
+	int annotationLinesAdded;
+	int token;
 
-	DocModification(int modificationType_, int position_=0, int length_=0, 
-		int linesAdded_=0, const char *text_=0) :
+	DocModification(int modificationType_, int position_=0, int length_=0,
+		int linesAdded_=0, const char *text_=0, int line_=0) :
 		modificationType(modificationType_),
 		position(position_),
 		length(length_),
 		linesAdded(linesAdded_),
 		text(text_),
-		line(0),
+		line(line_),
 		foldLevelNow(0),
-		foldLevelPrev(0) {}
+		foldLevelPrev(0),
+		annotationLinesAdded(0),
+		token(0) {}
 
-    DocModification(int modificationType_, const Action &act, int linesAdded_=0) :
+	DocModification(int modificationType_, const Action &act, int linesAdded_=0) :
 		modificationType(modificationType_),
-		position(act.position / 2),
+		position(act.position),
 		length(act.lenData),
 		linesAdded(linesAdded_),
 		text(act.data),
 		line(0),
 		foldLevelNow(0),
-		foldLevelPrev(0) {}
+		foldLevelPrev(0),
+		annotationLinesAdded(0),
+		token(0) {}
 };
 
 /**
@@ -276,5 +376,9 @@ public:
 	virtual void NotifyDeleted(Document *doc, void *userData) = 0;
 	virtual void NotifyStyleNeeded(Document *doc, void *userData, int endPos) = 0;
 };
+
+#ifdef SCI_NAMESPACE
+}
+#endif
 
 #endif
