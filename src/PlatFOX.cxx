@@ -129,7 +129,7 @@ void Palette::Allocate(Window & /* w */) {
 // <FIXME/>
 }
 
-Font::Font() : id(0) {}
+Font::Font() : fid(0) {}
 
 Font::~Font() {}
 
@@ -190,20 +190,20 @@ void Font::Create(const char *faceName, int characterSet,
 	// If name of the font begins with a '-', assume, that it is
 	// a full fontspec.
 	if (faceName[0] == '-') {
-		id = new FXFont(FXApp::instance(), faceName);
+		fid = new FXFont(FXApp::instance(), faceName);
 	}
 	else {
-        id = new FXFont(FXApp::instance(), faceName, size,
+        fid = new FXFont(FXApp::instance(), faceName, size,
         	bold ? FXFont::Bold : FXFont::Normal ,
 			italic ? FXFont::Italic : FXFont::Straight,
 			characterSet);
 	}
-	if (!id) {
+	if (!fid) {
 		// Font not available so substitute with the app default font.
-		id = FXApp::instance()->getNormalFont();
+		fid = FXApp::instance()->getNormalFont();
 	}
-	if (id)
-		id->create();
+	if (fid)
+		fid->create();
 }
 
 #else // WIN32
@@ -275,9 +275,9 @@ void Font::Create(const char *faceName, int characterSet,
 #endif // WIN32
 
 void Font::Release() {
-	if (id)
-		delete id;
-	id = 0;
+	if (fid)
+		delete fid;
+	fid = 0;
 }
 
 // ====================================================================
@@ -741,29 +741,29 @@ Surface *Surface::Allocate() {
 Window::~Window() {}
 
 void Window::Destroy() {
-	if (id)
-		delete id;
-	id = 0;
+	if (wid)
+		delete wid;
+	wid = 0;
 }
 
 bool Window::HasFocus() {
-	return id->hasFocus();
+	return wid->hasFocus();
 }
 
 PRectangle Window::GetPosition() {
 	// Before any size allocated pretend its 1000 wide so not scrolled
 	PRectangle rc(0, 0, 1000, 1000);
-	if (id) {
-		rc.left = id->getX();
-		rc.top = id->getY();
-		rc.right = rc.left + id->getWidth();
-		rc.bottom = rc.top + id->getHeight();
+	if (wid) {
+		rc.left = wid->getX();
+		rc.top = wid->getY();
+		rc.right = rc.left + wid->getWidth();
+		rc.bottom = rc.top + wid->getHeight();
 	}
 	return rc;
 }
 
 void Window::SetPosition(PRectangle rc) {
-	id->position(rc.left, rc.top, rc.Width(), rc.Height());
+	wid->position(rc.left, rc.top, rc.Width(), rc.Height());
 }
 
 
@@ -787,32 +787,32 @@ void Window::SetPositionRelative(PRectangle rc, Window relativeTo) {
 	if (oy + sizey > screenHeight)
 		oy = screenHeight - sizey;
 
-	id->position(ox, oy, rc.Width(), rc.Height());
+	wid->position(ox, oy, rc.Width(), rc.Height());
 }
 
 PRectangle Window::GetClientPosition() {
 	// On GTK+, the client position is the window position
-	return PRectangle(0, 0, (id) ? id->getWidth() - 1 : 1000, (id) ? id->getHeight() -1 : 1000);
+	return PRectangle(0, 0, (wid) ? wid->getWidth() - 1 : 1000, (wid) ? wid->getHeight() -1 : 1000);
 }
 
 void Window::Show(bool show) {
 	if (show) {
-		id->show();
-		id->raise();
+		wid->show();
+		wid->raise();
 	}
 	else
-		id->hide();
+		wid->hide();
 }
 
 void Window::InvalidateAll() {
-	if (id) {
-		id->update();
+	if (wid) {
+		wid->update();
 	}
 }
 
 void Window::InvalidateRectangle(PRectangle rc) {
-	if (id)
-		id->update(rc.left, rc.top, rc.right - rc.left + 1, rc.bottom - rc.top + 1);
+	if (wid)
+		wid->update(rc.left, rc.top, rc.right - rc.left + 1, rc.bottom - rc.top + 1);
 }
 
 void Window::SetFont(Font &) {
@@ -853,19 +853,19 @@ void Window::SetCursor(Cursor curs) {
 		cursorLast = cursorArrow;
 		break;
 	}
-	id->setDefaultCursor(id->getApp()->getDefaultCursor(cursorID));
+	wid->setDefaultCursor(wid->getApp()->getDefaultCursor(cursorID));
 }
 
 void Window::SetTitle(const char *s) {
-	static_cast<FXTopWindow *>(id)->setTitle(s);
+	static_cast<FXTopWindow *>(wid)->setTitle(s);
 }
 
 
 /*** JKP: FIXME: Ugly and not tested !!! ***/
 PRectangle Window::GetMonitorRect(Point pt) {
-  FXRootWindow *rootwin=id->getApp()->getRootWindow(); //(id->getApp(),id->getVisual());
-  FXint xpos=id->getX();
-  FXint ypos=id->getY();
+  FXRootWindow *rootwin=wid->getApp()->getRootWindow(); //(id->getApp(),id->getVisual());
+  FXint xpos=wid->getX();
+  FXint ypos=wid->getY();
   return PRectangle(-xpos, -ypos, (-xpos) + rootwin->getDefaultWidth(),
 	                  (-ypos) + rootwin->getDefaultHeight());
 }
@@ -1009,9 +1009,9 @@ long PopupListBox::onDoubleClicked(FXObject *, FXSelector, void *)
 // ====================================================================
 
 void ListBoxFox::Create(Window & parent, int, Point, int, bool) {
-	id = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
-	id->create();
-	list = (static_cast<PopupListBox *>(id))->getList();
+	wid = new PopupListBox(static_cast<FXComposite *>(parent.GetID()), this);
+	wid->create();
+	list = (static_cast<PopupListBox *>(wid))->getList();
 }
 
 void ListBoxFox::SetFont(Font &scint_font) {
@@ -1033,13 +1033,13 @@ int ListBoxFox::GetVisibleRows() const {
 PRectangle ListBoxFox::GetDesiredRect() {
 	// Before any size allocated pretend its 100 wide so not scrolled
 	PRectangle rc(0, 0, 100, 100);
-	if (id) {
+	if (wid) {
 		// Height
 		int rows = Length();
 		if ((rows == 0) || (rows > desiredVisibleRows))
 			rows = desiredVisibleRows;
 		list->setNumVisible(rows);
-		rc.bottom = id->getHeight();
+		rc.bottom = wid->getHeight();
 		// Width
 		int width = maxItemCharacters;
 		if (width < 12)
@@ -1082,8 +1082,8 @@ PRectangle ListBoxFox::GetDesiredRect() {
 
 void ListBoxFox::Show(bool show) {
 	if (show) {
-		(static_cast<FXPopup *>(id))->popup(NULL, id->getX(), id->getY(),
-											id->getWidth(), id->getHeight());
+		(static_cast<FXPopup *>(wid))->popup(NULL, wid->getX(), wid->getY(),
+											wid->getWidth(), wid->getHeight());
 		list->selectItem(0);
 	}
 }
@@ -1115,7 +1115,7 @@ void ListBoxFox::Append(char *s, int type) {
 }
 
 int ListBoxFox::Length() {
-	if (id)
+	if (wid)
 		return list->getNumItems();
 	return 0;
 }
@@ -1226,32 +1226,32 @@ ListBox * ListBox::Allocate()
 // Menu
 // ====================================================================
 
-Menu::Menu() : id(0) {}
+Menu::Menu() : mid(0) {}
 
 
 void Menu::CreatePopUp() {
 	Destroy();
-	id = new FXMenuPane(FXApp::instance()->getCursorWindow());
+	mid = new FXMenuPane(FXApp::instance()->getCursorWindow());
 }
 
 void Menu::Destroy() {
-	if (id)
-		delete id;
-	id = 0;
+	if (mid)
+		delete mid;
+	mid = 0;
 }
 
 void Menu::Show(Point pt, Window &) {
 	int screenHeight = FXApp::instance()->getRootWindow()->getDefaultHeight();
 	int screenWidth = FXApp::instance()->getRootWindow()->getDefaultWidth();
-	id->create();
-	if ((pt.x + id->getWidth()) > screenWidth) {
-		pt.x = screenWidth - id->getWidth();
+	mid->create();
+	if ((pt.x + mid->getWidth()) > screenWidth) {
+		pt.x = screenWidth - mid->getWidth();
 	}
-	if ((pt.y + id->getHeight()) > screenHeight) {
-		pt.y = screenHeight - id->getHeight();
+	if ((pt.y + mid->getHeight()) > screenHeight) {
+		pt.y = screenHeight - mid->getHeight();
 	}
-	id->popup(NULL, pt.x - 4, pt.y);
-  FXApp::instance()->runModalWhileShown(id);
+	mid->popup(NULL, pt.x - 4, pt.y);
+  FXApp::instance()->runModalWhileShown(mid);
 }
 
 #ifndef WIN32

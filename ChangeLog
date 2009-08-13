@@ -1,3 +1,6 @@
+2009-08-13 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Updated to Scintilla 1.79
+
 2009-06-10 Jeff Pohlmeyer <yetanothergeek@gmail.com>
 	* Migrated my local copy into Savannah CVS, see FXSCINTILLA-1_78 branch.
 	* Removed many non-essential and/or unmaintained files from source tree.

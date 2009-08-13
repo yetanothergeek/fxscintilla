@@ -105,7 +105,49 @@ rm -f "scintilla/src/SciTE.properties"
 mkdir "scintilla/doctmp/"
 mv "scintilla/doc/ScintillaDoc.html" "scintilla/doctmp/."
 
-( cd scintilla; rm -rf *.bat macosx tgzsrc vcbuild win32 bin doc gtk )
+( cd scintilla; rm -rf *.bat macosx tgzsrc vcbuild win32 bin doc gtk cocoa test )
 mv "scintilla/doctmp" "scintilla/doc"
 ( cd scintilla/include; patch -p0 < ../../util/Platform.h.patch )
+
+
+
+(
+  cd 'scintilla.old/scintilla'
+  find -type d -name 'CVS' | while read dir
+  do
+    dest="../../scintilla/${dir}"
+    [ -e "${dest}" ] && continue
+    cp -ai "${dir}" "${dest}" || true
+  done
+)
+
+if [ -f "scintilla/version.txt" ]
+then
+  version=$(head -n 1 "scintilla/version.txt")
+  case "${version}"
+  in 
+    [0-9][0-9][0-9])
+      major_version="${version:0:1}"
+      minor_version="${version:1:2}"
+    ;;
+    *)
+      major_version=""
+      minor_version=""
+    ;;
+  esac
+  if [ "${major_version}" ] && [ "${minor_version}" ]
+  then
+    sed -i "s/^MAJOR_VERSION=.*/MAJOR_VERSION=${major_version}/" configure.in
+    sed -i "s/^MINOR_VERSION=.*/MINOR_VERSION=${minor_version}/" configure.in
+    sed -i "s/^PATCH_LEVEL=.*/PATCH_LEVEL=0/" configure.in
+    grep "^MAJOR_VERSION=" configure.in
+    grep "^MINOR_VERSION=" configure.in
+    grep "^PATCH_LEVEL=" configure.in
+  else
+    echo "Warning: could not parse scintilla/version.txt" >&2
+  fi
+else
+  echo "Warning: could not find scintilla/version.txt" >&2
+fi
+
 
