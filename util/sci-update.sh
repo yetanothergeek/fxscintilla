@@ -2,8 +2,12 @@
 
 # Upgrade to a newer version of scintilla
 # Note: source archive must be in *.tgz format! 
+#
 # Example:
-#   % sci-update.sh /your/path/to/scintilla174.tgz
+#   % ./util/sci-update.sh /your/path/to/scintilla174.tgz
+#
+# Or update directly from a scintilla CVS checkout:
+#   % ./util/sci-update.sh /your/path/to/scintilla
 
 
 fail ()
@@ -14,14 +18,43 @@ fail ()
   exit 1
 }
 
+backup="scintilla.old"
+
+backup_old ()
+{
+  if [ -e include ] || [ -e scintilla ]
+  then
+    [ -d  "${backup}" ] && fail \
+      "Directory already exists:\n  ${backup}\n(You should remove it first.)"  
+    [ -e "${backup}" ] && fail \
+      "Will not overwrite existing file:\n  ${backup}\n(You should remove it first.)"
+
+    mkdir "${backup}"
+    if [ -e include ]
+    then
+      if [ -d include ] 
+      then
+        cp -a include "${backup}/."
+      else
+        mv include "${backup}/."
+        mkdir include
+      fi
+    fi
+
+    [ -e scintilla ] && mv scintilla "${backup}"
+
+  fi
+}
+
+
 abs=$(readlink -f "${0}")
 rel="./util/${0##*/}"
 
 
 if [ -f "${rel}" ] && [ -f "${abs}" ] && [ $(stat -c "%i" ${abs}) -eq $(stat -c "%i" ${rel}) ]
 then
-unset abs
-unset rel
+  unset abs
+  unset rel
 else
   dir=${abs%/*}
   fail "Working directory should be:\n ${dir%/*}/"
@@ -32,55 +65,35 @@ fi
 
 [ -e "${1}" ] || fail "File not found: ${1}"
 
-[ -f "${1}" ] || fail "Not a regular file: ${1}"
-
 [ -r "${1}" ] || fail "Access denied: ${1}"
 
+if [ -f "${1}" ]
+then 
+  case "${1##*/}" in
+    scintilla?*.tgz)
+    ;;
+    *)
+    fail "Filename should match pattern: 'scintilla?*.tgz'\nGot: '${1##*/}'"
+  esac
 
+  tar -ztf "${1}" &> /dev/null || fail "Invalid or corrupted archive:\n ${1}"
 
-case "${1##*/}" in
-  scintilla?*.tgz)
-  ;;
-  *)
-  fail "Filename should match pattern: 'scintilla?*.tgz'\nGot: '${1##*/}'"
-esac
+  scidir="$(tar -ztf "${1}" | while read entry; do echo "${entry%%/*}"; done | sort | uniq)"
 
-tar -ztf "${1}" &> /dev/null || fail "Invalid or corrupted archive:\n ${1}"
+  [ "${scidir}" = "scintilla" ] || fail "Archive has an unexpected directory structure."
 
-scidir="$(tar -ztf "${1}" | while read entry; do echo "${entry%%/*}"; done | sort | uniq)"
+  backup_old
 
-[ "${scidir}" = "scintilla" ] || fail "Archive has an unexpected directory structure."
+  tar -zxf "${1}"
 
-backup="scintilla.old"
-
-if [ -e include ] || [ -e scintilla ]
-then
-
-  backup="scintilla.old"
-  [ -d  ${backup} ] && fail \
-    "Directory already exists:\n  ${backup}\n(You should remove it first.)"  
-  [ -e "${backup}" ] && fail \
-    "Will not overwrite existing file:\n  ${backup}\n(You should remove it first.)"
-
-  mkdir "${backup}"
-
-  if [ -e include ]
-  then
-    if [ -d include ] 
-    then
-      cp -a include "${backup}/."
-    else
-      mv include "${backup}/."
-      mkdir include
-    fi
-  fi
-
-  [ -e scintilla ] && mv scintilla "${backup}"
-
+else 
+  [ -d "${1}" ] || fail "Source object is not a file or a directory:\n ${1}"
+  [ -x "${1}" ] || fail "Search permission denied for directory:\n ${1}"
+  [ "${1##*/}" = "scintilla" ] || fail "Source directory must be named 'scintilla'"
+  backup_old
+  cp -ai "$1" "."
+  
 fi
-
-
-tar -zxf "${1}"
 
 mv scintilla/include/Scintilla.h include
 mv scintilla/include/SciLexer.h include
@@ -110,6 +123,17 @@ mv "scintilla/doctmp" "scintilla/doc"
 ( cd scintilla/include; patch -p0 < ../../util/Platform.h.patch )
 
 
+(
+  cd 'scintilla'
+  find -type d -name 'CVS' | while read dir
+  do
+    rm -rf "${dir}"
+  done
+  find -type f -name '.cvs*' | while read file
+  do
+    rm -f "${file}"
+  done
+)
 
 (
   cd 'scintilla.old/scintilla'
@@ -133,6 +157,12 @@ then
     *)
       major_version=""
       minor_version=""
+    ;;
+  esac
+  case "${minor_version}"
+  in
+    0*)
+      minor_version="${minor_version:1}"
     ;;
   esac
   if [ "${major_version}" ] && [ "${minor_version}" ]
