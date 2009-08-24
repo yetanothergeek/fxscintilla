@@ -28,7 +28,9 @@ noinst_HEADERS = \
     src/StyleContext.h \
     src/UniConversion.h \
     src/ViewStyle.h \
-    src/XPM.h
+    src/XPM.h \
+    src/Selection.h \
+    src/PropSetSimple.h
 
 pkginclude_HEADERS = \
     include/Accessor.h \

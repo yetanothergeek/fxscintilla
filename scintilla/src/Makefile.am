@@ -34,14 +34,14 @@ libscintilla_la_SOURCES = \
 	Indicator.cxx \
 	AutoComplete.cxx \
 	XPM.cxx \
-    Decoration.cxx \
-    PositionCache.cxx \
-    RunStyles.cxx \
-    UniConversion.cxx \
+	Decoration.cxx \
+	PositionCache.cxx \
+	RunStyles.cxx \
+	UniConversion.cxx \
 	ExternalLexer.cxx \
 	KeyWords.cxx \
-    PerLine.cxx \
-    Selection.cxx \
+	PerLine.cxx \
+	Selection.cxx \
     \
     LexAPDL.cxx \
     LexASY.cxx \
