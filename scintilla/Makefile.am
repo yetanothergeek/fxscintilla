@@ -35,7 +35,6 @@ pkginclude_HEADERS = \
     include/KeyWords.h \
     include/Platform.h \
     include/PropSet.h \
-    include/SString.h \
     include/ScintillaWidget.h \
     include/WindowAccessor.h
 

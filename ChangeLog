@@ -1,3 +1,9 @@
+2009-08-22 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Updated to Scintilla 2.01
+  * Reworked selection code to work with new Scintilla multiple selections.
+  * Fixed a bug where DND was not properly releasing mouse grab after drop.
+  * Fixed a null-pointer crash in onSelectionRequest()
+
 2009-08-13 Jeff Pohlmeyer <yetanothergeek@gmail.com>
   * Updated to Scintilla 1.79
 

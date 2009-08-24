@@ -31,6 +31,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <time.h>
+#include <string>
+#include <vector>
 
 #if !defined(WIN32) || defined(__CYGWIN__)
 # if defined(__CYGWIN__)
@@ -58,6 +60,7 @@
 #ifdef SCI_LEXER
 # include "SciLexer.h"
 # include "PropSet.h"
+# include "PropSetSimple.h"
 # include "Accessor.h"
 # include "KeyWords.h"
 # include "ExternalLexer.h"
@@ -78,9 +81,10 @@
 #include "CharClassify.h"
 #include "Decoration.h"
 #include "Document.h"
+#include "Selection.h"
 #include "PositionCache.h"
 #include "Editor.h"
-#include "SString.h"
+//#include "SString.h"
 #include "ScintillaBase.h"
 
 #ifdef WIN32
@@ -236,13 +240,16 @@ sptr_t ScintillaFOX::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 void ScintillaFOX::ClaimSelection()
 {
   // Acquire selection
-	if (currentPos != anchor) {
+
+// JKP	1.79 if (currentPos != anchor) {
+// JKP 2.00 ? if (SelectionStart().Position() != SelectionEnd().Position()) {
+	if (!sel.Empty()) { // <- JKP 2.00
     _fxsc.acquireSelection(&FXWindow::stringType,1);
 		primarySelection = true;
 		primary.Free();
 	}
 	else {
-    _fxsc.releaseSelection();
+//	_fxsc.releaseSelection(); // JKP:  Does not work for 2.00 - Do we need somethong else?
 	}
 }
 
@@ -257,29 +264,49 @@ void ScintillaFOX::UnclaimSelection()
 }
 
 // JKP: Heavily reworked to fix middle-click-paste when current document has the X-selection.
-// JKP: FIXME - Rectangular paste in the middle of a line gives a strange "selection artifact"
+// JKP: Still more reworking for 2.00!
 void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 {
-  FXuchar *data; FXuint len;
+  FXuchar *data=NULL;
+	FXuint len=0;
   if (pdoc->IsReadOnly()) { return; }
   if(!_fxsc.getDNDData(origin, FXWindow::stringType, data, len)) { return; }
-  FXRESIZE(&data,FXuchar,len+1); data[len]='\0';
+  FXRESIZE(&data,FXuchar,len+1);
+	data[len]='\0';
+	bool isRectangular;
+	SelectionText selText;
+
 #ifdef WIN32
-    len=0;
+	len=0;
 	while(data[len]) { len++; }
-#endif	// WIN32
+	isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
+#else // !WIN32
+	isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));
+#endif // WIN32
+
+	selText.Copy((char*)data,len,CodePage(),0,isRectangular,false);
   pdoc->BeginUndoAction();
+
   if(_fxsc.hasSelection() && (origin == FROM_CLIPBOARD)) { ClearSelection(); }
-  pdoc->InsertString(atPos>0?atPos:currentPos, (const char*)data, len);
-  if (atPos<0) {
-    SetEmptySelection( currentPos + len );
-  } else {
-    currentPos=atPos+len;
-    anchor=currentPos;	  
-    FullPaint();
-  }
+
+  SelectionPosition selStart = SelectionStart();
+
+	if (selText.rectangular) {
+		PasteRectangular(selStart, selText.s, selText.len);
+	} else {
+		selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
+		if (pdoc->InsertString(atPos>0?atPos:selStart.Position(),selText.s, selText.len)) {
+			if (atPos<0) {
+				SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
+			} else {  
+				SetEmptySelection( (atPos>0?atPos:selStart.Position()) + selText.len );
+				FullPaint();
+			}
+		}
+	}
   pdoc->EndUndoAction();
   EnsureCaretVisible();
+//  _fxsc.setDNDData(origin, FXWindow::stringType, data, len);
   FXFREE(&data);
 }
 
@@ -838,7 +865,7 @@ long FXScintilla::onLeftBtnRelease(FXObject *, FXSelector, void * ptr)
 		if (_scint->tryDrag) {
 			_scint->tryDrag = false;
 			_scint->SetEmptySelection(_scint->PositionFromLocation(pt));
-			_scint->SetDragPosition(invalidPosition);
+			_scint->SetDragPosition(SelectionPosition(invalidPosition));
 		}
 		return 1;
 	}
@@ -863,11 +890,11 @@ long FXScintilla::onMiddleBtnPress(FXObject *, FXSelector, void * ptr)
 {
 //	if (FXScrollArea::onMiddleBtnPress(sender, sel, ptr))
 //		return 1;
-    int pos;
+	int pos;
 	Point pt;
 	pt.x = ((FXEvent *)ptr)->win_x;
 	pt.y = ((FXEvent *)ptr)->win_y;
-    pos=_scint->PositionFromLocation(pt);
+	pos=_scint->PositionFromLocation(pt);
 	_scint->ReceivedSelection(FROM_SELECTION, pos); 
 //	_scint->currentPos = pos; // JKP: Delay asignment of currentPos until AFTER ReceivedSelection()
 //	_scint->anchor = pos; // JKP
@@ -1038,71 +1065,74 @@ long FXScintilla::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
 // Start a drag operation
 long FXScintilla::onBeginDrag(FXObject* sender,FXSelector sel,void* ptr){
+  FXEvent*ev=(FXEvent*)ptr;
   _scint->SetMouseCapture(true);
-  if(FXScrollArea::onBeginDrag(sender,sel,ptr)) return 1;
+  if (FXScrollArea::onBeginDrag(sender,sel,ptr)) return 1;
   beginDrag(&textType,1);
   setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
   return 1;
-  }
+}
 
 
 // End drag operation
 long FXScintilla::onEndDrag(FXObject* sender,FXSelector sel,void* ptr){
+  _scint->inDragDrop = _scint->ddNone; // <-JKP: Fix for mouse not releasing.
   _scint->SetMouseCapture(false);
-  if(FXScrollArea::onEndDrag(sender,sel,ptr)) return 1;
+  if (FXScrollArea::onEndDrag(sender,sel,ptr)) return 1;
   endDrag((didAccept()!=DRAG_REJECT));
   setDragCursor(getApp()->getDefaultCursor(DEF_TEXT_CURSOR));
-
-	_scint->SetDragPosition(invalidPosition);
+	_scint->SetDragPosition(SelectionPosition(invalidPosition));
 	return 1;
-  }
+}
 
 
 // Dragged stuff around
-long FXScintilla::onDragged(FXObject* sender,FXSelector sel,void* ptr){
+long FXScintilla::onDragged(FXObject* sender,FXSelector sel,void* ptr) {
   FXEvent* event=(FXEvent*)ptr;
   FXDragAction action;
   if(FXScrollArea::onDragged(sender,sel,ptr)) return 1;
   action=DRAG_COPY;
 	if (!_scint->pdoc->IsReadOnly()) {
-    if(isDropTarget()) action=DRAG_MOVE;
-    if(event->state&CONTROLMASK) action=DRAG_COPY;
-    if(event->state&SHIFTMASK) action=DRAG_MOVE;
-    }
-  handleDrag(event->root_x,event->root_y,action);
-  if(didAccept()!=DRAG_REJECT){
-    if(action==DRAG_MOVE)
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
-    else
-      setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
-    }
-  else{
-    setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
-    }
-  return 1;
+    if (isDropTarget()) action=DRAG_MOVE;
+    if (event->state&CONTROLMASK) action=DRAG_COPY;
+    if (event->state&SHIFTMASK) action=DRAG_MOVE;
   }
+  handleDrag(event->root_x,event->root_y,action);
+
+  switch (didAccept()) {
+    case DRAG_MOVE:
+      setDragCursor(getApp()->getDefaultCursor(DEF_DNDMOVE_CURSOR));
+      break;
+    case DRAG_COPY:
+      setDragCursor(getApp()->getDefaultCursor(DEF_DNDCOPY_CURSOR));
+      break;
+    default:
+      setDragCursor(getApp()->getDefaultCursor(DEF_DNDSTOP_CURSOR));
+      break;
+  }
+  return 1;
+}
 
 
 // Handle drag-and-drop enter
-long FXScintilla::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr){
+long FXScintilla::onDNDEnter(FXObject* sender,FXSelector sel,void* ptr) {
   FXScrollArea::onDNDEnter(sender,sel,ptr);
   return 1;
-  }
+}
 
 
 // Handle drag-and-drop leave
-long FXScintilla::onDNDLeave(FXObject* sender,FXSelector sel,void* ptr){
+long FXScintilla::onDNDLeave(FXObject* sender,FXSelector sel,void* ptr) {
   stopAutoScroll();
   FXScrollArea::onDNDLeave(sender,sel,ptr);
   return 1;
-  }
+}
 
 // Handle drag-and-drop motion
 long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
   FXDragAction action;
   FXint pos;
-
   // Scroll into view
   if(startAutoScroll(ev, TRUE)) return 1;
 
@@ -1110,14 +1140,13 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
   if(FXScrollArea::onDNDMotion(sender,sel,ptr)) return 1;
 
   // Correct drop type
-  if(offeredDNDType(FROM_DRAGNDROP,textType)){
+  if (offeredDNDType(FROM_DRAGNDROP,textType) ){
 
     // Is target editable?
 		if (!_scint->pdoc->IsReadOnly()) {
       action=inquireDNDAction();
-
       // Check for legal DND action
-      if(action==DRAG_COPY || action==DRAG_MOVE){
+      if (action==DRAG_COPY || action==DRAG_MOVE) {
 				Point npt(ev->win_x, ev->win_y);
 				pos = _scint->PositionFromLocation(npt);
 				if (!_scint->inDragDrop) {
@@ -1125,9 +1154,12 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 					_scint->ptMouseLastBeforeDND = _scint->ptMouseLast;
 				}
 				_scint->ptMouseLast = npt;
-				_scint->SetDragPosition(pos);
-				if (_scint->PositionInSelection(pos) != 0) {
+				_scint->SetDragPosition(SelectionPosition(pos));
+
+        // JKP: Changed the logic here...
+				if ( (!_scint->PositionInSelection(pos)) || (_scint->pdoc->Length()==0) ) {
           acceptDrop(DRAG_ACCEPT);
+          setFocus();
         }
       }
     }
@@ -1141,7 +1173,8 @@ long FXScintilla::onDNDMotion(FXObject* sender,FXSelector sel,void* ptr){
 
 // Handle drag-and-drop drop
 long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
-  FXuchar *data,*junk; FXuint len,dum;
+  FXuchar *data,*junk;
+  FXuint len,dum;
 
   // Stop scrolling
   stopAutoScroll();
@@ -1181,7 +1214,7 @@ long FXScintilla::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 }
 
 // Service requested DND data
-long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
+long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr) {
   FXEvent *event=(FXEvent*)ptr;
 
   // Perhaps the target wants to supply its own data
@@ -1203,14 +1236,14 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
   if(event->target==deleteType){
 		if (!_scint->pdoc->IsReadOnly()) {
 			if (isDragging()) {
-				int selStart = _scint->SelectionStart();
-				int selEnd = _scint->SelectionEnd();
-				if (_scint->posDrop > selStart) {
-					if (_scint->posDrop > selEnd)
-						_scint->posDrop = _scint->posDrop - (selEnd-selStart);
+				int selStart = _scint->SelectionStart().Position();
+				int selEnd = _scint->SelectionEnd().Position();
+				if (_scint->posDrop.Position() > selStart) {
+					if (_scint->posDrop.Position() > selEnd)
+						_scint->posDrop.SetPosition(_scint->posDrop.Position() - (selEnd-selStart));
 					else
-						_scint->posDrop = selStart;
-					_scint->posDrop = _scint->pdoc->ClampPositionIntoDocument(_scint->posDrop);
+						_scint->posDrop.SetPosition(selStart);
+					_scint->posDrop.SetPosition(_scint->pdoc->ClampPositionIntoDocument(_scint->posDrop.Position()));
 				}
 			}
       _scint->ClearSelection();
@@ -1219,7 +1252,7 @@ long FXScintilla::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
     }
 
   return 0;
-  }
+}
 
 // ********************************************************************
 // Selection
@@ -1241,19 +1274,20 @@ long FXScintilla::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
 
   // Perhaps the target wants to supply its own data for the selection
-  if(FXScrollArea::onSelectionRequest(sender,sel,ptr)) return 1;
+  if (FXScrollArea::onSelectionRequest(sender,sel,ptr)) { return 1; }
 
   // Return text of the selection
-  if(event->target==stringType){
+  if (event->target==stringType) {
 		if (_scint->primary.s == NULL) {
 			_scint->CopySelectionRange(&_scint->primary);
 		}
+		if (_scint->primary.s) {
+			setDNDData(FROM_SELECTION,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
+			return 1;
+		}
+	}
 
-    setDNDData(FROM_SELECTION,stringType,(FXuchar *)strdup(_scint->primary.s),strlen(_scint->primary.s));
-    return 1;
-  }
-
-  return 0;
+	return 0;
 }
 
 // ********************************************************************

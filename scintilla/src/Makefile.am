@@ -41,6 +41,7 @@ libscintilla_la_SOURCES = \
 	ExternalLexer.cxx \
 	KeyWords.cxx \
     PerLine.cxx \
+    Selection.cxx \
     \
     LexAPDL.cxx \
     LexASY.cxx \
