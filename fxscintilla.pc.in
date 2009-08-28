@@ -5,8 +5,6 @@ includedir=@includedir@
 
 Name: fxscintilla
 Description: Implementation of the Scintilla text editing widget for the FOX GUI Toolkit.
-Version: @LT_FXSCINTILLA_CURRENT@.@LT_FXSCINTILLA_REVISION@.@LT_FXSCINTILLA_AGE@
+Version: @MAJOR_VERSION@.@MINOR_VERSION@.@PATCH_LEVEL@
 Libs: -L${libdir} -lfxscintilla
 Cflags: -I${includedir}/fxscintilla
-
-

@@ -1,3 +1,7 @@
+2009-08-27 Jeff Pohlmeyer <yetanothergeek@gmail.com>
+  * Changed pkg-config --modversion to show package release, 
+    instead of library numbering scheme.
+
 2009-08-22 Jeff Pohlmeyer <yetanothergeek@gmail.com>
   * Updated to Scintilla 2.01
   * Reworked selection code to work with new Scintilla multiple selections.
