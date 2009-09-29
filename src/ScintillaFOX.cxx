@@ -279,6 +279,8 @@ void ScintillaFOX::ReceivedSelection(FXDNDOrigin origin, int atPos)
 #ifdef WIN32
 	len=0;
 	while(data[len]) { len++; }
+	static CLIPFORMAT cfColumnSelect = 
+	  static_cast<CLIPFORMAT>(::RegisterClipboardFormat("MSDEVColumnSelect"));
 	isRectangular = ::IsClipboardFormatAvailable(cfColumnSelect) != 0;
 #else // !WIN32
 	isRectangular = ((len > 2) && (data[len - 1] == 0 && data[len - 2] == '\n'));

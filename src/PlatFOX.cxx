@@ -260,16 +260,16 @@ static int CharacterSetCode(int characterSet) {
 void Font::Create(const char *faceName, int characterSet,
 	int size, bool bold, bool italic, bool) {
 	Release();
-	id = new FXFont(FXApp::instance(), faceName, size,
+	fid = new FXFont(FXApp::instance(), faceName, size,
         	bold ? FXFont::Bold : FXFont::Normal ,
 			italic ? FXFont::Italic : FXFont::Straight,
 			CharacterSetCode(characterSet));
-	if (!id) {
+	if (!fid) {
 		// Font not available so substitute with the app default font.
-		id = FXApp::instance()->getNormalFont();
+		fid = FXApp::instance()->getNormalFont();
 	}
-	if (id)
-		id->create();
+	if (fid)
+		fid->create();
 }
 
 #endif // WIN32
