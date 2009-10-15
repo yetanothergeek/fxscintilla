@@ -44,8 +44,11 @@
 # include <fx.h>
 # include <fxkeys.h>
 #else
-# if defined(__MINGW32__) && defined(PIC) && !defined(FOXDLL)
-#   define FOXDLL
+# if defined(__MINGW32__) 
+#  include <windows.h>
+#  if defined(PIC) && !defined(FOXDLL)
+#    define FOXDLL
+#  endif
 # endif
 # include <fx.h>
 # include <fxkeys.h>
