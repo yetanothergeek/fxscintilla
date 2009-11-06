@@ -1,4 +1,20 @@
-#!/bin/bash
+#!/bin/bash -e
+
+
+abs=$(readlink -f "${0}")
+rel="./util/${0##*/}"
+
+
+if [ -f "${rel}" ] && [ -f "${abs}" ] && [ $(stat -c "%i" ${abs}) -eq $(stat -c "%i" ${rel}) ]
+then
+  unset abs
+  unset rel
+else
+  dir=${abs%/*}
+  printf "***FATAL***\nWorking directory must be:\n  %s/\n" "${dir%/*}" 1>&2
+  exit 1
+fi
+
 
 rm -f configure tests/test src/version.h fxscintilla-*.tar.gz
 
