@@ -16,8 +16,6 @@ scintilla/include/HFacer.py \
 scintilla/src/LexGen.py \
 scintilla/include/Scintilla.iface \
 scintilla/doc/ScintillaDoc.html \
-tests/test.rb \
 util/Platform.h.patch \
 util/cleanup.sh \
-util/sanity.sh \
 util/sci-update.sh
