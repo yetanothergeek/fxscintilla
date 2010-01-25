@@ -84,6 +84,7 @@ libscintilla_la_SOURCES = \
     LexMPT.cxx \
     LexMSSQL.cxx \
     LexMagik.cxx \
+    LexMarkdown.cxx \
     LexMatlab.cxx \
     LexMetapost.cxx \
     LexMySQL.cxx \
