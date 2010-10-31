@@ -1,62 +1,25 @@
 Install FOX
 ===========
 
-This version of FXScintilla depends on the FOX GUI toolkit version 1.6.x:
+This version of FXScintilla depends on the FOX GUI toolkit version 1.6.x or newer:
 
   http://fox-toolkit.org
     
 If for some reason you need to use an older version of Fox, you will also need
 an earlier version of FXScintilla, this version requires at least Fox-1.6.0.
+The latest development version of Fox (1.7.x) is also supported.
 
-Newer versions of Fox (1.7 or later) are not currently supported.
-
-
-The instructions below assume you have FOX installed on your box.
-
-
-Tarballs
-========
-
-Two different FXScintilla tarballs are provided
-- one zipped, for Win32 systems:      line end = CRLF
-- one tar.gz, for Unix like systems:  line end = LF
-
-Please, be careful to build from the appropriate tarball with respect to
-your system. 
+The instructions below assume you have already installed FOX.
 
 
 Install FXScintilla for Win32 systems
 =====================================
 
 Supported build environments are:
-- Visual C++ 6.0 (see below)
 - Cygwin  (see Unix build instructions)
 - MinGW32 (see Unix build instructions)
+- Compilation with Visual C++ is no longer supported.
 
-To build using Visual C++ 6.0 everything you need is in the VC++ workspace:
-
-	fxscintilla/windows/vcpp/win32.dsw
-
-IMPORTANT:
-* Before building anything you have to adapt each project's
-  compilation and link settings with the correct FOX install path.
-* Depending on the FOX version you use, you may have to:
-  - add the following define to the compiler's settings:
-    HAVE_FOX_1_?=1 for Fox 1.?.x
-  - adapt the Fox lib name in the linker settings:
-    fox-1.?.lib (release) and foxd-1.?.lib (debug) for Fox 1.?.x
-(Substitute ? for the Fox minor version number)
-
-The library files are built into the lib directory:
-
-	fxscintilla/lib
-
-Include files are in:
-
-	fxscintilla/include
-
-
-I don't have any other Win32 compiler. Any contribution is welcome.
 
 
 Install FXScintilla for most UNIX systems (including Linux)
