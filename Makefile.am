@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = scintilla include fox tests .
+SUBDIRS = src include fox tests .
 
 pkgconfigdir = $(libdir)/pkgconfig
 

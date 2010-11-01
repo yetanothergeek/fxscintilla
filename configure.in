@@ -71,8 +71,7 @@ AC_SUBST(FOX_LIBS)
 
 dnl Generated makefiles
 AC_OUTPUT( \
-	scintilla/src/Makefile \
-	scintilla/Makefile \
+	src/Makefile \
 	include/Makefile \
 	fox/Makefile \
 	fox/version.h \
