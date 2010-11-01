@@ -9,10 +9,10 @@ EXTRA_DIST = \
 COPYRIGHTS \
 bootstrap.sh \
 m4 \
-scintilla/License.txt \
-scintilla/version.txt \
+License.txt \
+version.txt \
 scintilla/include/Scintilla.iface \
-scintilla/doc/ScintillaDoc.html \
+doc/ScintillaDoc.html \
 util/Platform.h.patch \
 util/cleanup.sh \
 util/sci-update.sh
