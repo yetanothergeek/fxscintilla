@@ -11,9 +11,6 @@ bootstrap.sh \
 m4 \
 scintilla/License.txt \
 scintilla/version.txt \
-scintilla/include/Face.py \
-scintilla/include/HFacer.py \
-scintilla/src/LexGen.py \
 scintilla/include/Scintilla.iface \
 scintilla/doc/ScintillaDoc.html \
 util/Platform.h.patch \
