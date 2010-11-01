@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/scintilla/include
+INCLUDES = -I$(top_srcdir)/include
 AM_CXXFLAGS = -W -Wall -DFOX
 
 ## Cygwin
