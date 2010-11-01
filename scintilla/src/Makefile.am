@@ -151,3 +151,36 @@ libscintillanolexer_la_SOURCES = \
 	XPM.cxx
 
 endif # NOLEXER
+
+
+noinst_HEADERS = \
+    AutoComplete.h \
+    CallTip.h \
+    CellBuffer.h \
+    CharClassify.h \
+    CharacterSet.h \
+    ContractionState.h \
+    Decoration.h \
+    Document.h \
+    DocumentAccessor.h \
+    Editor.h \
+    ExternalLexer.h \
+    Indicator.h \
+    KeyMap.h \
+    LineMarker.h \
+    Partitioning.h \
+    PerLine.h \
+    PositionCache.h \
+    RESearch.h \
+    RunStyles.h \
+    SVector.h \
+    ScintillaBase.h \
+    SplitVector.h \
+    Style.h \
+    StyleContext.h \
+    UniConversion.h \
+    ViewStyle.h \
+    XPM.h \
+    Selection.h \
+    PropSetSimple.h
+
