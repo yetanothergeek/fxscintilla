@@ -1,5 +1,5 @@
 INCLUDES = -I$(top_srcdir)/include $(FOX_CFLAGS)
-LDADD = $(top_builddir)/src/libfxscintilla.la $(FOX_LIBS) -L$(prefix)/lib
+LDADD = $(top_builddir)/fox/libfxscintilla.la $(FOX_LIBS) -L$(prefix)/lib
 
 
 AM_CXXFLAGS = $(PTHREAD_CFLAGS) -W -Wall -DFOX -DSCI_LEXER

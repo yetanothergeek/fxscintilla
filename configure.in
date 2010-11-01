@@ -1,4 +1,4 @@
-AC_INIT(src/ScintillaFOX.cxx)
+AC_INIT(fox/ScintillaFOX.cxx)
 dnl AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -74,8 +74,8 @@ AC_OUTPUT( \
 	scintilla/src/Makefile \
 	scintilla/Makefile \
 	include/Makefile \
-	src/Makefile \
-	src/version.h \
+	fox/Makefile \
+	fox/version.h \
 	tests/Makefile \
 	Makefile \
     fxscintilla.pc)
