@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src include fox tests .
+SUBDIRS = lexers src include fox tests .
 
 pkgconfigdir = $(libdir)/pkgconfig
 
