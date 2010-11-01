@@ -1,5 +1,4 @@
 pkginclude_HEADERS = \
-  Accessor.h \
   KeyWords.h \
   Platform.h \
   PropSet.h \

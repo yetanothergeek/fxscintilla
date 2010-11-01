@@ -72,6 +72,7 @@ AC_SUBST(FOX_LIBS)
 dnl Generated makefiles
 AC_OUTPUT( \
 	lexers/Makefile \
+	lexlib/Makefile \
 	src/Makefile \
 	include/Makefile \
 	fox/Makefile \

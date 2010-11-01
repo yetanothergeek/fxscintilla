@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/lexlib
 AM_CXXFLAGS = -W -Wall -DFOX
 
 ## Cygwin
@@ -17,7 +17,6 @@ noinst_LTLIBRARIES = libscintilla.la
 libscintilla_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
-	StyleContext.cxx \
 	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
@@ -46,8 +45,9 @@ libscintilla_la_SOURCES = \
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 
-libscintilla_la_LIBADD = $(top_builddir)/lexers/liblexers.la
-
+libscintilla_la_LIBADD = \
+  $(top_builddir)/lexers/liblexers.la \
+  $(top_builddir)/lexlib/liblexlib.la
 
 ## NoLexer enabled
 if NOLEXER
@@ -57,7 +57,6 @@ noinst_LTLIBRARIES += libscintillanolexer.la
 libscintillanolexer_la_SOURCES = \
 	DocumentAccessor.cxx \
 	WindowAccessor.cxx \
-	StyleContext.cxx \
 	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
@@ -83,7 +82,6 @@ noinst_HEADERS = \
     CallTip.h \
     CellBuffer.h \
     CharClassify.h \
-    CharacterSet.h \
     ContractionState.h \
     Decoration.h \
     Document.h \
@@ -102,10 +100,9 @@ noinst_HEADERS = \
     ScintillaBase.h \
     SplitVector.h \
     Style.h \
-    StyleContext.h \
     UniConversion.h \
     ViewStyle.h \
     XPM.h \
-    Selection.h \
-    PropSetSimple.h
+    Selection.h
+
 
