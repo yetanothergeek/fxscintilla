@@ -1,6 +1,5 @@
 INCLUDES = \
 	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/scintilla/include \
 	-I$(top_srcdir)/scintilla/src \
 	$(FOX_CFLAGS)
 

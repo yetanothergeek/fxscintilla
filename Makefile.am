@@ -11,7 +11,7 @@ bootstrap.sh \
 m4 \
 License.txt \
 version.txt \
-scintilla/include/Scintilla.iface \
+include/Scintilla.iface \
 doc/ScintillaDoc.html \
 util/Platform.h.patch \
 util/cleanup.sh \

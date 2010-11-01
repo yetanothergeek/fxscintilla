@@ -32,11 +32,3 @@ noinst_HEADERS = \
     src/Selection.h \
     src/PropSetSimple.h
 
-pkginclude_HEADERS = \
-    include/Accessor.h \
-    include/KeyWords.h \
-    include/Platform.h \
-    include/PropSet.h \
-    include/ScintillaWidget.h \
-    include/WindowAccessor.h
-
