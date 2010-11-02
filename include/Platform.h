@@ -56,13 +56,40 @@ namespace Scintilla {
 // Underlying the implementation of the platform classes are platform specific types.
 // Sometimes these need to be passed around by client code so they are defined here
 
+#if PLAT_FOX
+
+namespace FX {
+
+class FXFont;
+class FXDrawable;
+class FXWindow;
+class FXMenuPane;
+class FXList;
+class FXChore;
+# ifndef WIN32
+class FXTimer;
+# else
+struct FXTimer;
+# endif	// WIN32
+
+};
+using namespace FX;
+
+typedef FXFont * FontID;
+typedef void * SurfaceID;
+typedef FXWindow * WindowID;
+typedef FXMenuPane * MenuID;
+typedef FXTimer * TickerID;
+typedef FXChore * IdlerID;
+#else
 typedef void *FontID;
 typedef void *SurfaceID;
 typedef void *WindowID;
 typedef void *MenuID;
 typedef void *TickerID;
-typedef void *Function;
 typedef void *IdlerID;
+#endif
+typedef void *Function;
 
 /**
  * A geometric point class.
@@ -253,6 +280,8 @@ class Palette {
 #if PLAT_GTK
 	void *allocatedPalette; // GdkColor *
 	int allocatedLen;
+#elif PLAT_FOX
+	void * visual;
 #endif
 	// Private so Palette objects can not be copied
 	Palette(const Palette &) {}
@@ -402,6 +431,9 @@ public:
 	void SetPosition(PRectangle rc);
 	void SetPositionRelative(PRectangle rc, Window relativeTo);
 	PRectangle GetClientPosition();
+#if PLAT_FOX
+	virtual
+#endif
 	void Show(bool show=true);
 	void InvalidateAll();
 	void InvalidateRectangle(PRectangle rc);
@@ -421,7 +453,6 @@ private:
 /**
  * Listbox management.
  */
-
 class ListBox : public Window {
 public:
 	ListBox();
