@@ -15,15 +15,13 @@ endif # MinGW32
 noinst_LTLIBRARIES = libscintilla.la
 
 libscintilla_la_SOURCES = \
-	DocumentAccessor.cxx \
-	WindowAccessor.cxx \
 	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
+	Catalogue.cxx \
 	ScintillaBase.cxx \
 	ContractionState.cxx \
 	Editor.cxx \
-	PropSet.cxx \
 	KeyMap.cxx \
 	LineMarker.cxx \
 	CellBuffer.cxx \
@@ -38,7 +36,6 @@ libscintilla_la_SOURCES = \
 	RunStyles.cxx \
 	UniConversion.cxx \
 	ExternalLexer.cxx \
-	KeyWords.cxx \
 	PerLine.cxx \
 	Selection.cxx
 
@@ -55,15 +52,12 @@ if NOLEXER
 noinst_LTLIBRARIES += libscintillanolexer.la
 
 libscintillanolexer_la_SOURCES = \
-	DocumentAccessor.cxx \
-	WindowAccessor.cxx \
 	CharClassify.cxx \
 	Document.cxx \
 	CallTip.cxx \
 	ScintillaBase.cxx \
 	ContractionState.cxx \
 	Editor.cxx \
-	PropSet.cxx \
 	KeyMap.cxx \
 	LineMarker.cxx \
 	CellBuffer.cxx \
@@ -81,11 +75,11 @@ noinst_HEADERS = \
     AutoComplete.h \
     CallTip.h \
     CellBuffer.h \
+    Catalogue.h \
     CharClassify.h \
     ContractionState.h \
     Decoration.h \
     Document.h \
-    DocumentAccessor.h \
     Editor.h \
     ExternalLexer.h \
     Indicator.h \

@@ -89,6 +89,7 @@ liblexers_la_SOURCES = \
     LexTAL.cxx \
     LexTCL.cxx \
     LexTeX.cxx \
+    LexTxt2tags.cxx \
     LexVB.cxx \
     LexVHDL.cxx \
     LexVerilog.cxx \

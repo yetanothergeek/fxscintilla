@@ -15,11 +15,29 @@ endif # MinGW32
 noinst_LTLIBRARIES = liblexlib.la
 
 liblexlib_la_SOURCES = \
-  StyleContext.cxx
+  Accessor.cxx \
+  CharacterSet.cxx \
+  LexerBase.cxx \
+  LexerModule.cxx \
+  LexerNoExceptions.cxx \
+  LexerSimple.cxx \
+  PropSetSimple.cxx \
+  StyleContext.cxx \
+  WordList.cxx
 
 noinst_HEADERS = \
   Accessor.h \
   CharacterSet.h \
+  LexAccessor.h \
+  LexerBase.h \
+  LexerModule.h \
+  LexerNoExceptions.h \
+  LexerSimple.h \
+  OptionSet.h \
   PropSetSimple.h \
-  StyleContext.h
+  StyleContext.h \
+  WordList.h
+
+
+
 

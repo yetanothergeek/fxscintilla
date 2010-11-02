@@ -7,19 +7,22 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
-#include "Platform.h"
-
-#include "PropSet.h"
-#include "Accessor.h"
-#include "StyleContext.h"
-#include "KeyWords.h"
+#include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
+
+#include "PropSetSimple.h"
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
 #include "CharacterSet.h"
+#include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -52,13 +55,6 @@ inline bool IsOperator(int ch) {
 	        ch == '?' || ch == '!' || ch == '.' || ch == '~')
 		return true;
 	return false;
-}
-
-static inline int MakeLowerCase(int ch) {
-	if (ch < 'A' || ch > 'Z')
-		return ch;
-	else
-		return ch - 'A' + 'a';
 }
 
 static void GetTextSegment(Accessor &styler, unsigned int start, unsigned int end, char *s, size_t len) {
@@ -587,8 +583,6 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 	styler.StartAt(startPos, static_cast<char>(STYLE_MAX));
 	char prevWord[200];
 	prevWord[0] = '\0';
-	char nextWord[200];
-	nextWord[0] = '\0';
 	char phpStringDelimiter[200]; // PHP is not limited in length, we are
 	phpStringDelimiter[0] = '\0';
 	int StateToPrint = initStyle;
@@ -621,7 +615,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 	int lineCurrent = styler.GetLine(startPos);
 	int lineState;
 	if (lineCurrent > 0) {
-		lineState = styler.GetLineState(lineCurrent);
+		lineState = styler.GetLineState(lineCurrent-1);
 	} else {
 		// Default client and ASP scripting language is JavaScript
 		lineState = eScriptJS << 8;
@@ -644,6 +638,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 	if (inScriptType == eNonHtmlScript && state == SCE_H_COMMENT) {
 		scriptLanguage = eScriptComment;
 	}
+	script_type beforeLanguage = ScriptOfState(beforePreProc);
 
 	// property fold.html
 	//	Folding is turned on or off for HTML and XML files with this option.
@@ -683,7 +678,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 	const bool isMako = styler.GetPropertyInt("lexer.html.mako", 0) != 0;
 
 	// property lexer.html.django
-	//	Set to 1 to enable the django template language.  
+	//	Set to 1 to enable the django template language.
 	const bool isDjango = styler.GetPropertyInt("lexer.html.django", 0) != 0;
 
 	const CharacterSet setHTMLWord(CharacterSet::setAlphaNum, ".-_:!#", 0x80, true);
@@ -803,8 +798,6 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				visibleChars = 0;
 				levelPrev = levelCurrent;
 			}
-			lineCurrent++;
-			lineStartVisibleChars = 0;
 			styler.SetLineState(lineCurrent,
 			                    ((inScriptType & 0x03) << 0) |
 			                    ((tagOpened & 0x01) << 2) |
@@ -812,6 +805,8 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 			                    ((aspScript & 0x0F) << 4) |
 			                    ((clientScript & 0x0F) << 8) |
 			                    ((beforePreProc & 0xFF) << 12));
+			lineCurrent++;
+			lineStartVisibleChars = 0;
 		}
 
 		// Allow falling through to mako handling code if newline is going to end a block
@@ -875,6 +870,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 		else if ((state != SCE_H_ASPAT) &&
 		         !isPHPStringState(state) &&
 		         (state != SCE_HPHP_COMMENT) &&
+		         (state != SCE_HPHP_COMMENTLINE) &&
 		         (ch == '<') &&
 		         (chNext == '?') &&
 				 !IsScriptCommentState(state) ) {
@@ -950,7 +946,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 		}
 
 		// handle the start Django template code
-		else if (isDjango && scriptLanguage == eScriptNone && (ch == '{' && (chNext == '%' ||  chNext == '{'))) {
+		else if (isDjango && scriptLanguage != eScriptPython && (ch == '{' && (chNext == '%' ||  chNext == '{'))) {
 			if (chNext == '%')
 				strcpy(djangoBlockType, "%");
 			else
@@ -965,10 +961,9 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 			i += 1;
 			visibleChars += 1;
 			state = SCE_HP_START;
+			beforeLanguage = scriptLanguage;
 			scriptLanguage = eScriptPython;
 			styler.ColourTo(i, SCE_H_ASP);
-			if (foldHTMLPreprocessor && chNext == '%')
-				levelCurrent++;
 
 			ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
 			continue;
@@ -1074,8 +1069,8 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 		}
 
 		// handle the end of Django template code
-		else if (isDjango && 
-			     ((inScriptType == eNonHtmlPreProc) || (inScriptType == eNonHtmlScriptPreProc)) && 
+		else if (isDjango &&
+			     ((inScriptType == eNonHtmlPreProc) || (inScriptType == eNonHtmlScriptPreProc)) &&
 				 (scriptLanguage != eScriptNone) && stateAllowsTermination(state) &&
 				 isDjangoBlockEnd(ch, chNext, djangoBlockType)) {
 			if (state == SCE_H_ASPAT) {
@@ -1095,10 +1090,7 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				inScriptType = eNonHtmlScript;
 			else
 				inScriptType = eHtml;
-			if (foldHTMLPreprocessor) {
-				levelCurrent--;
-			}
-			scriptLanguage = eScriptNone;
+			scriptLanguage = beforeLanguage;
 			continue;
 		}
 
@@ -1636,7 +1628,9 @@ static void ColouriseHyperTextDoc(unsigned int startPos, int length, int initSty
 				i += 2;
 			} else if (isLineEnd(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
-				state = SCE_HJ_STRINGEOL;
+				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
+					state = SCE_HJ_STRINGEOL;
+				}
 			}
 			break;
 		case SCE_HJ_STRINGEOL:
