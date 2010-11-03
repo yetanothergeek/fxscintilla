@@ -18,32 +18,29 @@ fail ()
   exit 1
 }
 
-backup="scintilla.old"
+
+list_files () {
+  (
+    stat -c "%n" 'version.txt' 'License.txt' 'doc/ScintillaDoc.html'
+    find include lexlib lexers src -type f \( \
+      -name '*.h' \
+      -or -name '*.cxx' \
+    \) -not -name 'FXScintilla.h'
+  ) | sort
+}
+
+
+backup="../fxscintilla-backup-$(date +%Y-%m-%d).tar.gz"
 
 backup_old ()
 {
-  if [ -e include ] || [ -e scintilla ]
-  then
-    [ -d  "${backup}" ] && fail \
-      "Directory already exists:\n  ${backup}\n(You should remove it first.)"  
-    [ -e "${backup}" ] && fail \
-      "Will not overwrite existing file:\n  ${backup}\n(You should remove it first.)"
-
-    mkdir "${backup}"
-    if [ -e include ]
-    then
-      if [ -d include ] 
-      then
-        cp -a include "${backup}/."
-      else
-        mv include "${backup}/."
-        mkdir include
-      fi
-    fi
-
-    [ -e scintilla ] && mv scintilla "${backup}"
-
-  fi
+  [ -e "${backup}" ] && fail \
+    "Will not overwrite existing file:\n  ${backup}\n(You should remove it first.)"
+  [ -e "$PWD/tmp" ] && fail \
+    "Temporary directory $PWD/tmp already exists"
+  mkdir tmp
+  list_files > ./tmp/old.files
+  tar -zcf "${backup}" $(list_files)
 }
 
 
@@ -60,12 +57,12 @@ else
   fail "Working directory should be:\n ${dir%/*}/"
 fi
 
-
 [ $# -eq 1 ] || fail "Usage ${0##*/} <scintilla-archive>"
 
 [ -e "${1}" ] || fail "File not found: ${1}"
 
 [ -r "${1}" ] || fail "Access denied: ${1}"
+
 
 if [ -f "${1}" ]
 then 
@@ -75,109 +72,82 @@ then
     *)
     fail "Filename should match pattern: 'scintilla?*.tgz'\nGot: '${1##*/}'"
   esac
-
   tar -ztf "${1}" &> /dev/null || fail "Invalid or corrupted archive:\n ${1}"
-
   scidir="$(tar -ztf "${1}" | while read entry; do echo "${entry%%/*}"; done | sort | uniq)"
-
   [ "${scidir}" = "scintilla" ] || fail "Archive has an unexpected directory structure."
-
   backup_old
-
-  tar -zxf "${1}"
-
+  tar -C ./tmp -zxf "${1}"
 else 
   [ -d "${1}" ] || fail "Source object is not a file or a directory:\n ${1}"
   [ -x "${1}" ] || fail "Search permission denied for directory:\n ${1}"
   [ "${1##*/}" = "scintilla" ] || fail "Source directory must be named 'scintilla'"
   backup_old
-  cp -ai "$1" "."
-  
+  cp -ai "$1" "./tmp/"
 fi
 
-mv scintilla/include/Scintilla.h include
-mv scintilla/include/SciLexer.h include
+(
+  cd './tmp/scintilla/include'
+  patch --quiet -p0 < ../../../util/Platform.h.patch
+)
 
+(
+  cd './tmp/scintilla'
+  list_files > '../new.files'
+)
 
-for dir in "scintilla" "scintilla/src"
+for somefile in $(cat ./tmp/old.files)
 do
-  if [ -f "${backup}/${dir}/Makefile.am" ]
+  if ! [ -e "./tmp/scintilla/${somefile}" ]
   then
-    if [ -e "./${dir}/Makefile.am" ]
+    rm ${somefile}
+  fi
+done > './tmp/removed.files'
+
+
+for somefile in $(cat ./tmp/new.files)
+do
+  if ! [ -e "${somefile}" ]
+  then
+    cp "./tmp/scintilla/${somefile}" "${somefile}"
+    echo ${somefile}
+  fi
+done > './tmp/added.files'
+
+
+for somefile in $(cat ./tmp/new.files)
+do
+  if [ -e "${somefile}" ]
+  then
+    if ! diff -q "${somefile}" "./tmp/scintilla/${somefile}" > /dev/null
     then
-      echo "Warning: Not updating existing file: ./${dir}/Makefile.am" >&2
-    else
-      cp "${backup}/${dir}/Makefile.am" "./${dir}/Makefile.am"
+      cp -a "./tmp/scintilla/${somefile}" "${somefile}"
+      echo ${somefile}
     fi
+  fi
+done > './tmp/changed.files'
+
+rm -rf './tmp/scintilla' './tmp/new.files' './tmp/old.files'
+
+for filelist in 'added' 'changed' 'removed'
+do
+  count=$(cat ./tmp/${filelist}.files | wc -l)
+  if [ ${count}  -eq 0 ]
+  then
+    rm "./tmp/${filelist}.files"
   else
-    echo "Warning: file not found: ${backup}/${dir}/Makefile.am" >&2
+    echo "${count} files have been ${filelist}.  See: tmp/${filelist}.files"
   fi
 done
 
-rm -f "scintilla/src/SciTE.properties"
-mkdir "scintilla/doctmp/"
-mv "scintilla/doc/ScintillaDoc.html" "scintilla/doctmp/."
 
-( cd scintilla; rm -rf *.bat macosx tgzsrc vcbuild win32 bin doc gtk cocoa test )
-mv "scintilla/doctmp" "scintilla/doc"
-( cd scintilla/include; patch -p0 < ../../util/Platform.h.patch )
-
-
-(
-  cd 'scintilla'
-  find -type d -name 'CVS' | while read dir
-  do
-    rm -rf "${dir}"
-  done
-  find -type f -name '.cvs*' | while read file
-  do
-    rm -f "${file}"
-  done
-)
-
-(
-  cd 'scintilla.old/scintilla'
-  find -type d -name 'CVS' | while read dir
-  do
-    dest="../../scintilla/${dir}"
-    [ -e "${dest}" ] && continue
-    cp -ai "${dir}" "${dest}" || true
-  done
-)
-
-if [ -f "scintilla/version.txt" ]
+if [ $(find tmp -mindepth 1 | wc -l) -eq 0 ]
 then
-  version=$(head -n 1 "scintilla/version.txt")
-  case "${version}"
-  in 
-    [0-9][0-9][0-9])
-      major_version="${version:0:1}"
-      minor_version="${version:1:2}"
-    ;;
-    *)
-      major_version=""
-      minor_version=""
-    ;;
-  esac
-  case "${minor_version}"
-  in
-    0*)
-      minor_version="${minor_version:1}"
-    ;;
-  esac
-  if [ "${major_version}" ] && [ "${minor_version}" ]
-  then
-    sed -i "s/^MAJOR_VERSION=.*/MAJOR_VERSION=${major_version}/" configure.in
-    sed -i "s/^MINOR_VERSION=.*/MINOR_VERSION=${minor_version}/" configure.in
-    sed -i "s/^PATCH_LEVEL=.*/PATCH_LEVEL=0/" configure.in
-    grep "^MAJOR_VERSION=" configure.in
-    grep "^MINOR_VERSION=" configure.in
-    grep "^PATCH_LEVEL=" configure.in
-  else
-    echo "Warning: could not parse scintilla/version.txt" >&2
-  fi
+  echo "Looks like nothing has changed."
+  rmdir tmp
+  rm -f "${backup}"
 else
-  echo "Warning: could not find scintilla/version.txt" >&2
+  echo "Some things have changed."
+  echo "For details, see: ${PWD}/tmp"
+  echo "Original files saved to $(readlink -f ${backup})"
 fi
-
 
