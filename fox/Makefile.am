@@ -26,7 +26,7 @@ libfxscintilla_la_SOURCES = \
 libfxscintilla_la_LIBADD = \
   $(top_builddir)/src/libscintilla.la
 
-libfxscintilla_la_LDFLAGS = -version-info
+libfxscintilla_la_LDFLAGS = -version-info \
   $(LT_FXSCINTILLA_CURRENT):$(LT_FXSCINTILLA_REVISION):$(LT_FXSCINTILLA_AGE)
 
 libfxscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
