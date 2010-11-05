@@ -6,9 +6,9 @@ AC_CONFIG_MACRO_DIR([m4])
 dnl Check Cygwin and MinGW32
 AC_CANONICAL_HOST
 case $host_os in
-	*cygwin* )  HAVE_CYGWIN=yes;;
-	*mingw32* ) HAVE_MINGW32=yes;;
-	* ) ;;
+  *cygwin* )  HAVE_CYGWIN=yes;;
+  *mingw32* ) HAVE_MINGW32=yes;;
+  * ) ;;
 esac
 
 AM_CONDITIONAL(HAVE_CYGWIN, test x"$HAVE_CYGWIN" = xyes)
@@ -71,12 +71,12 @@ AC_SUBST(FOX_LIBS)
 
 dnl Generated makefiles
 AC_OUTPUT( \
-	lexers/Makefile \
-	lexlib/Makefile \
-	src/Makefile \
-	include/Makefile \
-	fox/Makefile \
-	fox/version.h \
-	tests/Makefile \
-	Makefile \
-    fxscintilla.pc)
+  lexers/Makefile \
+  lexlib/Makefile \
+  src/Makefile \
+  include/Makefile \
+  fox/Makefile \
+  fox/version.h \
+  tests/Makefile \
+  Makefile \
+  fxscintilla.pc)
