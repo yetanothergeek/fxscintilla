@@ -16,7 +16,7 @@ else
 fi
 
 
-rm -f configure tests/test src/version.h fxscintilla-*.tar.gz
+rm -f configure tests/test fox/version.h fxscintilla-*.tar.gz
 
 find  -name 'Makefile' \
   -or -name 'Makefile.in' \
