@@ -21,7 +21,7 @@ fail ()
 
 list_files () {
   (
-    stat -c "%n" 'version.txt' 'License.txt' 'doc/ScintillaDoc.html'
+    stat -c "%n" 'version.txt' 'License.txt' 'doc/ScintillaDoc.html' 'include/Scintilla.iface'
     find include lexlib lexers src -type f \( \
       -name '*.h' \
       -or -name '*.cxx' \
