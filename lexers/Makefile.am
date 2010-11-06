@@ -15,6 +15,7 @@ endif # MinGW32
 noinst_LTLIBRARIES = liblexers.la
 
 liblexers_la_SOURCES = \
+  LexA68k.cxx \
   LexAPDL.cxx \
   LexASY.cxx \
   LexAU3.cxx \
