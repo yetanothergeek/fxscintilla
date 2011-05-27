@@ -60,6 +60,7 @@ liblexers_la_SOURCES = \
   LexMarkdown.cxx \
   LexMatlab.cxx \
   LexMetapost.cxx \
+  LexModula.cxx \
   LexMySQL.cxx \
   LexNimrod.cxx \
   LexNsis.cxx \

@@ -35,6 +35,7 @@ noinst_HEADERS = \
   LexerSimple.h \
   OptionSet.h \
   PropSetSimple.h \
+  SparseState.h \
   StyleContext.h \
   WordList.h
 
