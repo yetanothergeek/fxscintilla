@@ -26,7 +26,7 @@ AC_PROG_CXX
 dnl Versioning
 dnl - FXScintilla versioning scheme
 MAJOR_VERSION=2
-MINOR_VERSION=26
+MINOR_VERSION=28
 PATCH_LEVEL=0
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
@@ -41,9 +41,9 @@ dnl   . if any interface has been added, removed or changed, increment
 dnl     current and set revision to 0
 dnl   . if backward compatibility has been preserved, then increment age
 dnl   . if backward compatibility has been broken, then set age to 0
-LT_FXSCINTILLA_CURRENT=22
-LT_FXSCINTILLA_REVISION=1
-LT_FXSCINTILLA_AGE=1
+LT_FXSCINTILLA_CURRENT=23
+LT_FXSCINTILLA_REVISION=0
+LT_FXSCINTILLA_AGE=3
 AC_SUBST(LT_FXSCINTILLA_CURRENT)
 AC_SUBST(LT_FXSCINTILLA_REVISION)
 AC_SUBST(LT_FXSCINTILLA_AGE)
