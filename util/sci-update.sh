@@ -85,9 +85,12 @@ else
   cp -ai "$1" "./tmp/"
 fi
 
+
+[ "$ALLOW_PATCH_FAIL" ] || ALLOW_PATCH_FAIL=false
+
 (
   cd './tmp/scintilla/include'
-  patch --quiet -p0 < ../../../util/Platform.h.patch
+  patch --quiet -p0 < ../../../util/Platform.h.patch || $ALLOW_PATCH_FAIL
 )
 
 (
