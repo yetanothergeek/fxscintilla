@@ -1,6 +1,6 @@
---- Platform.h.orig	2009-06-10 18:10:05.000000000 -0500
-+++ Platform.h	2009-08-13 01:44:33.000000000 -0500
-@@ -56,13 +56,40 @@
+--- Platform.h.orig	2011-11-02 08:42:45.000000000 -0500
++++ Platform.h	2011-11-02 09:31:28.000000000 -0500
+@@ -66,13 +66,40 @@
  // Underlying the implementation of the platform classes are platform specific types.
  // Sometimes these need to be passed around by client code so they are defined here
  
@@ -42,16 +42,7 @@
  
  /**
   * A geometric point class.
-@@ -253,6 +280,8 @@
- #if PLAT_GTK
- 	void *allocatedPalette; // GdkColor *
- 	int allocatedLen;
-+#elif PLAT_FOX
-+	void * visual;
- #endif
- 	// Private so Palette objects can not be copied
- 	Palette(const Palette &) {}
-@@ -402,6 +431,9 @@
+@@ -359,6 +386,9 @@
  	void SetPosition(PRectangle rc);
  	void SetPositionRelative(PRectangle rc, Window relativeTo);
  	PRectangle GetClientPosition();
@@ -61,7 +52,7 @@
  	void Show(bool show=true);
  	void InvalidateAll();
  	void InvalidateRectangle(PRectangle rc);
-@@ -421,7 +453,6 @@
+@@ -378,7 +408,6 @@
  /**
   * Listbox management.
   */
