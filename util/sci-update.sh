@@ -86,7 +86,7 @@ else
 fi
 
 
-[ "$ALLOW_PATCH_FAIL" ] || ALLOW_PATCH_FAIL=false
+ALLOW_PATCH_FAIL=${ALLOW_PATCH_FAIL-false}
 
 (
   cd './tmp/scintilla/include'
