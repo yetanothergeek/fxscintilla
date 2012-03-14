@@ -20,6 +20,7 @@ liblexers_la_SOURCES = \
   LexASY.cxx \
   LexAU3.cxx \
   LexAVE.cxx \
+  LexAVS.cxx \
   LexAbaqus.cxx \
   LexAda.cxx \
   LexAsm.cxx \
@@ -34,10 +35,12 @@ liblexers_la_SOURCES = \
   LexCSS.cxx \
   LexCaml.cxx \
   LexCmake.cxx \
+  LexCoffeeScript.cxx \
   LexConf.cxx \
   LexCrontab.cxx \
   LexCsound.cxx \
   LexD.cxx \
+  LexECL.cxx \
   LexEScript.cxx \
   LexEiffel.cxx \
   LexErlang.cxx \
@@ -90,10 +93,12 @@ liblexers_la_SOURCES = \
   LexTADS3.cxx \
   LexTAL.cxx \
   LexTCL.cxx \
+  LexTCMD.cxx \
   LexTeX.cxx \
   LexTxt2tags.cxx \
   LexVB.cxx \
   LexVHDL.cxx \
   LexVerilog.cxx \
   LexYAML.cxx
+
 
