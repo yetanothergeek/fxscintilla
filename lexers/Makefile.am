@@ -67,6 +67,7 @@ liblexers_la_SOURCES = \
   LexMySQL.cxx \
   LexNimrod.cxx \
   LexNsis.cxx \
+  LexOScript.cxx \
   LexOpal.cxx \
   LexOthers.cxx \
   LexPB.cxx \
@@ -99,6 +100,7 @@ liblexers_la_SOURCES = \
   LexVB.cxx \
   LexVHDL.cxx \
   LexVerilog.cxx \
+  LexVisualProlog.cxx \
   LexYAML.cxx
 
 
