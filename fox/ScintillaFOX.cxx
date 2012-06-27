@@ -454,7 +454,7 @@ void ScintillaFOX::Copy()
   if (_fxsc.hasSelection()) {
     FXDragType dt[2] = { 
       FXWindow::stringType,
-      sel.selType==Selection::selRectangle ? cfColumnSelect() : 0
+      sel.selType==Selection::selRectangle ? cfColumnSelect() : (FXDragType)0
     };
     if (_fxsc.acquireClipboard(dt, dt[1]?2:1)) {
       CopySelectionRange(&copyText);
