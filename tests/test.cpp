@@ -25,21 +25,21 @@ static const char cppKeyWords[] =
 
 class Test: public FXMainWindow
 {
-	FXDECLARE(Test)
+  FXDECLARE(Test)
 protected:
-	FXScintilla * scint;
-	Test() {}
+  FXScintilla * scint;
+  Test() {}
 public:
-	enum {
-		ID_SCINTILLA = FXMainWindow::ID_LAST,
-		ID_FONT,
-		ID_LAST
-	};
+  enum {
+    ID_SCINTILLA = FXMainWindow::ID_LAST,
+    ID_FONT,
+    ID_LAST
+  };
   Test(FXApp *app);
-	long onCmdScintilla(FXObject *obj, FXSelector sel, void *ptr);
-	virtual void create();
-	void setFont(const FXString &font, int size);
-	long onCmdFont(FXObject *obj, FXSelector sel, void *ptr);
+  long onCmdScintilla(FXObject *obj, FXSelector sel, void *ptr);
+  virtual void create();
+  void setFont(const FXString &font, int size);
+  long onCmdFont(FXObject *obj, FXSelector sel, void *ptr);
 };
 
 
@@ -136,12 +136,13 @@ FXIMPLEMENT(Test,FXMainWindow,TestMap,ARRAYNUMBER(TestMap))
 
 int main(int argc, char *argv[])
 {
-	FXApp application(FXString("test"));
-	application.init(argc, argv);
-	Test * win = new Test(&application);
-	application.create();
+  FXApp application(FXString("test"));
+  application.init(argc, argv);
+  Test * win = new Test(&application);
+  application.create();
   win->setTitle(FXString("FXScintilla-")+FXScintilla::version());
-	win->show(PLACEMENT_SCREEN);
-	application.run();
-	return 0;
+  win->show(PLACEMENT_SCREEN);
+  application.run();
+  return 0;
 }
+
