@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/include $(FOX_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/include $(FOX_CFLAGS)
 LDADD = $(top_builddir)/fox/libfxscintilla.la $(FOX_LIBS) -L$(prefix)/lib
 
 
