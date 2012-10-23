@@ -72,6 +72,7 @@ liblexers_la_SOURCES = \
   LexOthers.cxx \
   LexPB.cxx \
   LexPLM.cxx \
+  LexPO.cxx \
   LexPOV.cxx \
   LexPS.cxx \
   LexPascal.cxx \
