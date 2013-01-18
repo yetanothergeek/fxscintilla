@@ -1,4 +1,4 @@
-AC_INIT(fox/ScintillaFOX.cxx)
+AC_INIT([fxscintilla],3.2.3,[yetanothergeek@gmail.com])
 dnl AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -31,7 +31,7 @@ PATCH_LEVEL=3
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
-AM_INIT_AUTOMAKE(fxscintilla, "$MAJOR_VERSION.$MINOR_VERSION.$PATCH_LEVEL")
+AM_INIT_AUTOMAKE([-Wall])
 
 dnl - Libtool versioning scheme
 dnl   current:revision:age
