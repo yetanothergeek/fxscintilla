@@ -11,6 +11,7 @@ else
 fi
 
 for CMD in \
+ 'mkdir -p m4' \
  'aclocal --force' \
  'libtoolize --force --copy' \
  'automake --foreign --add-missing --copy' \
