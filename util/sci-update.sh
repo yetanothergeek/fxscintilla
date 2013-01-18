@@ -144,9 +144,10 @@ done
 
 (sed 's/\(.\)/\1 /g' version.txt || true) | while read A B C
 do
-  sed -i 's/^MAJOR_VERSION=.*/MAJOR_VERSION='$A'/' configure.in || true
-  sed -i 's/^MINOR_VERSION=.*/MINOR_VERSION='$B'/' configure.in || true
-  sed -i 's/^PATCH_LEVEL=.*/PATCH_LEVEL='$C'/'   configure.in || true
+  sed -i 's/^MAJOR_VERSION=.*/MAJOR_VERSION='$A'/' configure.ac || true
+  sed -i 's/^MINOR_VERSION=.*/MINOR_VERSION='$B'/' configure.ac || true
+  sed -i 's/^PATCH_LEVEL=.*/PATCH_LEVEL='$C'/'   configure.ac || true
+  sed -i 's/^AC_INIT.*$/AC_INIT([fxscintilla],'$A.$B.$C',[yetanothergeek@gmail.com])/' configure.ac || true
   break
 done
 
