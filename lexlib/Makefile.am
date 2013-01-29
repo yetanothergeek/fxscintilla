@@ -37,6 +37,7 @@ noinst_HEADERS = \
   PropSetSimple.h \
   SparseState.h \
   StyleContext.h \
+  SubStyles.h \
   WordList.h
 
 

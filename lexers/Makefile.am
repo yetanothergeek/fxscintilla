@@ -53,6 +53,7 @@ liblexers_la_SOURCES = \
   LexHaskell.cxx \
   LexInno.cxx \
   LexKix.cxx \
+  LexLaTeX.cxx \
   LexLisp.cxx \
   LexLout.cxx \
   LexLua.cxx \
