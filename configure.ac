@@ -1,4 +1,4 @@
-AC_INIT([fxscintilla],3.2.4,[yetanothergeek@gmail.com])
+AC_INIT([fxscintilla],3.2.5,[yetanothergeek@gmail.com])
 dnl AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -27,7 +27,7 @@ dnl Versioning
 dnl - FXScintilla versioning scheme
 MAJOR_VERSION=3
 MINOR_VERSION=2
-PATCH_LEVEL=4
+PATCH_LEVEL=5
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
 AC_SUBST(PATCH_LEVEL)
