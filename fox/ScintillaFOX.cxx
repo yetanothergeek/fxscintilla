@@ -195,12 +195,15 @@ ScintillaFOX::~ScintillaFOX()
 }
 
 int ScintillaFOX::TargetAsUTF8(char *text) {
+  (void)text;
   // TODO
   // Fail
   return 0;
 }
 
 int ScintillaFOX::EncodedFromUTF8(char *utf8, char *encoded) {
+  (void)utf8;
+  (void)encoded;
   // TODO
   // Fail
   return 0;
