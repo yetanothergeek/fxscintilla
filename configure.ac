@@ -62,9 +62,61 @@ AC_ARG_ENABLE(nolexer, [  --enable-nolexer        enable libfxscintillanolexer [
 AC_MSG_RESULT([$enable_nolexer])
 AM_CONDITIONAL(NOLEXER, test x"$enable_nolexer" = xyes)
 
-dnl Check FOX library
-PKG_CHECK_MODULES([FOX], [fox >= 1.7], [AC_DEFINE(FOX_1_7)], [AC_DEFINE(FOX_1_6)])
-PKG_CHECK_MODULES([FOX], [fox >= 1.6])
+dnl #Let pkgconfig handle FOX flags unless they are set in the environment
+if test "x${FOX_LIBS}${FOX_CFLAGS}" = "x"
+then
+  PKG_PROG_PKG_CONFIG()
+  FOX_PKG_NAME=fox
+  for L in fox18 fox17 fox
+  do
+    AC_MSG_CHECKING([for $L.pc])
+    if ${PKG_CONFIG} --exists ${L}
+    then
+      AC_MSG_RESULT([yes])
+      FOX_PKG_NAME=${L}
+      break
+    else
+      AC_MSG_RESULT([no])
+    fi
+  done
+  PKG_CHECK_MODULES([FOX], [${FOX_PKG_NAME} >= 1.7],
+    [
+      AC_MSG_RESULT([Found FOX-1.7 or newer])
+      AC_DEFINE(FOX_1_7)
+    ],
+    [
+      AC_MSG_RESULT([Could not find FOX-1.7 or newer])
+      PKG_CHECK_MODULES([FOX], [fox >= 1.6],
+        AC_MSG_RESULT([Found FOX-1.6.x])
+        AC_DEFINE(FOX_1_6))
+    ]
+  )
+else
+  if test "x${FOX_LIBS}" = "x"
+  then
+    AC_MSG_ERROR([If you set FOX_CFLAGS, you must also set FOX_LIBS])
+  fi
+  if test "x${FOX_CFLAGS}" = "x"
+  then
+    AC_MSG_ERROR([If you set FOX_LIBS, you must also set FOX_CFLAGS])
+  fi
+  AC_MSG_CHECKING([for FOX version in FOX_LIBS])
+  case "${FOX_LIBS}" in
+    *FOX-1.6*)
+      AC_MSG_RESULT([looks like version 1.6])
+      AC_DEFINE(FOX_1_6)
+    ;;
+    *FOX-1.7*|*FOX-1.8*)
+      AC_MSG_RESULT([looks like version 1.7 or newer])
+      AC_DEFINE(FOX_1_7)
+    ;;
+    *)
+      AC_MSG_RESULT([FAILED])
+      AC_MSG_WARN([could not find FOX version, assuming 1.6])
+      AC_DEFINE(FOX_1_6)
+    ;;
+  esac
+fi
 AC_SUBST(FOX_CFLAGS)
 AC_SUBST(FOX_LIBS)
 
