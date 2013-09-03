@@ -37,7 +37,9 @@ libscintilla_la_SOURCES = \
   UniConversion.cxx \
   ExternalLexer.cxx \
   PerLine.cxx \
-  Selection.cxx
+  Selection.cxx \
+  CaseConvert.cxx \
+  CaseFolder.cxx
 
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
@@ -90,13 +92,15 @@ noinst_HEADERS = \
   PositionCache.h \
   RESearch.h \
   RunStyles.h \
-  SVector.h \
   ScintillaBase.h \
   SplitVector.h \
   Style.h \
   UniConversion.h \
   ViewStyle.h \
   XPM.h \
-  Selection.h
+  Selection.h \
+  CaseConvert.h \
+  CaseFolder.h \
+  UnicodeFromUTF8.h
 
 

@@ -16,6 +16,7 @@ noinst_LTLIBRARIES = liblexlib.la
 
 liblexlib_la_SOURCES = \
   Accessor.cxx \
+  CharacterCategory.cxx \
   CharacterSet.cxx \
   LexerBase.cxx \
   LexerModule.cxx \
@@ -27,6 +28,7 @@ liblexlib_la_SOURCES = \
 
 noinst_HEADERS = \
   Accessor.h \
+  CharacterCategory.h \
   CharacterSet.h \
   LexAccessor.h \
   LexerBase.h \

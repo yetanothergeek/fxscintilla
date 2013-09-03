@@ -52,6 +52,7 @@ liblexers_la_SOURCES = \
   LexHTML.cxx \
   LexHaskell.cxx \
   LexInno.cxx \
+  LexKVIrc.cxx \
   LexKix.cxx \
   LexLaTeX.cxx \
   LexLisp.cxx \
@@ -87,6 +88,7 @@ liblexers_la_SOURCES = \
   LexRuby.cxx \
   LexSML.cxx \
   LexSQL.cxx \
+  LexSTTXT.cxx \
   LexScriptol.cxx \
   LexSmalltalk.cxx \
   LexSorcus.cxx \
