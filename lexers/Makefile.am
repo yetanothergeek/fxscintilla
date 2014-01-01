@@ -40,6 +40,7 @@ liblexers_la_SOURCES = \
   LexCrontab.cxx \
   LexCsound.cxx \
   LexD.cxx \
+  LexDMAP.cxx \
   LexECL.cxx \
   LexEScript.cxx \
   LexEiffel.cxx \
@@ -86,6 +87,7 @@ liblexers_la_SOURCES = \
   LexR.cxx \
   LexRebol.cxx \
   LexRuby.cxx \
+  LexRust.cxx \
   LexSML.cxx \
   LexSQL.cxx \
   LexSTTXT.cxx \
