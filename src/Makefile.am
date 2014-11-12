@@ -39,8 +39,10 @@ libscintilla_la_SOURCES = \
   PerLine.cxx \
   Selection.cxx \
   CaseConvert.cxx \
-  CaseFolder.cxx
-
+  CaseFolder.cxx \
+  EditModel.cxx \
+  EditView.cxx \
+  MarginView.cxx
 
 libscintilla_la_CXXFLAGS = $(AM_CXXFLAGS) -DSCI_LEXER
 
@@ -101,6 +103,8 @@ noinst_HEADERS = \
   Selection.h \
   CaseConvert.h \
   CaseFolder.h \
-  UnicodeFromUTF8.h
-
+  UnicodeFromUTF8.h \
+  EditModel.h \
+  EditView.h \
+  MarginView.h
 

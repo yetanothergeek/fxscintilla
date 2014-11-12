@@ -28,6 +28,7 @@ liblexers_la_SOURCES = \
   LexBaan.cxx \
   LexBash.cxx \
   LexBasic.cxx \
+  LexBibTeX.cxx \
   LexBullant.cxx \
   LexCLW.cxx \
   LexCOBOL.cxx \
@@ -41,6 +42,7 @@ liblexers_la_SOURCES = \
   LexCsound.cxx \
   LexD.cxx \
   LexDMAP.cxx \
+  LexDMIS.cxx \
   LexECL.cxx \
   LexEScript.cxx \
   LexEiffel.cxx \
@@ -86,6 +88,7 @@ liblexers_la_SOURCES = \
   LexPython.cxx \
   LexR.cxx \
   LexRebol.cxx \
+  LexRegistry.cxx \
   LexRuby.cxx \
   LexRust.cxx \
   LexSML.cxx \
