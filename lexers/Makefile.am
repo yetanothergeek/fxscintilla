@@ -54,6 +54,7 @@ liblexers_la_SOURCES = \
   LexGui4Cli.cxx \
   LexHTML.cxx \
   LexHaskell.cxx \
+  LexHex.cxx \
   LexInno.cxx \
   LexKVIrc.cxx \
   LexKix.cxx \
